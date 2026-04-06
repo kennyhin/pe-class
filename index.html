@@ -699,6 +699,194 @@ footer {
 
 /* UTILITY */
 .red { color: var(--red); }
+
+/* =============================================
+   MOBILE NAV HAMBURGER
+   ============================================= */
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 4px;
+  background: none;
+  border: none;
+}
+.nav-hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--black);
+  transition: all 0.25s ease;
+}
+.nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.nav-mobile-menu {
+  display: none;
+  position: fixed;
+  top: 60px;
+  left: 0; right: 0;
+  background: var(--white);
+  border-bottom: 2px solid var(--black);
+  z-index: 140;
+  flex-direction: column;
+}
+.nav-mobile-menu.open { display: flex; }
+.nav-mobile-menu a {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--black);
+  text-decoration: none;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--gray-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav-mobile-menu a::after {
+  content: '→';
+  color: var(--red);
+  font-size: 0.9rem;
+}
+
+/* =============================================
+   TABLET  ≤ 900px
+   ============================================= */
+@media (max-width: 900px) {
+  /* NAV */
+  .nav-links, .nav-badge { display: none; }
+  .nav-hamburger { display: flex; }
+
+  /* HERO */
+  .hero {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  .hero-left {
+    border-right: none;
+    border-bottom: 2px solid var(--black);
+    padding: 3rem 2rem;
+    gap: 1.5rem;
+  }
+  .hero-right {
+    padding: 2.5rem 2rem;
+    min-height: 340px;
+  }
+  .hero-title { font-size: clamp(52px, 12vw, 90px); }
+
+  /* SECTION HEADERS */
+  .section-title-block {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.5rem 1.5rem;
+    gap: 0.75rem;
+  }
+  .section-desc { text-align: left; max-width: 100%; }
+  .section-num { font-size: 3.5rem; padding: 1rem 1.5rem; }
+
+  /* PHILOSOPHY */
+  .phil-wrap { grid-template-columns: 1fr; }
+  .phil-col:first-child { border-right: none; border-bottom: 1px solid var(--gray-light); }
+  .phil-col { padding: 2.5rem 2rem; }
+
+  /* SKILLS */
+  .skills-wrap { padding: 1.5rem; }
+  .skills-grid { grid-template-columns: 1fr 1fr; }
+
+  /* BALANCE */
+  .balance-wrap {
+    grid-template-columns: 1fr;
+    margin: 1.5rem;
+  }
+  .balance-card { border-left: none !important; border-top: 1px solid var(--gray-light); }
+
+  /* ABOUT */
+  .about-wrap { grid-template-columns: 1fr; }
+  .about-col:first-child { border-right: none; border-bottom: 1px solid var(--gray-light); }
+  .about-col { padding: 2.5rem 2rem; }
+
+  /* FOOTER */
+  footer {
+    grid-template-columns: 1fr 1fr;
+    padding: 2.5rem 2rem;
+    gap: 2rem;
+  }
+  .footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+/* =============================================
+   MOBILE  ≤ 600px
+   ============================================= */
+@media (max-width: 600px) {
+  /* CURSOR OFF on touch */
+  body { cursor: auto; }
+  #cursor { display: none; }
+
+  /* NAV */
+  nav { padding: 0 1.25rem; }
+
+  /* HERO */
+  .hero-left { padding: 2.5rem 1.25rem; gap: 1.25rem; }
+  .hero-title { font-size: clamp(44px, 13vw, 72px); }
+  .hero-subtitle { font-size: 0.93rem; }
+  .hero-stats { grid-template-columns: repeat(3, 1fr); gap: 0; }
+  .stat + .stat { padding-left: 0.75rem; }
+  .stat-num { font-size: 2.2rem; }
+  .stat-lbl { font-size: 0.58rem; }
+
+  .hero-right { padding: 2rem 1.25rem; min-height: 280px; }
+  .hero-school-name { font-size: 2.8rem; }
+  .hero-quote { font-size: 0.82rem; margin-bottom: 1.25rem; }
+
+  /* SECTION HEADERS */
+  .section-header { grid-template-columns: 60px 1fr; }
+  .section-num { font-size: 2.5rem; padding: 0.75rem 1rem; }
+  .section-title-block { padding: 1.25rem; }
+  .section-ttl { font-size: clamp(1.8rem, 8vw, 2.6rem); }
+
+  /* PHILOSOPHY */
+  .phil-col { padding: 1.75rem 1.25rem; }
+  .phil-headline { font-size: clamp(1.5rem, 6vw, 2rem); margin-bottom: 1rem; }
+  .phil-body { font-size: 0.88rem; }
+  .pillars { grid-template-columns: 1fr 1fr; }
+  .pillar { padding: 1rem; }
+
+  /* SKILLS — single column on small phones */
+  .skills-wrap { padding: 1rem; }
+  .skills-grid { grid-template-columns: 1fr; }
+  .skill-card { padding: 1.5rem 1.25rem; }
+  .skill-name { font-size: 1.7rem; }
+
+  /* BALANCE */
+  .balance-wrap { margin: 1rem; }
+  .balance-card { padding: 1.75rem 1.25rem; }
+  .balance-type { font-size: 2.2rem; }
+  .stage-row { grid-template-columns: 70px 1fr; }
+
+  /* ABOUT */
+  .about-col { padding: 1.75rem 1.25rem; }
+  .contact-grid { grid-template-columns: 1fr; }
+  .contact-cell { padding: 1rem 1.25rem; }
+
+  /* FOOTER */
+  footer {
+    grid-template-columns: 1fr;
+    padding: 2rem 1.25rem;
+    gap: 1.5rem;
+  }
+  .footer-brand { font-size: 2.2rem; }
+  .footer-bottom { flex-direction: column; gap: 0.4rem; }
+  .footer-legal { font-size: 0.6rem; }
+}
 </style>
 </head>
 <body>
@@ -717,7 +905,19 @@ footer {
     <li><a href="#about">About</a></li>
   </ul>
   <div class="nav-badge">Go Bulls!</div>
+  <button class="nav-hamburger" id="hamburger" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<!-- MOBILE MENU -->
+<div class="nav-mobile-menu" id="mobileMenu">
+  <a href="#philosophy" class="mob-link">Program</a>
+  <a href="#locomotor" class="mob-link">Locomotor</a>
+  <a href="#manipulative" class="mob-link">Manipulative</a>
+  <a href="#balancing" class="mob-link">Balancing</a>
+  <a href="#about" class="mob-link">About</a>
+</div>
 
 <!-- HERO -->
 <section class="hero">
@@ -1246,11 +1446,12 @@ footer {
           <div class="contact-val">SLAM Nevada Elementary<br>1095 Fielders Street<br>Henderson, NV 89011</div>
         </div>
         <div class="contact-cell">
-          <div class="contact-lbl">NV State Standards</div>
-          <div class="contact-val"><a href="https://webapp-strapi-paas-prod-nde-001.azurewebsites.net/uploads/nevada_k_12_pe_content_standards_97e56073b4.pdf" target="_blank">View ↗</a></div>        </div>
+          <div class="contact-lbl">Mascot</div>
+          <div class="contact-val" style="font-family:var(--font-display);font-size:1.4rem;color:var(--red);">GO BULLS! 🐂</div>
+        </div>
         <div class="contact-cell">
           <div class="contact-lbl">Email</div>
-          <div class="contact-val"><a href="mailto:kenny.hin@slamnv.org">kenny.hin@slamnv.org</a></div>
+          <div class="contact-val"><a href="/cdn-cgi/l/email-protection#49222c27273067212027093a252824273f67263b2e"><span class="__cf_email__" data-cfemail="274c4249495e094f4e4967544b464a495109485540">[email&#160;protected]</span></a></div>
         </div>
         <div class="contact-cell">
           <div class="contact-lbl">Athletics Page</div>
@@ -1258,7 +1459,7 @@ footer {
         </div>
         <div class="contact-cell" style="grid-column: 1 / -1;">
           <div class="contact-lbl">Athletics Email</div>
-          <div class="contact-val"><a href="mailto:slam.esathletics@slamnv.org">slam.esathletics@slamnv.org</a></div>
+          <div class="contact-val"><a href="/cdn-cgi/l/email-protection#295a454844074c5a485d41454c5d404a5a695a454844475f07465b4e"><span class="__cf_email__" data-cfemail="d5a6b9b4b8fbb0a6b4a1bdb9b0a1bcb6a695a6b9b4b8bba3fbbaa7b2">[email&#160;protected]</span></a></div>
         </div>
       </div>
     </div>
@@ -1284,7 +1485,7 @@ footer {
   <div>
     <div class="footer-col-ttl">Contact</div>
     <div class="footer-info">
-      <a href="mailto:kenny.hin@slamnv.org">kenny.hin@slamnv.org</a><br>
+      <a href="/cdn-cgi/l/email-protection#8ee5ebe0e0f7a0e6e7e0cefde2efe3e0f8a0e1fce9"><span class="__cf_email__" data-cfemail="8ae1efe4e4f3a4e2e3e4caf9e6ebe7e4fca4e5f8ed">[email&#160;protected]</span></a><br>
       1095 Fielders Street<br>
       Henderson, NV 89011
     </div>
@@ -1296,7 +1497,21 @@ footer {
   </div>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // Hamburger menu
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+  });
+  document.querySelectorAll('.mob-link').forEach(link => {
+    link.addEventListener('click', () => {
+      hamburger.classList.remove('open');
+      mobileMenu.classList.remove('open');
+    });
+  });
+
   // Custom cursor
   const cursor = document.getElementById('cursor');
   let mx = 0, my = 0;
@@ -1320,21 +1535,4 @@ footer {
   const progressBar = document.getElementById('progress-bar');
   window.addEventListener('scroll', () => {
     const scrolled = window.scrollY;
-    const total = document.body.scrollHeight - window.innerHeight;
-    progressBar.style.width = (scrolled / total * 100) + '%';
-  });
-
-  // Scroll reveal with stagger
-  const reveals = document.querySelectorAll('.reveal');
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('in');
-        io.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-  reveals.forEach(el => io.observe(el));
-</script>
-</body>
-</html>
+    const total = document.bod
