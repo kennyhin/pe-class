@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Locomotor: Gallop & Slide — Coach K. Hin · SLAM Nevada</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; background: #0a0a0a; font-family: 'Segoe UI', system-ui, sans-serif; overflow: hidden; }
+
+:root {
+  --accent: #F59E0B;
+  --accent-dim: rgba(245,158,11,0.14);
+  --accent-mid: rgba(245,158,11,0.38);
+  --card: #1c1c1c;
+  --border: #2a2a2a;
+  --text: #ffffff;
+  --muted: #888;
+  --red: #D52B1E;
+  --blue: #3b82f6;
+  --green: #22c55e;
+}
+
+/* ── PROGRESS ── */
+#progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--accent); z-index: 999; transition: width 0.35s ease; }
+
+/* ── BRAND ── */
+#brand { position: fixed; top: 16px; left: 20px; z-index: 999; font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+#brand span { color: var(--accent); }
+
+/* ── NAV ── */
+#nav { position: fixed; bottom: 20px; right: 20px; display: flex; align-items: center; gap: 10px; z-index: 999; }
+.nav-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--card); border: 1px solid var(--border); color: var(--text); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.nav-btn:hover, .nav-btn:active { background: var(--accent); border-color: var(--accent); color: #000; }
+#counter { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: 0.1em; min-width: 48px; text-align: center; }
+
+/* ── SLIDES ── */
+.slide { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 52px 48px 72px; opacity: 0; pointer-events: none; transition: opacity 0.32s ease, transform 0.32s ease; transform: translateY(14px); overflow-y: auto; }
+.slide.active { opacity: 1; pointer-events: all; transform: translateY(0); }
+.slide.exit { opacity: 0; transform: translateY(-14px); }
+.inner { max-width: 900px; width: 100%; }
+
+/* ── TYPE ── */
+.eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.eyebrow::before { content:''; width: 24px; height: 2px; background: var(--accent); display: block; flex-shrink: 0; }
+h1 { font-size: clamp(40px, 8vw, 86px); font-weight: 800; color: var(--text); line-height: 0.95; letter-spacing: -0.02em; }
+h2 { font-size: clamp(22px, 4vw, 46px); font-weight: 700; color: var(--text); line-height: 1.1; letter-spacing: -0.01em; margin-bottom: 22px; }
+.acc { color: var(--accent); }
+.subtitle { font-size: clamp(14px, 2vw, 18px); color: var(--muted); line-height: 1.65; margin-top: 14px; max-width: 600px; }
+
+/* ── BG DECO ── */
+.title-bg { position: absolute; inset: 0; overflow: hidden; z-index: 0; }
+.grid-lines { position: absolute; inset: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(255,255,255,0.025) 59px, rgba(255,255,255,0.025) 60px), repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(255,255,255,0.025) 59px, rgba(255,255,255,0.025) 60px); }
+.deco-cross { position: absolute; top: 50%; right: 5%; transform: translateY(-50%); width: 280px; height: 280px; opacity: 0.06; }
+.deco-cross::before, .deco-cross::after { content:''; position: absolute; background: var(--accent); border-radius: 3px; }
+.deco-cross::before { width: 100%; height: 60px; top: 50%; transform: translateY(-50%); }
+.deco-cross::after { width: 60px; height: 100%; left: 50%; transform: translateX(-50%); }
+.title-content { position: relative; z-index: 1; }
+
+/* ── CARDS ── */
+.card-grid { display: grid; gap: 10px; }
+.cols-2 { grid-template-columns: 1fr 1fr; }
+.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 16px; position: relative; overflow: hidden; }
+.card.al::before { content:''; position: absolute; top:0; left:0; width:3px; height:100%; background: var(--accent); }
+.card .icon { font-size: 24px; margin-bottom: 8px; }
+.card .ct { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text); margin-bottom: 4px; }
+.card .cb { font-size: 12px; color: var(--muted); line-height: 1.55; }
+
+/* ── CUE LIST ── */
+.cue-list { display: flex; flex-direction: column; gap: 8px; }
+.cue-row { display: flex; align-items: flex-start; gap: 14px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; }
+.cue-kw { font-family: 'Courier New', monospace; font-size: 12px; font-weight: 700; color: var(--accent); white-space: nowrap; min-width: 130px; flex-shrink: 0; padding-top: 1px; }
+.cue-def { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+/* ── STAGE GRID ── */
+.stage-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.sc { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 14px; }
+.sc.mature { border-color: var(--accent); }
+.s-num { font-size: 10px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+.s-name { font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 3px; }
+.s-sub { font-size: 11px; font-weight: 600; color: var(--accent); margin-bottom: 8px; font-style: italic; }
+.s-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+.s-tag { display: inline-block; margin-top: 8px; font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 3px 7px; border-radius: 4px; }
+.t-init { background: rgba(255,255,255,0.07); color: #aaa; }
+.t-elem { background: rgba(59,130,246,0.15); color: var(--blue); }
+.t-mat { background: rgba(245,158,11,0.18); color: var(--accent); }
+
+/* ── STAT GRID ── */
+.stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.stat-box { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 22px 16px; text-align: center; }
+.stat-num { font-size: clamp(36px, 5vw, 52px); font-weight: 800; color: var(--accent); line-height: 1; margin-bottom: 6px; }
+.stat-lbl { font-size: 10px; color: var(--muted); font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
+
+/* ── QUOTE ── */
+.quote-block { background: var(--card); border-radius: 12px; padding: 24px 28px; border-left: 4px solid var(--accent); }
+.q-text { font-size: clamp(14px, 2vw, 18px); font-style: italic; color: var(--text); line-height: 1.55; margin-bottom: 12px; }
+.q-attr { font-size: 11px; color: var(--accent); font-weight: 700; letter-spacing: 0.08em; }
+
+/* ── TWO COL ── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+
+/* ── COMPARE ── */
+.compare { display: grid; grid-template-columns: 1fr auto 1fr; gap: 0; align-items: stretch; }
+.compare-col { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px 16px; }
+.compare-col.right { border-color: var(--accent); }
+.compare-divider { display: flex; align-items: center; justify-content: center; padding: 0 12px; font-size: 12px; font-weight: 800; color: var(--muted); }
+.compare-head { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); color: var(--muted); }
+.compare-head.amber { color: var(--accent); }
+.compare-item { font-size: 11px; color: var(--muted); padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.04); line-height: 1.4; }
+.compare-item:last-child { border-bottom: none; }
+
+/* ── DIFF TABLE ── */
+.diff-table { width: 100%; border-collapse: separate; border-spacing: 0 7px; }
+.diff-table thead th { font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); padding: 0 14px 6px; text-align: left; }
+.diff-table tbody tr { background: var(--card); }
+.diff-table tbody td { padding: 12px 14px; font-size: 12px; color: var(--muted); line-height: 1.45; }
+.diff-table tbody td:first-child { border-radius: 8px 0 0 8px; border-left: 3px solid var(--accent); color: var(--text); font-weight: 600; width: 36%; }
+.diff-table tbody td:last-child { border-radius: 0 8px 8px 0; }
+
+/* ── STEP FLOW ── */
+.step-flow { display: flex; align-items: flex-start; gap: 0; width: 100%; }
+.step { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; padding: 0 4px; }
+.step:not(:last-child)::after { content: '→'; position: absolute; top: 14px; right: -8px; font-size: 16px; color: var(--accent); font-weight: 700; }
+.step-num { width: 38px; height: 38px; border-radius: 50%; background: var(--accent); color: #000; font-size: 15px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; flex-shrink: 0; }
+.step-lbl { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.step-desc { font-size: 10px; color: var(--muted); line-height: 1.4; }
+
+/* ── THEME GRID ── */
+.theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.tc { background: var(--card); border-radius: 10px; padding: 14px 12px; }
+.tc-title { font-size: 10px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; padding-bottom: 7px; margin-bottom: 7px; border-bottom: 1px solid var(--border); }
+.tc-title.prof { color: var(--accent); }
+.tc-title.util { color: var(--blue); }
+.tc-title.ctrl { color: var(--green); }
+.tc-title.pre { color: var(--muted); }
+.tc-item { font-size: 10px; color: #666; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.04); line-height: 1.45; }
+.tc-item:last-child { border-bottom: none; }
+
+/* ── MC GRID ── */
+.mc-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.mc-col { background: var(--card); border-radius: 10px; padding: 14px; }
+.mc-head { font-size: 10px; font-weight: 800; color: var(--accent); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 7px; padding-bottom: 5px; border-bottom: 1px solid var(--border); }
+.mc-sub { font-size: 9px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin: 7px 0 3px; }
+.mc-item { font-size: 10px; color: #666; line-height: 1.5; padding: 2px 0; }
+
+/* ── UTILS ── */
+hr.sep { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+.pill { display: inline-block; padding: 3px 9px; border-radius: 100px; font-size: 10px; font-weight: 700; }
+.pill-a { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-mid); }
+.pill-b { background: rgba(59,130,246,0.1); color: var(--blue); border: 1px solid rgba(59,130,246,0.3); }
+.title-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--accent-dim); border: 1px solid var(--accent-mid); border-radius: 6px; padding: 5px 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+.slide-footer { position: absolute; bottom: 14px; left: 0; right: 0; display: flex; justify-content: center; font-size: 10px; color: #2a2a2a; letter-spacing: 0.1em; text-transform: uppercase; }
+
+/* SVG stick figure box */
+.svg-box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+
+/* ── MOBILE ── */
+@media (max-width: 640px) {
+  .slide { padding: 48px 16px 72px; }
+  #brand { display: none; }
+  h2 { margin-bottom: 14px; }
+
+  .stage-grid { grid-template-columns: 1fr 1fr; }
+  .cols-2 { grid-template-columns: 1fr; }
+  .cols-3 { grid-template-columns: 1fr 1fr; }
+  .two-col { grid-template-columns: 1fr; }
+  .compare { grid-template-columns: 1fr; gap: 8px; }
+  .compare-divider { display: none; }
+  .theme-grid { grid-template-columns: 1fr 1fr; }
+  .mc-grid { grid-template-columns: 1fr; }
+  .stat-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .step-flow { flex-direction: column; gap: 8px; }
+  .step:not(:last-child)::after { content: '↓'; top: auto; bottom: -14px; right: 50%; transform: translateX(50%); }
+  .deco-cross { display: none; }
+  .cue-kw { min-width: 110px; }
+}
+
+@media (max-width: 400px) {
+  .stage-grid { grid-template-columns: 1fr; }
+  .cols-3 { grid-template-columns: 1fr; }
+  .theme-grid { grid-template-columns: 1fr; }
+  .stat-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<div id="brand">Coach <span>K. Hin</span> · SLAM Nevada</div>
+
+<!-- ====== SLIDE 1: TITLE ====== -->
+<div class="slide active">
+  <div class="title-bg"><div class="grid-lines"></div><div class="deco-cross"></div></div>
+  <div class="inner title-content">
+    <div class="title-tag">🐎 Locomotor · 3 Developmental Stages</div>
+    <h1>GALLOP &amp;<br><span class="acc">SLIDE</span></h1>
+    <p class="subtitle">Two closely related locomotor skills built on the same step-together rhythm — one moving forward, one moving sideways. The bridge between walking and complex movement.</p>
+    <hr class="sep" style="margin-top:24px;">
+    <div style="display:flex;gap:32px;margin-top:16px;flex-wrap:wrap;">
+      <div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.14em;margin-bottom:3px;">Framework</div><div style="font-size:14px;color:var(--text);font-weight:700;">PHE Canada · TGMD-2</div></div>
+      <div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.14em;margin-bottom:3px;">Grades</div><div style="font-size:14px;color:var(--text);font-weight:700;">K – 5</div></div>
+      <div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.14em;margin-bottom:3px;">Category</div><div style="font-size:14px;color:var(--text);font-weight:700;">Locomotor · Traveling</div></div>
+    </div>
+  </div>
+  <div class="slide-footer">SLAM Nevada Elementary · Physical Education</div>
+</div>
+
+<!-- ====== SLIDE 2: GALLOP vs SLIDE ====== -->
+<div class="slide">
+  <div class="inner">
+    <div class="eyebrow">Understanding the Skills</div>
+    <h2>Gallop vs Slide — <span class="acc">Same Pattern, Different Direction</span></h2>
+    <div class="compare">
+      <div class="compare-col">
+        <div class="compare-head">🐎 Gallop</div>
+        <div class="compare-item">Lead foot steps <strong style="color:var(--text);">forward</strong></div>
+        <div class="compare-item">Trail foot closes up behind</div>
+        <div class="compare-item">Hips face forward throughout</div>
+        <div class="compare-item">Either leg can be the lead</div>
+        <div class="compare-item">Arms swing with the beat</div>
+      </div>
+      <div class="compare-divider">VS</div>
+      <div class="compare-col right">
+        <div class="compare-head amber">↔️ Slide</div>
+        <div class="compare-item">Lead foot steps <strong style="color:var(--accent);">sideways</strong></div>
+        <div class="compare-item">Trail foot closes up beside it</div>
+        <div class="compare-item">Body turns to direction of travel</div>
+        <div class="compare-item">Either direction (left or right)</div>
+        <div class="compare-item">Arms swing with the beat</div>
+      </div>
+    </div>
+    <div style="margin-top:14px;" class="quote-block">
+      <div class="q-text" style="font-size:clamp(13px,1.8vw,16px);">Both use the same <strong style="color:var(--accent);">step-together</strong> rhythm — master one and the other follows naturally.</div>
+      <div class="q-attr">PHE Canada, Fundamental Movement Skills Educator's Guide (2011)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 3: STATS ====== -->
+<div class="slide">
+  <div class="inner">
+    <div class="eyebrow">Why It Matters</div>
+    <h2>The <span class="acc">Numbers</span></h2>
+    <div class="stat-grid">
+      <div class="stat-box">
+        <div class="stat-num">3</div>
+        <div class="stat-lbl">Developmental Stages</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">4</div>
+        <div class="stat-lbl">Teaching Cues</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">25<span style="font-size:clamp(16px,2vw,22px)">ft</span></div>
+        <div class="stat-lbl">Assessment Distance</div>
+      </div>
+    </div>
+    <div style="margin-top:16px;" class="card-grid cols-2">
+      <div class="card al">
+        <div class="icon">🏀</div>
+        <div class="ct">Sports Connection</div>
+        <div class="cb">Galloping: basketball defense, soccer. Sliding: tennis, baseball infield, volleyball, and dance. Both are essential sport foundations.</div>
+      </div>
+      <div class="card al">
+        <div class="icon">🧠</div>
+        <div class="ct">Why It's Hard</div>
+        <div class="cb">Asymmetrical patterns challenge bilateral coordination — harder than running, easier than skipping. A critical developmental stepping stone.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 4: 4 TEACHING CUES ====== -->
+<div class="slide">
+  <div class="inner">
+    <div class="eyebrow">Performance Indicators — PHE Canada</div>
+    <h2>The 4 Teaching <span class="acc">Cues</span></h2>
+    <div class="cue-list">
+      <div class="cue-row">
+        <div class="cue-kw">"Trail Leg"</div>
+        <div class="cue-def">Keep the trail leg <strong style="color:var(--text);">behind</strong> the lead leg — it never crosses in front during the airborne phase</div>
+      </div>
+      <div class="cue-row">
+        <div class="cue-kw">"Lead Leg"</div>
+        <div class="cue-def">Can gallop or slide using <strong style="color:var(--text);">either leg</strong> as the lead — practice both sides equally</div>
+      </div>
+      <div class="cue-row">
+        <div class="cue-kw">"Arms With Beat"</div>
+        <div class="cue-def">Rhythmical arm movement that <strong style="color:var(--text);">matches the step-together pattern</strong> — arms help drive the rhythm</div>
+      </div>
+      <div class="cue-row">
+        <div class="cue-kw">"Twist to Direction"</div>
+        <div class="cue-def">Hips, shoulders, and eyes all <strong style="color:var(--text);">turn to face the direction of movement</strong> — not frozen facing forward</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 5: STAGE 1 ====== -->
+<div class="slide">
+  <div class="inner">
+    <div class="eyebrow">Stage 1 of 3</div>
+    <h2>Initial Stage: <span class="acc">Choppy Run</span></h2>
+    <div class="two-col">
+      <div>
+        <div class="card-grid" style="gap:9px;">
+          <div class="card al">
+            <div class="ct">❌ Resembles Uneven Run</div>
+            <div class="cb">Looks more like an irregular running pattern than a true gallop. The rhythm is broken and unpredictable.</div>
+          </div>
+          <div class="card al">
+            <div class="ct">❌ Trail Leg Crosses Front</div>
+            <div class="cb">The trail leg crosses in front of the lead leg during the airborne phase and remains there at contact — the key error at this stage.</div>
+          </div>
+          <div class="card al">
+            <div class="ct">❌ No Rhythm</div>
+            <div class="cb">No clear beat or tempo. Each step looks different from the last. Arms are not yet helping.</div>
+          </div>
+          <div class="card al">
+            <div class="ct">❌ Choppy, Tense</div>
+            <div class="cb">Movement appears stiff and effortful. No fluidity between the step and the close.</div>
+          </div>
+        </div>
+      </div>
+      <div class="svg-box">
+        <!-- SVG: Initial Stage gallop - choppy, trail leg crossing -->
+        <svg viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-height:220px;">
+          <line x1="10" y1="220" x2="190" y2="220" stroke="#333" stroke-width="2"/>
+          <!-- figure: choppy, trail leg crossing in front -->
+          <circle cx="90" cy="38" r="18" fill="none" stroke="#888" stroke-width="2.2"/>
+          <!-- torso upright -->
+          <line x1="90" y1="56" x2="90" y2="130" stroke="#888" stroke-width="2.8" stroke-linecap="round"/>
+          <!-- arms - stiff out to sides -->
+          <line x1="90" y1="78" x2="58" y2="88" stroke="#888" stroke-width="2.2" stroke-linecap="round"/>
+          <line x1="90" y1="78" x2="122" y2="88" stroke="#888" stroke-width="2.2" stroke-linecap="round"/>
+          <!-- lead leg forward -->
+          <line x1="90" y1="130" x2="114" y2="182" stroke="#888" stroke-width="2.8" stroke-linecap="round"/>
+          <line x1="114" y1="182" x2="126" y2="220" stroke="#888" stroke-width="2.8" stroke-linecap="round"/>
+          <!-- trail leg crosses IN FRONT (error highlighted in red) -->
+          <line x1="90" y1="130" x2="118" y2="168" stroke="#D52B1E" stroke-width="2.8" stroke-linecap="round"/>
+          <line x1="118" y1="168" x2="138" y2="220" stroke="#D52B1E" stroke-width="2.8" stroke-linecap="round"/>
+          <!-- error label -->
+          <text x="148" y="190" fill="#D52B1E" font-size="9" font-family="system-ui" font-weight="700">Trail leg</text>
+          <text x="148" y="201" fill="#D52B1E" font-size="9" font-family="system-ui" font-weight="700">crosses!</text>
+          <text x="90" y="238" text-anchor="middle" fill="#555" font-size="10" font-family="system-ui">Stage 1 — Choppy Run</text>
+        </svg>
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+          <span class="pill t-init" style="border-radius:100px;font-size:10px;padding:3px 9px;">Initial Stage</span>
+          <span style="font-size:11px;color:var(--muted);align-self:center;">K–1 typical</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 6: STAGE 2 ====== -->
+<div class="slide">
+  <div class="inner">
+    <div class="eyebrow">Stage 2 of 3</div>
+    <h2>Elementary Stage: <span class="acc">Stiff Back Leg</span></h2>
+    <div class="two-col">
+      <div>
+        <div class="card-grid" style="gap:9px;">
+          <div class="card">
+            <div class="ct">🔄 Slow-Moderate Tempo</div>
+            <div class="cb">Pattern starts to emerge but rhythm is choppy. Tempo is slow to moderate — improving from the chaotic initial stage.</div>
+          </div>
+          <div class="card">
+            <div class="ct">🦵 Trail Leg Stiff</div>
+            <div class="cb">The trail leg stays behind the lead leg now (correct!) but remains stiff and extended rather than relaxed and bent.</div>
+          </div>
+          <div class="card">
+            <div class="ct">↕️ Vertical Component Exaggerated</div>
+            <div class="cb">Too much up-and-down bounce. Energy is wasted vertically rather than directed forward or sideways.</div>
+          </div>
+          <div class="card">
+            <div class="ct">↔️ Hips Oriented Sideways</div>
+            <div class="cb">Hips haven't fully rotated to face the direction of travel. The "Twist to Direction" cue is still needed here.</div>
+          </div>
+        </div>
+      </div>
+      <div class="svg-box">
+        <svg viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-height:220px;">
+          <line x1="10" y1="220" x2="190" y2="220" stroke="#333" stroke-width="2"/>
+          <!-- figure: improving, trail leg behind but stiff -->
+          <circle cx="88" cy="36" r="18" fill="none" stroke="#3b82f6" stroke-width="2.2"/>
+          <!-- slight forward lean starting -->
+          <line x1="88" y1="54" x2="92" y2="130" stroke="#888" stroke-width="2.8" stroke-linecap="round"/>
+          <!-- arms beginning to swing with beat -->
+          <line x1="90" y1="80" x2="62" y2="68" stroke="#3b82f6" stroke-width="2.2" stroke-linecap="round"/>
+          <line x1="90" y1="80" x2="116" y2="94" stroke="#3b82f6" stroke-width="2.2" stroke-linecap="round"/>
+          <!-- lead leg -->
+          <line x1="92" y1="130" x2="116" y2="180" stroke="#888" stroke-width="2.8" stroke-linecap="round"/>
+          <line x1="116" y1="180" x2="128" y2="220" stroke="#888" stroke-width="2.8" stroke-linecap="round"/>
+          <!-- trail leg - behind now but stiff/extended -->
+          <line x1="92" y1="130" x2="68" y2="185" stroke="#3b82f6" stroke-width="2.8" stroke-linecap="round"/>
+          <line x1="68" y1="185" x2="60" y2="220" stroke="#3b82f6" stroke-width="2.8" stroke-linecap="round"/>
+          <!-- stiff label -->
+          <text x="34" y="176" fill="#3b82f6" font-size="9" font-family="system-ui" font-weight="700">Stiff</text>
+          <text x="34" y="187" fill="#3b82f6" font-size="9" font-family="system-ui" font-weight="700">leg ↓</text>
+          <text x="96" y="238" text-anchor="middle" fill="#555" font-size="10" font-family="system-ui">Stage 2 — Stiff Back Leg</text>
+        </svg>
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+          <span class="pill pill-b" style="border-radius:100px;font-size:10px;padding:3px 9px;">Elementary Stage</span>
+          <span style="font-size:11px;color:var(--muted);align-self:center;">Grades 1–3 typical</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 7: STAGE 3 MATURE ====== -->
+<div class="slide">
+  <div class="inner">
+    <div class="eyebrow">Stage 3 of 3 — The Goal</div>
+    <h2>Mature Stage: <span class="acc">Smooth & Rhythmical</span></h2>
+    <div class="two-col">
+      <div>
+        <div class="card-grid" style="gap:9px;">
+          <div class="card al">
+            <div class="ct">✅ Smooth Rhythmical Pattern</div>
+            <div class="cb">Consistent, even tempo with a clear beat. Movement looks effortless and natural — no choppiness.</div>
+          </div>
+          <div class="card al">
+            <div class="ct">✅ Feet Remain Close to Ground</div>
+            <div class="cb">Flight phase is low and efficient. No wasted vertical energy. Weight transfers smoothly step to close.</div>
+          </div>
+          <div class="card al">
+            <div class="ct">✅ Hips Oriented Forward</div>
+            <div class="cb">Full hip rotation toward direction of travel. The "Twist to Direction" cue is fully executed — eyes, shoulders, hips all aligned.</div>
+          </div>
+          <div class="card al">
+            <div class="ct">✅ Arms Move With Beat</div>
+            <div class="cb">Arm swing is rhythmical and in sync with the step-together pattern. Arms actively drive the tempo.</div>
+          </div>
+        </div>
+      </div>
+      <div class="svg-box">
+        <svg viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-height:220px;">
+          <line x1="10" y1="220" x2="190" y2="220" stroke="#333" stroke-width="2"/>
+          <!-- figure: mature gallop - fluid, low, hips forward -->
+          <circle cx="86" cy="34" r="18" fill="none" stroke="#F59E0B" stroke-width="2.2"/>
+          <!-- nice forward lean -->
+          <line x1="86" y1="52" x2="94" y2="128" stroke="#F59E0B" stroke-width="2.8" stroke-linecap="round"/>
+          <!-- arms rhythmical opposition -->
+          <line x1="90" y1="78" x2="60" y2="62" stroke="#F59E0B" stroke-width="2.2" stroke-linecap="round"/>
+          <line x1="60" y1="62" x2="50" y2="78" stroke="#F59E0B" stroke-width="2.2" stroke-linecap="round"/>
+          <line x1="90" y1="78" x2="120" y2="96" stroke="#F59E0B" stroke-width="2.2" stroke-linecap="round"/>
+          <line x1="120" y1="96" x2="132" y2="82" stroke="#F59E0B" stroke-width="2.2" stroke-linecap="round"/>
+          <!-- lead leg extended forward low flight -->
+          <line x1="94" y1="128" x2="122" y2="178" stroke="#F59E0B" stroke-width="2.8" stroke-linecap="round"/>
+          <line x1="122" y1="178" x2="134" y2="220" stroke="#F59E0B" stroke-width="2.8" stroke-linecap="round"/>
+          <!-- trail leg behind, relaxed, low -->
+          <line x1="94" y1="128" x2="72" y2="180" stroke="#F59E0B" stroke-width="2.8" stroke-linecap="round"/>
+          <line x1="72" y1="180" x2="62" y2="216" stroke="#F59E0B" stroke-width="2.8" stroke-linecap="round"/>
+          <!-- ground dots showing low flight -->
+          <circle cx="62" cy="218" r="3" fill="#F59E0B"/>
+          <text x="96" y="238" text-anchor="middle" fill="#F59E0B" font-size="10" font-family="system-ui" font-weight="700">Stage 3 — MATURE ✓</text>
+        </svg>
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+          <span class="pill pill-a" style="border-radius:100px;font-size:10px;padding:3px 9px;">Mature Stage</span>
+          <span style="font-size:11px;color:var(--muted);align-self:center;">Grades 2–5 goal</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 8: ALL 3 STAGES ====== -->
+<div class="slide">
+  <div class="inner">
+    <div class="eyebrow">Full Developmental Progression</div>
+    <h2>All 3 Stages at a <span class="acc">Glance</span></h2>
+    <div class="stage-grid">
+      <div class="sc">
+        <div class="s-num">Stage 1</div>
+        <div class="s-name">Choppy Run</div>
+        <div class="s-sub">Initial Stage</div>
+        <div class="s-desc">Rhythmically uneven. Trail leg crosses in front of lead leg during airborne phase and stays there at contact.</div>
+        <span class="s-tag t-init">Initial</span>
+      </div>
+      <div class="sc">
+        <div class="s-num">Stage 2</div>
+        <div class="s-name">Stiff Back Leg</div>
+        <div class="s-sub">Elementary Stage</div>
+        <div class="s-desc">Slow-moderate tempo, choppy rhythm. Trail leg now stays behind — but stiff. Hips still sideways. Vertical bounce high.</div>
+        <span class="s-tag t-elem">Elementary</span>
+      </div>
+      <div class="sc mature">
+        <div class="s-num" style="color:var(--accent);">Stage 3</div>
+        <div class="s-name" style="color:var(--accent);">Smooth Rhythmical</div>
+        <div class="s-sub">Mature Stage</div>
+        <div class="s-desc">Smooth pattern, moderate tempo. Feet stay close to ground. Hips oriented forward. Arms swing with the beat.</div>
+        <span class="s-tag t-mat">Mature ✓</span>
+      </div>
+    </div>
+    <div style="margin-top:16px;display:flex;align-items:center;gap:12px;">
+      <div style="font-size:10px;color:var(--muted);white-space:nowrap;letter-spacing:0.1em;">K</div>
+      <div style="flex:1;height:4px;background:linear-gradient(to right, #333, #3b82f6, #F59E0B);border-radius:4px;"></div>
+      <div style="font-size:10px;color:var(--accent);white-space:nowrap;letter-spacing:0.1em;">5th Grade</div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 9: DIFFICULTIES ====== -->
+<div class="slide">
+  <div class="inner">
+    <div class="eyebrow">Difficulties to Watch For — PHE Canada</div>
+    <h2>Common Errors <span class="acc">&amp; Fixes</span></h2>
+    <table class="diff-table">
+      <thead>
+        <tr>
+          <th>If you see this…</th>
+          <th>Then try this…</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Inconsistent step-hop pattern</td>
+          <td>Use colored tape to mark footsteps on the floor to help establish the pattern visually</td>
+        </tr>
+        <tr>
+          <td>Lack of rhythm in the movement</td>
+          <td>Clap the rhythm for the child — or use a drum beat — so they can match their movement to the beat</td>
+        </tr>
+        <tr>
+          <td>Exaggerated, bouncy movements</td>
+          <td>Encourage children to lift feet just off the ground — "quiet feet" or "sneak like a fox"</td>
+        </tr>
+        <tr>
+          <td>Slight loss of balance repeatedly</td>
+          <td>Have the child slow down and exaggerate the "close" step — focus on control before speed</td>
+        </tr>
+        <tr>
+          <td>Landing flat-footed</td>
+          <td>Ask children if they can make their gallop/slide as <em>quiet</em> as possible — forces forefoot landing</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ====== SLIDE 10: ASSESSMENT ====== -->
+<div class="slide">
+  <div class="inner">
+    <div class="eyebrow">Assessment Protocol — TGMD-2</div>
+    <h2>How We <span class="acc">Assess</span></h2>
+    <div class="two-col">
+      <div>
+        <div class="quote-block" style="margin-bottom:14px;">
+          <div class="q-text" style="font-size:clamp(13px,1.8vw,17px);">"Have the child gallop from one cone to the other for about <strong style="color:var(--accent);">25 feet.</strong>"</div>
+          <div class="q-attr">TGMD-2 Assessment Protocol</div>
+        </div>
+        <div class="card-grid" style="gap:9px;">
+          <div class="card al">
+            <div class="ct">📋 What to observe</div>
+            <div class="cb">All 4 cues: trail leg position, lead leg alternation, arm rhythm, and hip/shoulder orientation toward direction of travel.</div>
+          </div>
+          <div class="card al">
+            <div class="ct">🔁 Both sides</div>
+            <div class="cb">Test galloping with the right leg leading AND the left leg leading. Both sides should be assessed separately.</div>
+          </div>
+        </div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;">Checklist</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:#141414;border-radius:7px;">
+            <div style="width:20px;height:20px;border:2px solid var(--accent);border-radius:4px;flex-shrink:0;"></div>
+            <div style="font-size:12px;color:var(--text);">Trail leg stays <span style="color:var(--muted);">behind lead leg</span></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:#141414;border-radius:7px;">
+            <div style="width:20px;height:20px;border:2px solid var(--accent);border-radius:4px;flex-shrink:0;"></div>
+            <div style="font-size:12px;color:var(--text);">Either leg can <span style="color:var(--muted);">be the lead</span></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:#141414;border-radius:7px;">
+            <div style="width:20px;height:20px;border:2px solid var(--accent);border-radius:4px;flex-shrink:0;"></div>
+            <div style="font-size:12px;color:var(--text);">Arms move <span style="color:var(--muted);">rhythmically with beat</span></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:#141414;border-radius:7px;">
+            <div style="width:20px;height:20px;border:2px solid var(--accent);border-radius:4px;flex-shrink:0;"></div>
+            <div style="font-size:12px;color:var(--text);">Hips, shoulders, eyes <span style="color:var(--muted);">twist to direction</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 11: MOVEMENT CONCEPTS ====== -->
+<div class="slide">
+  <div class="inner">
+    <div class="eyebrow">Movement Concepts — Gallahue et al.</div>
+    <h2>Teaching <span class="acc">Contexts</span></h2>
+    <div class="mc-grid">
+      <div class="mc-col">
+        <div class="mc-head">Effort</div>
+        <div class="mc-sub">Force</div>
+        <div class="mc-item">Landing flat-footed? On your toes?</div>
+        <div class="mc-item">Very quietly? Like an elephant?</div>
+        <div class="mc-item">Dragging an elephant vs. escaping one?</div>
+        <div class="mc-sub">Time</div>
+        <div class="mc-item">As fast / as slow as you can?</div>
+        <div class="mc-item">To the beat of a drum?</div>
+        <div class="mc-sub">Flow</div>
+        <div class="mc-item">Keeping both legs stiff?</div>
+        <div class="mc-item">Keeping your trunk erect?</div>
+        <div class="mc-item">Bending forward at your waist?</div>
+      </div>
+      <div class="mc-col">
+        <div class="mc-head">Space</div>
+        <div class="mc-sub">Level</div>
+        <div class="mc-item">Sideways and get smaller / bigger?</div>
+        <div class="mc-item">Somewhere in between big and small?</div>
+        <div class="mc-item">Change levels as I raise my hand?</div>
+        <div class="mc-sub">Direction</div>
+        <div class="mc-item">Sideways? Forward or backward?</div>
+        <div class="mc-item">Left 4 steps then right 4 steps?</div>
+        <div class="mc-item">Alternating left and right?</div>
+        <div class="mc-sub">Range</div>
+        <div class="mc-item">Taking big steps? Tiny steps?</div>
+        <div class="mc-item">As far right as you can until I say stop?</div>
+      </div>
+      <div class="mc-col">
+        <div class="mc-head">Relationship</div>
+        <div class="mc-sub">Objects</div>
+        <div class="mc-item">From one line to the other?</div>
+        <div class="mc-item">While bouncing and catching a ball?</div>
+        <div class="mc-item">While dribbling a ball?</div>
+        <div class="mc-sub">People</div>
+        <div class="mc-item">Facing partner, same direction?</div>
+        <div class="mc-item">Facing partner, opposite direction?</div>
+        <div class="mc-sub">Combinations</div>
+        <div class="mc-item">Gallop/slide to a line and come back</div>
+        <div class="mc-item">In 30 seconds — how many times?</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 12: SKILL THEME PROGRESSION ====== -->
+<div class="slide">
+  <div class="inner">
+    <div class="eyebrow">Skill Theme Progression — Graham et al.</div>
+    <h2>Progression <span class="acc">Levels</span></h2>
+    <div class="theme-grid">
+      <div class="tc">
+        <div class="tc-title pre">Pre-Control</div>
+        <div class="tc-item">Traveling among wide and narrow shapes</div>
+        <div class="tc-item">Traveling through rope pathways</div>
+        <div class="tc-item">Traveling with imagery</div>
+        <div class="tc-item">Traveling in different ways</div>
+        <div class="tc-item">Traveling in general space</div>
+      </div>
+      <div class="tc">
+        <div class="tc-title ctrl">Control</div>
+        <div class="tc-item">Combining locomotor movements</div>
+        <div class="tc-item">Traveling in slow motion</div>
+        <div class="tc-item">Changing speed to music</div>
+        <div class="tc-item">Run/Leap/Skip/Hop/Gallop/Slide</div>
+        <div class="tc-item">Locomotor rhythm: Follow Me Dance</div>
+        <div class="tc-item">Traveling in different directions</div>
+      </div>
+      <div class="tc">
+        <div class="tc-title util">Utilization</div>
+        <div class="tc-item">Traveling in bound and free flow</div>
+        <div class="tc-item">Traveling to tell a story</div>
+        <div class="tc-item">Meeting & parting with partner</div>
+        <div class="tc-item">Shadowing a partner's travel</div>
+        <div class="tc-item">Partner: changing direction & speed</div>
+        <div class="tc-item">Partner: matching pathways</div>
+      </div>
+      <div class="tc">
+        <div class="tc-title prof">Proficiency</div>
+        <div class="tc-item">Traveling in gymnastics</div>
+        <div class="tc-item">Traveling in games and sports</div>
+        <div class="tc-item">Performing rhythmical patterns</div>
+        <div class="tc-item">Body shapes & group travel</div>
+        <div class="tc-item">Traveling with shapes and actions: a story without words</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;display:flex;align-items:center;gap:12px;">
+      <div style="font-size:10px;color:var(--muted);white-space:nowrap;">PRE-CONTROL</div>
+      <div style="flex:1;height:3px;background:linear-gradient(to right, #444, var(--green), var(--blue), var(--accent));border-radius:4px;"></div>
+      <div style="font-size:10px;color:var(--accent);white-space:nowrap;">PROFICIENCY</div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 13: LITERACY WORDS ====== -->
+<div class="slide">
+  <div class="inner">
+    <div class="eyebrow">Vocabulary — PHE Canada Literacy Component</div>
+    <h2>Key <span class="acc">Vocabulary</span> Words</h2>
+    <div class="card-grid cols-3" style="gap:10px;margin-bottom:16px;">
+      <div class="card al"><div class="ct">gallop</div><div class="cb">The primary skill — forward asymmetrical step-together movement</div></div>
+      <div class="card al"><div class="ct">slide</div><div class="cb">The lateral version — same pattern moving sideways</div></div>
+      <div class="card al"><div class="ct">forward</div><div class="cb">Direction of travel for the gallop</div></div>
+      <div class="card al"><div class="ct">sideways</div><div class="cb">Direction of travel for the slide</div></div>
+      <div class="card al"><div class="ct">open / close</div><div class="cb">The two parts of the step-together pattern — step open, then close</div></div>
+      <div class="card al"><div class="ct">lead / follow</div><div class="cb">Lead foot goes first; trail (follow) foot closes behind it</div></div>
+    </div>
+    <div class="quote-block">
+      <div class="q-text" style="font-size:clamp(13px,1.8vw,16px);">Use these words consistently in class so students can understand and verbalize their movement. Language and movement develop together.</div>
+      <div class="q-attr">PHE Canada, Fundamental Movement Skills (2011)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 14: KEY TAKEAWAYS ====== -->
+<div class="slide">
+  <div class="inner">
+    <div class="eyebrow">Summary</div>
+    <h2>Key <span class="acc">Takeaways</span></h2>
+    <div class="card-grid cols-2" style="gap:12px;">
+      <div class="card al">
+        <div class="icon">🔢</div>
+        <div class="ct">3 Stages</div>
+        <div class="cb">Choppy Run → Stiff Back Leg → Smooth Rhythmical. The trail leg position is the clearest indicator of which stage a student is at.</div>
+      </div>
+      <div class="card al">
+        <div class="icon">📣</div>
+        <div class="ct">4 Cues</div>
+        <div class="cb">"Trail Leg" · "Lead Leg" · "Arms With Beat" · "Twist to Direction" — short, visual, actionable.</div>
+      </div>
+      <div class="card al">
+        <div class="icon">↔️</div>
+        <div class="ct">Same Skill, Two Planes</div>
+        <div class="cb">Gallop = forward. Slide = sideways. Same mechanics. Teach both together and reinforce the connection.</div>
+      </div>
+      <div class="card al">
+        <div class="icon">🔧</div>
+        <div class="ct">5 Common Errors</div>
+        <div class="cb">Trail leg crosses, no rhythm, too bouncy, loss of balance, flat feet. Each has a targeted floor-tape or drum-beat fix.</div>
+      </div>
+      <div class="card al" style="grid-column: 1 / -1;">
+        <div class="icon">📏</div>
+        <div class="ct">Assessment — TGMD-2: Gallop 25 feet, both lead legs</div>
+        <div class="cb">Observe all 4 performance indicators per trial. Test the right leg leading AND the left leg leading — both sides matter equally.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SLIDE 15: CLOSING ====== -->
+<div class="slide">
+  <div class="title-bg"><div class="grid-lines"></div><div class="deco-cross"></div></div>
+  <div class="inner title-content" style="text-align:center;display:flex;flex-direction:column;align-items:center;">
+    <div class="eyebrow" style="justify-content:center;">SLAM Nevada Elementary · Henderson, NV</div>
+    <h1 style="font-size:clamp(34px,6vw,70px);">BUILD STRONG<br><span class="acc">MOVERS.</span></h1>
+    <p class="subtitle" style="text-align:center;margin-top:14px;">Every skill, every day, every kid. — Coach K. Hin</p>
+    <hr class="sep" style="margin:22px 0;width:100%;max-width:380px;">
+    <div style="display:flex;gap:28px;justify-content:center;flex-wrap:wrap;">
+      <div style="text-align:center;">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.14em;margin-bottom:3px;">Email</div>
+        <div style="font-size:13px;color:var(--text);">kenny.hin@slamnv.org</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.14em;margin-bottom:3px;">Athletics</div>
+        <div style="font-size:13px;color:var(--text);">slam.esathletics@slamnv.org</div>
+      </div>
+    </div>
+    <div style="margin-top:24px;background:var(--accent-dim);border:1px solid var(--accent-mid);border-radius:10px;padding:14px 24px;display:inline-block;">
+      <div style="font-size:18px;font-weight:800;color:var(--accent);letter-spacing:0.08em;">GO BULLS! 🐂</div>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div id="nav">
+  <button class="nav-btn" onclick="go(-1)">←</button>
+  <span id="counter">1 / 15</span>
+  <button class="nav-btn" onclick="go(1)">→</button>
+</div>
+
+<script>
+(function(){
+  var slides = document.querySelectorAll('.slide');
+  var total = slides.length;
+  var cur = 0;
+
+  document.getElementById('counter').textContent = '1 / ' + total;
+  document.getElementById('progress').style.width = (1/total*100) + '%';
+
+  window.go = function(dir) {
+    slides[cur].classList.remove('active');
+    slides[cur].classList.add('exit');
+    var prev = cur;
+    setTimeout(function(){ slides[prev].classList.remove('exit'); }, 360);
+    cur = (cur + dir + total) % total;
+    slides[cur].classList.add('active');
+    document.getElementById('counter').textContent = (cur+1) + ' / ' + total;
+    document.getElementById('progress').style.width = ((cur+1)/total*100) + '%';
+  };
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); go(1); }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); go(-1); }
+  });
+
+  // Swipe support for mobile
+  var tx = 0;
+  document.addEventListener('touchstart', function(e){ tx = e.touches[0].clientX; }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    var dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1);
+  }, {passive:true});
+})();
+</script>
+</body>
+</html>
