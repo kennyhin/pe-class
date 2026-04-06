@@ -1,1 +1,1614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coach K. Hin — PE Class / SLAM Nevada</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #D52B1E;
+  --red-dark: #A01F15;
+  --white: #FAFAF8;
+  --black: #0A0A0A;
+  --gray-light: #E5E5E0;
+  --gray-mid: #B0B0AA;
+  --gray-dark: #555550;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-head: 'Barlow Condensed', sans-serif;
+  --font-body: 'Barlow', sans-serif;
+}
 
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--white);
+  color: var(--black);
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.6;
+  cursor: none;
+}
+
+/* CURSOR */
+#cursor {
+  position: fixed;
+  width: 10px; height: 10px;
+  background: var(--red);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: multiply;
+  transition: transform 0.08s ease;
+}
+body:hover #cursor { transform: translate(-50%,-50%) scale(1); }
+a:hover ~ #cursor, button:hover ~ #cursor { transform: translate(-50%,-50%) scale(2.5); }
+
+/* PROGRESS BAR */
+#progress-bar {
+  position: fixed;
+  top: 60px; left: 0;
+  height: 2px;
+  background: var(--red);
+  z-index: 200;
+  width: 0%;
+  transition: width 0.1s linear;
+}
+
+/* NAV */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 150;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2.5rem;
+  height: 60px;
+  background: var(--white);
+  border-bottom: 2px solid var(--black);
+}
+.nav-brand {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--black);
+  text-decoration: none;
+}
+.nav-brand span { color: var(--red); }
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a {
+  font-family: var(--font-head);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--black);
+  text-decoration: none;
+  position: relative;
+  padding-bottom: 2px;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 0;
+  width: 0; height: 2px;
+  background: var(--red);
+  transition: width 0.22s ease;
+}
+.nav-links a:hover::after { width: 100%; }
+.nav-badge {
+  background: var(--red);
+  color: white;
+  font-family: var(--font-head);
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.7rem;
+}
+
+/* HERO */
+.hero {
+  display: grid;
+  grid-template-columns: 55% 45%;
+  min-height: 100vh;
+  padding-top: 60px;
+  border-bottom: 2px solid var(--black);
+}
+.hero-left {
+  padding: 5rem 4rem;
+  border-right: 2px solid var(--black);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2rem;
+}
+.hero-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-head);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+.hero-eyebrow::before {
+  content: '';
+  display: block;
+  width: 36px; height: 2px;
+  background: var(--red);
+  flex-shrink: 0;
+}
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(64px, 9vw, 130px);
+  line-height: 0.9;
+  letter-spacing: 0.01em;
+  color: var(--black);
+}
+.hero-title .red { color: var(--red); }
+.hero-subtitle {
+  font-size: 1.05rem;
+  font-weight: 300;
+  color: var(--gray-dark);
+  line-height: 1.75;
+  max-width: 460px;
+}
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 2px solid var(--black);
+  padding-top: 2rem;
+}
+.stat + .stat {
+  padding-left: 2rem;
+  border-left: 1px solid var(--gray-mid);
+}
+.stat-num {
+  font-family: var(--font-display);
+  font-size: 3.2rem;
+  color: var(--red);
+  line-height: 1;
+  margin-bottom: 0.2rem;
+}
+.stat-lbl {
+  font-family: var(--font-head);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gray-dark);
+}
+
+/* HERO RIGHT */
+.hero-right {
+  background: var(--black);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 4rem 3.5rem;
+}
+.hero-grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(255,255,255,0.04) 59px, rgba(255,255,255,0.04) 60px),
+    repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(255,255,255,0.04) 59px, rgba(255,255,255,0.04) 60px);
+}
+.hero-swiss-cross {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 220px; height: 220px;
+  opacity: 0.12;
+}
+.hero-swiss-cross::before, .hero-swiss-cross::after {
+  content: '';
+  position: absolute;
+  background: var(--red);
+  border-radius: 2px;
+}
+.hero-swiss-cross::before {
+  width: 100%; height: 48px;
+  top: 50%; transform: translateY(-50%);
+}
+.hero-swiss-cross::after {
+  width: 48px; height: 100%;
+  left: 50%; transform: translateX(-50%);
+}
+.hero-top-block {
+  position: relative;
+  z-index: 2;
+}
+.hero-school-lbl {
+  font-family: var(--font-head);
+  font-size: 0.68rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gray-mid);
+  margin-bottom: 0.5rem;
+}
+.hero-school-name {
+  font-family: var(--font-display);
+  font-size: 4rem;
+  color: var(--white);
+  line-height: 0.95;
+}
+.hero-school-name span { color: var(--red); }
+.hero-bottom-block {
+  position: relative;
+  z-index: 2;
+}
+.hero-quote {
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: var(--gray-mid);
+  line-height: 1.7;
+  border-left: 3px solid var(--red);
+  padding-left: 1.2rem;
+  margin-bottom: 2rem;
+}
+.hero-cats {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.hero-cat-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.hero-cat-num {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--red);
+  width: 28px;
+  flex-shrink: 0;
+}
+.hero-cat-name {
+  font-family: var(--font-head);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--white);
+}
+.hero-cat-count {
+  margin-left: auto;
+  font-family: var(--font-head);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  color: var(--gray-mid);
+}
+
+/* SECTION FRAMEWORK */
+section { border-bottom: 2px solid var(--black); }
+
+.section-header {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  border-bottom: 1px solid var(--gray-light);
+}
+.section-num {
+  font-family: var(--font-display);
+  font-size: 5rem;
+  color: var(--gray-light);
+  padding: 1.5rem 2rem;
+  border-right: 1px solid var(--gray-light);
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+.section-title-block {
+  padding: 2rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+.section-lbl {
+  font-family: var(--font-head);
+  font-size: 0.68rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--red);
+  display: block;
+  margin-bottom: 0.35rem;
+}
+.section-ttl {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 4vw, 3.8rem);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: var(--black);
+}
+.section-desc {
+  font-size: 0.88rem;
+  font-weight: 300;
+  color: var(--gray-dark);
+  max-width: 280px;
+  line-height: 1.65;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* PHILOSOPHY */
+.phil-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.phil-col {
+  padding: 4rem;
+}
+.phil-col:first-child { border-right: 1px solid var(--gray-light); }
+.phil-headline {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 2.5vw, 2.6rem);
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  color: var(--black);
+  margin-bottom: 1.5rem;
+}
+.phil-headline .red { color: var(--red); }
+.phil-body {
+  font-size: 0.93rem;
+  color: var(--gray-dark);
+  line-height: 1.75;
+  margin-bottom: 1rem;
+}
+.pillars {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--gray-light);
+  border: 1px solid var(--gray-light);
+  margin-top: 1rem;
+}
+.pillar {
+  background: var(--white);
+  padding: 1.5rem;
+}
+.pillar-icon {
+  width: 32px; height: 32px;
+  background: var(--red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+.pillar-icon svg {
+  width: 15px; height: 15px;
+  stroke: white; fill: none; stroke-width: 2.2;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.pillar-name {
+  font-family: var(--font-head);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--black);
+  margin-bottom: 0.35rem;
+}
+.pillar-text {
+  font-size: 0.8rem;
+  color: var(--gray-dark);
+  line-height: 1.55;
+}
+
+/* SKILLS GRID */
+.skills-wrap { padding: 3rem; }
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--gray-light);
+  border: 1px solid var(--gray-light);
+}
+.skill-card {
+  background: var(--white);
+  padding: 2rem 1.75rem;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.2s ease;
+}
+.skill-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: var(--red);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.28s ease;
+}
+.skill-card:hover::after { transform: scaleY(1); }
+.skill-card:hover { background: #F9F9F6; }
+
+.skill-cat-tag {
+  font-family: var(--font-head);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 0.4rem;
+}
+.skill-name {
+  font-family: var(--font-display);
+  font-size: 1.95rem;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: var(--black);
+  margin-bottom: 1rem;
+}
+.skill-divider {
+  width: 100%; height: 1px;
+  background: var(--gray-light);
+  margin-bottom: 0.9rem;
+}
+.cues-ttl {
+  font-family: var(--font-head);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gray-dark);
+  margin-bottom: 0.5rem;
+}
+.cues-list {
+  list-style: none;
+  margin-bottom: 1rem;
+}
+.cues-list li {
+  font-size: 0.8rem;
+  color: var(--black);
+  padding: 0.28rem 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--gray-light);
+  line-height: 1.4;
+}
+.cues-list li:last-child { border-bottom: none; }
+.kw {
+  font-family: var(--font-head);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--red);
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.04em;
+}
+.skill-assess {
+  background: var(--black);
+  padding: 0.75rem 1rem;
+  margin-top: 0.75rem;
+}
+.assess-lbl {
+  font-family: var(--font-head);
+  font-size: 0.58rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gray-mid);
+  margin-bottom: 0.2rem;
+}
+.assess-txt {
+  font-size: 0.78rem;
+  color: var(--white);
+  line-height: 1.4;
+}
+
+/* STAGES STRIP */
+.stages-strip {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 0.8rem;
+}
+.s-pip {
+  height: 3px;
+  flex: 1;
+  border-radius: 2px;
+}
+.s-pip.p1 { background: var(--gray-mid); }
+.s-pip.p2 { background: rgba(213,43,30,0.45); }
+.s-pip.p3 { background: rgba(213,43,30,0.7); }
+.s-pip.p4 { background: var(--red); }
+
+/* BALANCE SECTION */
+.balance-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--gray-light);
+  margin: 3rem;
+  border: 1px solid var(--gray-light);
+}
+.balance-card {
+  background: var(--white);
+  padding: 2.5rem 2.5rem;
+}
+.balance-type {
+  font-family: var(--font-display);
+  font-size: 2.8rem;
+  line-height: 1;
+  margin-bottom: 0.2rem;
+}
+.stage-rows {
+  margin-top: 0.8rem;
+}
+.stage-row {
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--gray-light);
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 0.75rem;
+  align-items: start;
+}
+.stage-row:last-child { border-bottom: none; }
+.stage-tag {
+  font-family: var(--font-head);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.4rem;
+  background: var(--gray-light);
+  color: var(--gray-dark);
+  text-align: center;
+  align-self: start;
+  margin-top: 0.1rem;
+}
+.stage-tag.mature {
+  background: var(--red);
+  color: white;
+}
+.stage-desc {
+  font-size: 0.78rem;
+  color: var(--black);
+  line-height: 1.5;
+}
+
+/* ABOUT STRIP */
+.about-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.about-col { padding: 4rem; }
+.about-col:first-child { border-right: 1px solid var(--gray-light); }
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--gray-light);
+  border: 1px solid var(--gray-light);
+}
+.contact-cell {
+  background: var(--white);
+  padding: 1.5rem;
+}
+.contact-lbl {
+  font-family: var(--font-head);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 0.4rem;
+}
+.contact-val {
+  font-size: 0.85rem;
+  color: var(--black);
+  line-height: 1.6;
+}
+.contact-val a {
+  color: var(--red);
+  text-decoration: none;
+}
+.contact-val a:hover { text-decoration: underline; }
+
+/* FOOTER */
+footer {
+  background: var(--black);
+  padding: 4rem;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+.footer-brand {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  color: var(--white);
+  line-height: 0.95;
+  margin-bottom: 0.75rem;
+}
+.footer-brand span { color: var(--red); }
+.footer-tagline {
+  font-family: var(--font-head);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gray-mid);
+  margin-bottom: 1rem;
+}
+.footer-col-ttl {
+  font-family: var(--font-head);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.footer-info {
+  font-size: 0.83rem;
+  color: var(--gray-mid);
+  line-height: 1.9;
+}
+.footer-info a {
+  color: var(--white);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.footer-info a:hover { color: var(--red); }
+.footer-bottom {
+  grid-column: 1 / -1;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+.footer-legal {
+  font-family: var(--font-head);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: #444;
+}
+.footer-bull {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--red);
+  letter-spacing: 0.08em;
+}
+
+
+
+/* Deep Dive button */
+.deep-dive-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 10px;
+  padding: 0.7rem 1rem;
+  background: var(--red);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-head);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  transition: background 0.2s;
+  text-decoration: none;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+.deep-dive-btn:hover,
+.deep-dive-btn:active { background: var(--red-dark); }
+
+/* REVEAL ANIMATION */
+.reveal {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+.reveal.hidden {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.reveal.in { opacity: 1; transform: translateY(0); }
+.reveal-d1 { transition-delay: 0.08s; }
+.reveal-d2 { transition-delay: 0.16s; }
+.reveal-d3 { transition-delay: 0.24s; }
+
+/* UTILITY */
+.red { color: var(--red); }
+
+/* =============================================
+   MOBILE NAV HAMBURGER
+   ============================================= */
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 4px;
+  background: none;
+  border: none;
+}
+.nav-hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--black);
+  transition: all 0.25s ease;
+}
+.nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.nav-mobile-menu {
+  display: none;
+  position: fixed;
+  top: 60px;
+  left: 0; right: 0;
+  background: var(--white);
+  border-bottom: 2px solid var(--black);
+  z-index: 140;
+  flex-direction: column;
+}
+.nav-mobile-menu.open { display: flex; }
+.nav-mobile-menu a {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--black);
+  text-decoration: none;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--gray-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav-mobile-menu a::after {
+  content: '→';
+  color: var(--red);
+  font-size: 0.9rem;
+}
+
+/* =============================================
+   TABLET  ≤ 900px
+   ============================================= */
+@media (max-width: 900px) {
+  /* NAV */
+  .nav-links, .nav-badge { display: none; }
+  .nav-hamburger { display: flex; }
+
+  /* HERO */
+  .hero {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  .hero-left {
+    border-right: none;
+    border-bottom: 2px solid var(--black);
+    padding: 3rem 2rem;
+    gap: 1.5rem;
+  }
+  .hero-right {
+    padding: 2.5rem 2rem;
+    min-height: 340px;
+  }
+  .hero-title { font-size: clamp(52px, 12vw, 90px); }
+
+  /* SECTION HEADERS */
+  .section-title-block {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.5rem 1.5rem;
+    gap: 0.75rem;
+  }
+  .section-desc { text-align: left; max-width: 100%; }
+  .section-num { font-size: 3.5rem; padding: 1rem 1.5rem; }
+
+  /* PHILOSOPHY */
+  .phil-wrap { grid-template-columns: 1fr; }
+  .phil-col:first-child { border-right: none; border-bottom: 1px solid var(--gray-light); }
+  .phil-col { padding: 2.5rem 2rem; }
+
+  /* SKILLS */
+  .skills-wrap { padding: 1.5rem; }
+  .skills-grid { grid-template-columns: 1fr 1fr; }
+
+  /* BALANCE */
+  .balance-wrap {
+    grid-template-columns: 1fr;
+    margin: 1.5rem;
+  }
+  .balance-card { border-left: none !important; border-top: 1px solid var(--gray-light); }
+
+  /* ABOUT */
+  .about-wrap { grid-template-columns: 1fr; }
+  .about-col:first-child { border-right: none; border-bottom: 1px solid var(--gray-light); }
+  .about-col { padding: 2.5rem 2rem; }
+
+  /* FOOTER */
+  footer {
+    grid-template-columns: 1fr 1fr;
+    padding: 2.5rem 2rem;
+    gap: 2rem;
+  }
+  .footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+/* =============================================
+   MOBILE  ≤ 600px
+   ============================================= */
+@media (max-width: 600px) {
+  /* CURSOR OFF on touch */
+  body { cursor: auto; }
+  #cursor { display: none; }
+
+  /* NAV */
+  nav { padding: 0 1.25rem; }
+
+  /* HERO */
+  .hero-left { padding: 2.5rem 1.25rem; gap: 1.25rem; }
+  .hero-title { font-size: clamp(44px, 13vw, 72px); }
+  .hero-subtitle { font-size: 0.93rem; }
+  .hero-stats { grid-template-columns: repeat(3, 1fr); gap: 0; }
+  .stat + .stat { padding-left: 0.75rem; }
+  .stat-num { font-size: 2.2rem; }
+  .stat-lbl { font-size: 0.58rem; }
+
+  .hero-right { padding: 2rem 1.25rem; min-height: 280px; }
+  .hero-school-name { font-size: 2.8rem; }
+  .hero-quote { font-size: 0.82rem; margin-bottom: 1.25rem; }
+
+  /* SECTION HEADERS */
+  .section-header { grid-template-columns: 60px 1fr; }
+  .section-num { font-size: 2.5rem; padding: 0.75rem 1rem; }
+  .section-title-block { padding: 1.25rem; }
+  .section-ttl { font-size: clamp(1.8rem, 8vw, 2.6rem); }
+
+  /* PHILOSOPHY */
+  .phil-col { padding: 1.75rem 1.25rem; }
+  .phil-headline { font-size: clamp(1.5rem, 6vw, 2rem); margin-bottom: 1rem; }
+  .phil-body { font-size: 0.88rem; }
+  .pillars { grid-template-columns: 1fr 1fr; }
+  .pillar { padding: 1rem; }
+
+  /* SKILLS — single column on small phones */
+  .skills-wrap { padding: 1rem; }
+  .skills-grid { grid-template-columns: 1fr; }
+  .skill-card { padding: 1.5rem 1.25rem; }
+  .skill-name { font-size: 1.7rem; }
+
+  /* BALANCE */
+  .balance-wrap { margin: 1rem; }
+  .balance-card { padding: 1.75rem 1.25rem; }
+  .balance-type { font-size: 2.2rem; }
+  .stage-row { grid-template-columns: 70px 1fr; }
+
+  /* ABOUT */
+  .about-col { padding: 1.75rem 1.25rem; }
+  .contact-grid { grid-template-columns: 1fr; }
+  .contact-cell { padding: 1rem 1.25rem; }
+
+  /* FOOTER */
+  footer {
+    grid-template-columns: 1fr;
+    padding: 2rem 1.25rem;
+    gap: 1.5rem;
+  }
+  .footer-brand { font-size: 2.2rem; }
+  .footer-bottom { flex-direction: column; gap: 0.4rem; }
+  .footer-legal { font-size: 0.6rem; }
+}
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="progress-bar"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-brand">Coach <span>K. Hin</span></a>
+  <ul class="nav-links">
+    <li><a href="#philosophy">Program</a></li>
+    <li><a href="#locomotor">Locomotor</a></li>
+    <li><a href="#manipulative">Manipulative</a></li>
+    <li><a href="#balancing">Balancing</a></li>
+    <li><a href="#about">About</a></li>
+  </ul>
+  <div class="nav-badge">Go Bulls!</div>
+  <button class="nav-hamburger" id="hamburger" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="nav-mobile-menu" id="mobileMenu">
+  <a href="#philosophy" class="mob-link">Program</a>
+  <a href="#locomotor" class="mob-link">Locomotor</a>
+  <a href="#manipulative" class="mob-link">Manipulative</a>
+  <a href="#balancing" class="mob-link">Balancing</a>
+  <a href="#about" class="mob-link">About</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">SLAM Nevada Elementary · Henderson, NV</div>
+    <h1 class="hero-title">PHYSICAL<br>EDUCATION<br><span class="red">CLASS</span></h1>
+    <p class="hero-subtitle">
+      Welcome to Coach K. Hin's PE class — where we build strong bodies, confident movers, and lifelong athletes. Every skill, every day, every kid.
+    </p>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">K–5</div>
+        <div class="stat-lbl">Grades Served</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">13</div>
+        <div class="stat-lbl">Core Skills</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">3</div>
+        <div class="stat-lbl">Skill Categories</div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-grid-bg"></div>
+    <div class="hero-swiss-cross"></div>
+    <div class="hero-top-block">
+      <div class="hero-school-lbl">School</div>
+      <div class="hero-school-name">SLAM<br><span>NEVADA</span></div>
+    </div>
+    <div class="hero-bottom-block">
+      <p class="hero-quote">
+        Fundamental movement skills are the building blocks of physical literacy — mastered here, used for life.
+      </p>
+      <div class="hero-cats">
+        <div class="hero-cat-row">
+          <div class="hero-cat-num">01</div>
+          <div class="hero-cat-name">Locomotor Skills</div>
+          <div class="hero-cat-count">6 Skills</div>
+        </div>
+        <div class="hero-cat-row">
+          <div class="hero-cat-num">02</div>
+          <div class="hero-cat-name">Manipulative Skills</div>
+          <div class="hero-cat-count">6 Skills</div>
+        </div>
+        <div class="hero-cat-row">
+          <div class="hero-cat-num">03</div>
+          <div class="hero-cat-name">Balancing</div>
+          <div class="hero-cat-count">2 Types</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PHILOSOPHY -->
+<section id="philosophy">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title-block">
+      <div>
+        <span class="section-lbl">Program</span>
+        <h2 class="section-ttl">OUR APPROACH</h2>
+      </div>
+      <p class="section-desc">Every child develops at their own pace. We meet students where they are and build from there.</p>
+    </div>
+  </div>
+  <div class="phil-wrap">
+    <div class="phil-col reveal">
+      <p class="phil-headline">Movement is a <span class="red">language.</span><br>We teach every child to speak it fluently.</p>
+      <p class="phil-body">In Coach Hin's PE class, we follow a research-based framework for Fundamental Movement Skills (FMS). Students progress through developmental stages — Initial, Elementary, and Mature — building competence and confidence along the way.</p>
+      <p class="phil-body">Our curriculum covers three skill families: Locomotor (moving the body through space), Manipulative (controlling objects), and Balancing (controlling the body itself).</p>
+      <p class="phil-body">Parents and students can use this page to understand expectations, recognize teaching cues used in class, and practice at home. Everything here connects directly to what happens in the gym.</p>
+    </div>
+    <div class="phil-col reveal reveal-d1">
+      <div class="pillars">
+        <div class="pillar">
+          <div class="pillar-icon">
+            <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </div>
+          <div class="pillar-name">Movement</div>
+          <div class="pillar-text">Fundamental patterns practiced daily through structured, engaging activities.</div>
+        </div>
+        <div class="pillar">
+          <div class="pillar-icon">
+            <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          </div>
+          <div class="pillar-name">Progression</div>
+          <div class="pillar-text">Skills build from pre-control to proficiency across K–5 grade levels.</div>
+        </div>
+        <div class="pillar">
+          <div class="pillar-icon">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="pillar-name">Community</div>
+          <div class="pillar-text">Partner activities and games build social skills alongside physical ones.</div>
+        </div>
+        <div class="pillar">
+          <div class="pillar-icon">
+            <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div class="pillar-name">Assessment</div>
+          <div class="pillar-text">Regular skill checks help Coach Hin tailor instruction to each student.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOCOMOTOR SKILLS -->
+<section id="locomotor">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title-block">
+      <div>
+        <span class="section-lbl">Category One</span>
+        <h2 class="section-ttl">LOCOMOTOR SKILLS</h2>
+      </div>
+      <p class="section-desc">Moving the body through space. Six foundational skills every K–5 student develops.</p>
+    </div>
+  </div>
+  <div class="skills-wrap">
+    <div class="skills-grid">
+
+      <!-- Running -->
+      <div class="skill-card reveal">
+        <div class="skill-cat-tag">Locomotor · 4 Stages</div>
+        <div class="stages-strip">
+          <div class="s-pip p1"></div><div class="s-pip p2"></div><div class="s-pip p3"></div><div class="s-pip p4"></div>
+        </div>
+        <div class="skill-name">RUNNING</div>
+        <div class="skill-divider"></div>
+        <div class="cues-ttl">Teaching Cues</div>
+        <ul class="cues-list">
+          <li><span class="kw">"Look Ahead"</span> Eyes focused forward throughout</li>
+          <li><span class="kw">"High Knees"</span> Knees bend at right angles</li>
+          <li><span class="kw">"Pump Arms"</span> Arms move in opposition to legs</li>
+          <li><span class="kw">"Light Feet"</span> Front of foot contacts ground</li>
+          <li><span class="kw">"Lean Forward"</span> Body leans slightly forward</li>
+        </ul>
+        <div class="skill-assess">
+          <div class="assess-lbl">Assessment</div>
+          <div class="assess-txt">Run as fast as possible between 2 cones set 60 feet apart</div>
+        </div>
+        <a href="running-locomotor-deck.html" target="_blank" class="deep-dive-btn">Deep Dive: Running →</a>
+      </div>
+
+      <!-- Galloping & Sliding -->
+      <div class="skill-card reveal reveal-d1">
+        <div class="skill-cat-tag">Locomotor · 3 Stages</div>
+        <div class="stages-strip">
+          <div class="s-pip p1"></div><div class="s-pip p2"></div><div class="s-pip p4"></div>
+        </div>
+        <div class="skill-name">GALLOP / SLIDE</div>
+        <div class="skill-divider"></div>
+        <div class="cues-ttl">Teaching Cues</div>
+        <ul class="cues-list">
+          <li><span class="kw">"Trail Leg"</span> Keep trail leg behind lead leg</li>
+          <li><span class="kw">"Lead Leg"</span> Can gallop using either leg</li>
+          <li><span class="kw">"Arms With Beat"</span> Rhythmical arm movement</li>
+          <li><span class="kw">"Twist to Direction"</span> Hips, shoulders, eyes all aligned</li>
+        </ul>
+        <div class="skill-assess">
+          <div class="assess-lbl">Assessment</div>
+          <div class="assess-txt">Gallop from one cone to the other for about 25 feet</div>
+        </div>
+        <a href="gallop-slide-locomotor-deck.html" target="_blank" class="deep-dive-btn">Deep Dive: Gallop &amp; Slide →</a>
+      </div>
+
+      <!-- Hopping -->
+      <div class="skill-card reveal reveal-d2">
+        <div class="skill-cat-tag">Locomotor · 4 Stages</div>
+        <div class="stages-strip">
+          <div class="s-pip p1"></div><div class="s-pip p2"></div><div class="s-pip p3"></div><div class="s-pip p4"></div>
+        </div>
+        <div class="skill-name">HOPPING</div>
+        <div class="skill-divider"></div>
+        <div class="cues-ttl">Teaching Cues</div>
+        <ul class="cues-list">
+          <li><span class="kw">"One Foot"</span> Take off and land same foot</li>
+          <li><span class="kw">"Make an L Shape"</span> Knee at 90° behind body</li>
+          <li><span class="kw">"Arms"</span> Use arms for lift</li>
+          <li><span class="kw">"Hop to a Beat"</span> Rhythmical hopping pattern</li>
+          <li><span class="kw">"Controlled"</span> Maintain balance throughout</li>
+        </ul>
+        <div class="skill-assess">
+          <div class="assess-lbl">Assessment</div>
+          <div class="assess-txt">Hop 3 times on one foot then the other foot</div>
+        </div>
+      </div>
+
+      <!-- Horizontal Jump -->
+      <div class="skill-card reveal">
+        <div class="skill-cat-tag">Locomotor · 4 Stages</div>
+        <div class="stages-strip">
+          <div class="s-pip p1"></div><div class="s-pip p2"></div><div class="s-pip p3"></div><div class="s-pip p4"></div>
+        </div>
+        <div class="skill-name">HORIZ. JUMP</div>
+        <div class="skill-divider"></div>
+        <div class="cues-ttl">Teaching Cues</div>
+        <ul class="cues-list">
+          <li><span class="kw">"Look Ahead"</span> Eyes focused forward</li>
+          <li><span class="kw">"Bend Then Explode"</span> Prep: bend knees and waist</li>
+          <li><span class="kw">"Swing"</span> Full arms swing back-to-forward</li>
+          <li><span class="kw">"Expand"</span> Extend body in flight with bent knees</li>
+          <li><span class="kw">"Soft Feet"</span> Take off and land on two feet</li>
+        </ul>
+        <div class="skill-assess">
+          <div class="assess-lbl">Assessment</div>
+          <div class="assess-txt">Jump as far as possible from a starting line on the floor</div>
+        </div>
+      </div>
+
+      <!-- Leaping -->
+      <div class="skill-card reveal reveal-d1">
+        <div class="skill-cat-tag">Locomotor · 4 Stages</div>
+        <div class="stages-strip">
+          <div class="s-pip p1"></div><div class="s-pip p2"></div><div class="s-pip p3"></div><div class="s-pip p4"></div>
+        </div>
+        <div class="skill-name">LEAPING</div>
+        <div class="skill-divider"></div>
+        <div class="cues-ttl">Teaching Cues</div>
+        <ul class="cues-list">
+          <li><span class="kw">"Move Forward"</span> Sustained forward movement in leap</li>
+          <li><span class="kw">"Looking Ahead"</span> Eyes focused forward</li>
+          <li><span class="kw">"Opposite Feet"</span> Take off one foot, land other</li>
+          <li><span class="kw">"Straight Legs"</span> Legs extended in flight</li>
+          <li><span class="kw">"Control"</span> Controlled landing, no balance loss</li>
+        </ul>
+        <div class="skill-assess">
+          <div class="assess-lbl">Assessment</div>
+          <div class="assess-txt">Run then leap over a beanbag starting from tape</div>
+        </div>
+      </div>
+
+      <!-- Skipping -->
+      <div class="skill-card reveal reveal-d2">
+        <div class="skill-cat-tag">Locomotor · 3 Stages</div>
+        <div class="stages-strip">
+          <div class="s-pip p1"></div><div class="s-pip p2"></div><div class="s-pip p4"></div>
+        </div>
+        <div class="skill-name">SKIPPING</div>
+        <div class="skill-divider"></div>
+        <div class="cues-ttl">Teaching Cues</div>
+        <ul class="cues-list">
+          <li><span class="kw">"Step-Hop"</span> Displays a step-hop pattern</li>
+          <li><span class="kw">"Left Then Right"</span> Uses both sides alternately</li>
+          <li><span class="kw">"Arm Swing"</span> Arms swing in opposition to feet</li>
+          <li><span class="kw">"Keep a Beat"</span> Displays rhythmical pattern</li>
+          <li><span class="kw">"Look Ahead"</span> Eyes focused forward</li>
+        </ul>
+        <div class="skill-assess">
+          <div class="assess-lbl">Assessment</div>
+          <div class="assess-txt">Skip from one cone to another for about 25 feet</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- MANIPULATIVE SKILLS -->
+<section id="manipulative">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title-block">
+      <div>
+        <span class="section-lbl">Category Two</span>
+        <h2 class="section-ttl">MANIPULATIVE SKILLS</h2>
+      </div>
+      <p class="section-desc">Controlling and interacting with objects using different body parts and implements.</p>
+    </div>
+  </div>
+  <div class="skills-wrap">
+    <div class="skills-grid">
+
+      <!-- Catching -->
+      <div class="skill-card reveal">
+        <div class="skill-cat-tag">Manipulative · 5 Stages</div>
+        <div class="stages-strip">
+          <div class="s-pip p1"></div><div class="s-pip p1"></div><div class="s-pip p2"></div><div class="s-pip p3"></div><div class="s-pip p4"></div>
+        </div>
+        <div class="skill-name">CATCHING</div>
+        <div class="skill-divider"></div>
+        <div class="cues-ttl">Teaching Cues</div>
+        <ul class="cues-list">
+          <li><span class="kw">"Look"</span> Eyes on object throughout entire catch</li>
+          <li><span class="kw">"Get Behind"</span> Position body in path of object</li>
+          <li><span class="kw">"Ready"</span> One foot slightly ahead, balanced</li>
+          <li><span class="kw">"Pinkies / Thumbs"</span> Correct hand orientation</li>
+          <li><span class="kw">"Soft Hands"</span> Relax and absorb force of object</li>
+        </ul>
+        <div class="skill-assess">
+          <div class="assess-lbl">Assessment</div>
+          <div class="assess-txt">4' ball, 2 lines 15ft apart — toss underhand to child aiming at chest</div>
+        </div>
+      </div>
+
+      <!-- Dribbling -->
+      <div class="skill-card reveal reveal-d1">
+        <div class="skill-cat-tag">Manipulative · 4 Stages</div>
+        <div class="stages-strip">
+          <div class="s-pip p1"></div><div class="s-pip p2"></div><div class="s-pip p3"></div><div class="s-pip p4"></div>
+        </div>
+        <div class="skill-name">DRIBBLING</div>
+        <div class="skill-divider"></div>
+        <div class="cues-ttl">Teaching Cues</div>
+        <ul class="cues-list">
+          <li><span class="kw">"Look Ahead"</span> Eyes forward, not on ball</li>
+          <li><span class="kw">"5 Fingers"</span> Fingertip contact with ball</li>
+          <li><span class="kw">"Yo-Yo"</span> Bend and straighten wrist/elbow</li>
+          <li><span class="kw">"Bend & Lean"</span> Hips and knees slightly flexed</li>
+          <li><span class="kw">"Opp. Foot Fwd"</span> Dribble in front, to the side</li>
+        </ul>
+        <div class="skill-assess">
+          <div class="assess-lbl">Assessment</div>
+          <div class="assess-txt">Dribble ball 4x without moving; repeat on other side</div>
+        </div>
+      </div>
+
+      <!-- Kicking -->
+      <div class="skill-card reveal reveal-d2">
+        <div class="skill-cat-tag">Manipulative · 4 Stages</div>
+        <div class="stages-strip">
+          <div class="s-pip p1"></div><div class="s-pip p2"></div><div class="s-pip p3"></div><div class="s-pip p4"></div>
+        </div>
+        <div class="skill-name">KICKING</div>
+        <div class="skill-divider"></div>
+        <div class="cues-ttl">Teaching Cues</div>
+        <ul class="cues-list">
+          <li><span class="kw">"Eyes on Target"</span> Focus on the target</li>
+          <li><span class="kw">"Plant Foot"</span> Step beside ball with non-kicking foot</li>
+          <li><span class="kw">"Lean In"</span> Bend at waist, initiate kick from hip</li>
+          <li><span class="kw">"Shoelaces"</span> Contact ball with instep</li>
+          <li><span class="kw">"Swing Through"</span> Follow through toward target</li>
+        </ul>
+        <div class="skill-assess">
+          <div class="assess-lbl">Assessment</div>
+          <div class="assess-txt">Run and kick a stationary ball for 20 feet</div>
+        </div>
+      </div>
+
+      <!-- Overhand Throw -->
+      <div class="skill-card reveal">
+        <div class="skill-cat-tag">Manipulative · 5 Stages</div>
+        <div class="stages-strip">
+          <div class="s-pip p1"></div><div class="s-pip p1"></div><div class="s-pip p2"></div><div class="s-pip p3"></div><div class="s-pip p4"></div>
+        </div>
+        <div class="skill-name">OVERHAND THROW</div>
+        <div class="skill-divider"></div>
+        <div class="cues-ttl">Teaching Cues</div>
+        <ul class="cues-list">
+          <li><span class="kw">"Eyes on Target"</span> Focus on target throughout</li>
+          <li><span class="kw">"W"</span> Elbow back at shoulder height, behind ear</li>
+          <li><span class="kw">"Rotate"</span> Hips rotate, opposite shoulder to target</li>
+          <li><span class="kw">"Step Forward"</span> Opposite foot steps forward</li>
+          <li><span class="kw">"Follow Through"</span> Lead with elbow, follow down across</li>
+        </ul>
+        <div class="skill-assess">
+          <div class="assess-lbl">Assessment</div>
+          <div class="assess-txt">20 ft from wall — throw tennis ball hard at the wall</div>
+        </div>
+      </div>
+
+      <!-- Striking -->
+      <div class="skill-card reveal reveal-d1">
+        <div class="skill-cat-tag">Manipulative · 4 Stages</div>
+        <div class="stages-strip">
+          <div class="s-pip p1"></div><div class="s-pip p2"></div><div class="s-pip p3"></div><div class="s-pip p4"></div>
+        </div>
+        <div class="skill-name">STRIKING</div>
+        <div class="skill-divider"></div>
+        <div class="cues-ttl">Teaching Cues</div>
+        <ul class="cues-list">
+          <li><span class="kw">"Watch Ball"</span> Eyes on object being struck</li>
+          <li><span class="kw">"Stand Sideways"</span> Side on to target</li>
+          <li><span class="kw">"Swing Back"</span> Preparatory backswing displayed</li>
+          <li><span class="kw">"Rotate"</span> Hip and shoulder rotation during swing</li>
+          <li><span class="kw">"Follow Through"</span> Follow through along swinging path</li>
+        </ul>
+        <div class="skill-assess">
+          <div class="assess-lbl">Assessment</div>
+          <div class="assess-txt">Hit 4' ball off batting tee — hit hard</div>
+        </div>
+      </div>
+
+      <!-- Underhand Rolling -->
+      <div class="skill-card reveal reveal-d2">
+        <div class="skill-cat-tag">Manipulative · 3 Stages</div>
+        <div class="stages-strip">
+          <div class="s-pip p1"></div><div class="s-pip p2"></div><div class="s-pip p4"></div>
+        </div>
+        <div class="skill-name">UH ROLLING</div>
+        <div class="skill-divider"></div>
+        <div class="cues-ttl">Teaching Cues</div>
+        <ul class="cues-list">
+          <li><span class="kw">"Eyes on Target"</span> Focus eyes on the target</li>
+          <li><span class="kw">"Swing"</span> Backward and forward arm swing</li>
+          <li><span class="kw">"3 Steps"</span> Step forward with opposite leg</li>
+          <li><span class="kw">"Bend & Release Low"</span> Bend knees, release along floor</li>
+          <li><span class="kw">"Follow Through"</span> Hand pointing at target after release</li>
+        </ul>
+        <div class="skill-assess">
+          <div class="assess-lbl">Assessment</div>
+          <div class="assess-txt">Roll from 20 ft away between 2 cones set 4 ft apart</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- BALANCING -->
+<section id="balancing">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title-block">
+      <div>
+        <span class="section-lbl">Category Three</span>
+        <h2 class="section-ttl">BALANCING</h2>
+      </div>
+      <p class="section-desc">Controlling the body — both still and in motion. Static and dynamic balance both matter.</p>
+    </div>
+  </div>
+  <div class="balance-wrap reveal">
+
+    <!-- Static -->
+    <div class="balance-card">
+      <div class="skill-cat-tag">Balance · 3 Stages</div>
+      <div class="stages-strip" style="margin-bottom:0.8rem;">
+        <div class="s-pip p1"></div><div class="s-pip p2"></div><div class="s-pip p4"></div>
+      </div>
+      <div class="balance-type">STATIC</div>
+      <div style="font-family:var(--font-head);font-size:0.75rem;color:var(--gray-dark);letter-spacing:0.08em;margin-bottom:1rem;">Holding still while maintaining balance</div>
+      <div class="skill-divider"></div>
+      <div class="cues-ttl">Teaching Cues</div>
+      <ul class="cues-list" style="margin-bottom:1rem;">
+        <li><span class="kw">"Control"</span> Maintains a steady balance</li>
+        <li><span class="kw">"Correct"</span> Adjusts body to maintain balance</li>
+        <li><span class="kw">"Looking Forward"</span> Eyes focused forward at all times</li>
+      </ul>
+      <div class="cues-ttl">Developmental Stages</div>
+      <div class="stage-rows">
+        <div class="stage-row">
+          <div class="stage-tag">Initial</div>
+          <div class="stage-desc">Very unstable; raises non-supporting leg several inches; overcompensates with outside support</div>
+        </div>
+        <div class="stage-row">
+          <div class="stage-tag">Elementary</div>
+          <div class="stage-desc">Performs better on dominant leg; uses arms for balance; cannot balance with eyes closed</div>
+        </div>
+        <div class="stage-row">
+          <div class="stage-tag mature">Mature</div>
+          <div class="stage-desc">Can balance with eyes closed; uses arms and trunk as needed; changes to non-dominant leg</div>
+        </div>
+      </div>
+      <div class="skill-assess">
+        <div class="assess-lbl">Assessment</div>
+        <div class="assess-txt">Stork stance on one leg then the other — hold for 30 seconds</div>
+      </div>
+    </div>
+
+    <!-- Dynamic -->
+    <div class="balance-card" style="border-left:1px solid var(--gray-light);">
+      <div class="skill-cat-tag">Balance · 3 Stages</div>
+      <div class="stages-strip" style="margin-bottom:0.8rem;">
+        <div class="s-pip p1"></div><div class="s-pip p2"></div><div class="s-pip p4"></div>
+      </div>
+      <div class="balance-type">DYNAMIC</div>
+      <div style="font-family:var(--font-head);font-size:0.75rem;color:var(--gray-dark);letter-spacing:0.08em;margin-bottom:1rem;">Maintaining balance while moving through space</div>
+      <div class="skill-divider"></div>
+      <div class="cues-ttl">Teaching Cues</div>
+      <ul class="cues-list" style="margin-bottom:1rem;">
+        <li><span class="kw">"Movement"</span> Maintains balance while alternate stepping</li>
+        <li><span class="kw">"Good Posture"</span> Maintains an upright posture</li>
+        <li><span class="kw">"Control"</span> Maintains balance by using arms as needed</li>
+        <li><span class="kw">"Looking Forward"</span> Eyes focused forward at all times</li>
+      </ul>
+      <div class="cues-ttl">Developmental Stages</div>
+      <div class="stage-rows">
+        <div class="stage-row">
+          <div class="stage-tag">Initial</div>
+          <div class="stage-desc">Balances with support; eyes on feet; uses follow step with dominant foot lead</div>
+        </div>
+        <div class="stage-row">
+          <div class="stage-tag">Elementary</div>
+          <div class="stage-desc">Eyes focused on beam; loses balance easily; uses alternate stepping action</div>
+        </div>
+        <div class="stage-row">
+          <div class="stage-tag mature">Mature</div>
+          <div class="stage-desc">Movements fluid, relaxed, and in control; eyes focused beyond beam; loses balance rarely</div>
+        </div>
+      </div>
+      <div class="skill-assess">
+        <div class="assess-lbl">Assessment</div>
+        <div class="assess-txt">Walk across a balance beam forwards</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title-block">
+      <div>
+        <span class="section-lbl">Your Teacher</span>
+        <h2 class="section-ttl">COACH K. HIN</h2>
+      </div>
+      <p class="section-desc">PE Teacher & Athletic Director — SLAM Nevada Elementary, Henderson NV</p>
+    </div>
+  </div>
+  <div class="about-wrap">
+    <div class="about-col reveal">
+      <p class="phil-headline" style="margin-bottom:1.5rem;">Building <span class="red">confident</span> movers from day one.</p>
+      <p class="phil-body">Coach Kenny Hin serves as both the K–5 Physical Education teacher and Athletic Director at SLAM Nevada Elementary in Henderson, NV. Every unit is grounded in developmental movement science — meeting students where they are and progressing them toward mastery.</p>
+      <p class="phil-body">The content on this page reflects the Fundamental Movement Skill (FMS) framework used in class. Parents and students can use it to understand expectations, recognize teaching cues, and practice at home.</p>
+      <p class="phil-body">The skill framework on this site is based on research from PHE Canada, the TGMD-2 Assessment Protocol, and Graham et al.'s <em>Children Moving</em>.</p>
+    </div>
+    <div class="about-col reveal reveal-d1">
+      <div class="cues-ttl" style="margin-bottom:1rem;">Contact & Links</div>
+      <div class="contact-grid">
+        <div class="contact-cell">
+          <div class="contact-lbl">School</div>
+          <div class="contact-val">SLAM Nevada Elementary<br>1095 Fielders Street<br>Henderson, NV 89011</div>
+        </div>
+        <div class="contact-cell">
+          <div class="contact-lbl">NV State Standards</div>
+          <div class="contact-val"><a href="https://doe.nv.gov/Standards_Instructional_Support/Nevada_Academic_Content_Standards/Physical_Education/" target="_blank">Nevada PE Standards ↗</a></div>
+        </div>
+        <div class="contact-cell">
+          <div class="contact-lbl">Email</div>
+          <div class="contact-val"><a href="mailto:kenny.hin@slamnv.org">kenny.hin@slamnv.org</a></div>
+        </div>
+        <div class="contact-cell">
+          <div class="contact-lbl">Athletics Page</div>
+          <div class="contact-val"><a href="https://www.slamnv.org/apps/pages/index.jsp?uREC_ID=591296&type=d&termREC_ID=&pREC_ID=1145033" target="_blank">SLAM Athletics ↗</a></div>
+        </div>
+        <div class="contact-cell" style="grid-column: 1 / -1;">
+          <div class="contact-lbl">Athletics Email</div>
+          <div class="contact-val"><a href="mailto:slam.esathletics@slamnv.org">slam.esathletics@slamnv.org</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-brand">COACH<br><span>K. HIN</span></div>
+    <div class="footer-tagline">Physical Education · SLAM Nevada</div>
+    <div class="footer-info" style="margin-top:1rem;">K–5 Physical Education<br>& Athletic Director</div>
+  </div>
+  <div>
+    <div class="footer-col-ttl">Skills</div>
+    <div class="footer-info">
+      <a href="#locomotor">Locomotor Skills</a><br>
+      <a href="#manipulative">Manipulative Skills</a><br>
+      <a href="#balancing">Balancing</a><br>
+      <a href="#philosophy">Our Approach</a>
+    </div>
+  </div>
+  <div>
+    <div class="footer-col-ttl">Contact</div>
+    <div class="footer-info">
+      <a href="mailto:kenny.hin@slamnv.org">kenny.hin@slamnv.org</a><br>
+      1095 Fielders Street<br>
+      Henderson, NV 89011
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-legal">© 2025 Coach K. Hin — SLAM Nevada Elementary · K–5 Physical Education</div>
+    <div class="footer-bull">GO BULLS</div>
+    <div class="footer-legal">Framework based on PHE Canada FMS Research · TGMD-2</div>
+  </div>
+</footer>
+
+
+
+<div id="brand">Coach <span>K. Hin</span> · SLAM Nevada</div>
+
+
+
+
+
+  </div>
+</div>
+
+
+<script>
+(function() {
+  'use strict';
+
+  // Hamburger menu
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  if (hamburger) {
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+    });
+  }
+  document.querySelectorAll('.mob-link').forEach(link => {
+    link.addEventListener('click', () => {
+      hamburger.classList.remove('open');
+      mobileMenu.classList.remove('open');
+    });
+  });
+
+  // Custom cursor (desktop only)
+  const cursor = document.getElementById('cursor');
+  if (cursor && window.matchMedia('(pointer: fine)').matches) {
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+    });
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.style.transform = 'translate(-50%,-50%) scale(2.8)';
+        cursor.style.opacity = '0.7';
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.style.transform = 'translate(-50%,-50%) scale(1)';
+        cursor.style.opacity = '1';
+      });
+    });
+  }
+
+  // Page scroll progress bar
+  const progressBar = document.getElementById('progress-bar');
+  if (progressBar) {
+    window.addEventListener('scroll', () => {
+      const scrolled = window.scrollY;
+      const total = document.body.scrollHeight - window.innerHeight;
+      progressBar.style.width = (scrolled / total * 100) + '%';
+    });
+  }
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window && reveals.length) {
+    reveals.forEach(el => el.classList.add('hidden'));
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.remove('hidden');
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
+    reveals.forEach(el => io.observe(el));
+  }
+
+})();
+</script>
+
+</body>
+</html>
