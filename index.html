@@ -688,9 +688,13 @@ footer {
 
 /* REVEAL ANIMATION */
 .reveal {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+.reveal.hidden {
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.55s ease, transform 0.55s ease;
 }
 .reveal.in { opacity: 1; transform: translateY(0); }
 .reveal-d1 { transition-delay: 0.08s; }
@@ -1497,7 +1501,7 @@ footer {
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
   // Hamburger menu
   const hamburger = document.getElementById('hamburger');
   const mobileMenu = document.getElementById('mobileMenu');
@@ -1512,27 +1516,48 @@ footer {
     });
   });
 
-  // Custom cursor
+  // Custom cursor (desktop only)
   const cursor = document.getElementById('cursor');
-  let mx = 0, my = 0;
-  document.addEventListener('mousemove', e => {
-    mx = e.clientX; my = e.clientY;
-    cursor.style.left = mx + 'px';
-    cursor.style.top = my + 'px';
-  });
-  document.querySelectorAll('a, button').forEach(el => {
-    el.addEventListener('mouseenter', () => {
-      cursor.style.transform = 'translate(-50%,-50%) scale(2.8)';
-      cursor.style.opacity = '0.7';
+  if (window.matchMedia('(pointer: fine)').matches) {
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
     });
-    el.addEventListener('mouseleave', () => {
-      cursor.style.transform = 'translate(-50%,-50%) scale(1)';
-      cursor.style.opacity = '1';
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.style.transform = 'translate(-50%,-50%) scale(2.8)';
+        cursor.style.opacity = '0.7';
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.style.transform = 'translate(-50%,-50%) scale(1)';
+        cursor.style.opacity = '1';
+      });
     });
-  });
+  }
 
   // Progress bar
   const progressBar = document.getElementById('progress-bar');
   window.addEventListener('scroll', () => {
     const scrolled = window.scrollY;
-    const total = document.bod
+    const total = document.body.scrollHeight - window.innerHeight;
+    progressBar.style.width = (scrolled / total * 100) + '%';
+  });
+
+  // Scroll reveal — content starts visible, hides via JS, reveals on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    reveals.forEach(el => el.classList.add('hidden'));
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.remove('hidden');
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
+    reveals.forEach(el => io.observe(el));
+  }
+</script>
+</body>
+</html>
