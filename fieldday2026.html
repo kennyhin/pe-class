@@ -44,7 +44,6 @@ nav{position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.97);backdrop-fi
 .hero-sub{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);position:relative;z-index:1;margin-bottom:2.5rem;}
 .cd-wrap{position:relative;z-index:1;}
 .cd-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}
-.cd-num{font-family:'Bebas Neue',sans-serif;font-size:clamp(72px,14vw,120px);color:var(--red);letter-spacing:4px;line-height:1;}
 .cd-sub{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-top:4px;}
 
 /* TICKER */
@@ -52,7 +51,42 @@ nav{position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.97);backdrop-fi
 .ticker-inner{display:inline-block;animation:tick 30s linear infinite;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:4px;color:var(--white);}
 @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-/* SECTIONS */
+/* COUNTDOWN PULSE */
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.06);opacity:.85;}}
+.cd-num{font-family:'Bebas Neue',sans-serif;font-size:clamp(72px,14vw,120px);color:var(--red);letter-spacing:4px;line-height:1;animation:pulse 2.4s ease-in-out infinite;}
+
+/* SCROLL REVEAL */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .55s ease,transform .55s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+.reveal-delay-1{transition-delay:.1s;}
+.reveal-delay-2{transition-delay:.2s;}
+.reveal-delay-3{transition-delay:.3s;}
+.reveal-delay-4{transition-delay:.4s;}
+.reveal-delay-5{transition-delay:.5s;}
+.reveal-delay-6{transition-delay:.6s;}
+.reveal-delay-7{transition-delay:.7s;}
+
+/* STATION PILL LINKS in rotation table */
+.sp{display:inline-block;padding:3px 10px;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;white-space:nowrap;text-decoration:none;transition:filter .15s;}
+.sp:hover{filter:brightness(1.3);}
+.sp-pop{background:rgba(26,110,216,.25);color:#6ab0ff;}
+.sp-obs{background:rgba(34,168,85,.25);color:#5dda85;}
+.sp-rpc{background:rgba(224,107,0,.25);color:#ffaa4a;}
+.sp-sp{background:rgba(155,89,182,.25);color:#c89ee0;}
+.sp-pan{background:rgba(0,206,209,.2);color:#4ae8ea;}
+.sp-hot{background:rgba(213,43,30,.25);color:#ff7066;}
+.sp-oly{background:rgba(200,160,0,.25);color:#ffd84a;}
+
+/* WEATHER WIDGET */
+.weather-bar{background:var(--gray2);border-bottom:1px solid var(--gray3);padding:.75rem 1.5rem;}
+.weather-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;}
+.weather-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--red);white-space:nowrap;}
+.weather-data{display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap;flex:1;}
+.weather-temp{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white);letter-spacing:2px;line-height:1;}
+.weather-desc{font-family:'Barlow',sans-serif;font-size:13px;color:var(--muted);}
+.weather-detail{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:1px;color:var(--muted);white-space:nowrap;}
+.weather-loading{font-family:'Barlow',sans-serif;font-size:13px;color:var(--muted2);font-style:italic;}
+.weather-note{font-family:'Barlow',sans-serif;font-size:11px;color:var(--muted2);margin-left:auto;white-space:nowrap;}
 section{padding:4rem 1.5rem;border-bottom:1px solid var(--gray2);}
 .section-tag{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:.3rem;}
 .section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,6vw,60px);letter-spacing:2px;color:var(--white);margin-bottom:2rem;line-height:1;}
@@ -60,28 +94,40 @@ section{padding:4rem 1.5rem;border-bottom:1px solid var(--gray2);}
 
 /* QUICK NAV CARDS (top of page for teachers) */
 .quick-nav{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:var(--gray2);margin-bottom:0;}
-.qn-card{background:var(--black);padding:1.25rem 1rem;text-decoration:none;display:flex;flex-direction:column;gap:6px;transition:background .2s;border:none;cursor:pointer;}
-.qn-card:hover{background:var(--gray);}
-.qn-icon{font-size:22px;}
-.qn-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--white);}
+.qn-card{background:var(--black);padding:1.25rem 1rem 1rem;text-decoration:none;display:flex;flex-direction:column;gap:5px;transition:background .2s,border-color .2s;border:none;cursor:pointer;border-bottom:3px solid transparent;position:relative;}
+.qn-card:hover{background:var(--gray);border-bottom-color:var(--red);}
+.qn-icon{font-size:20px;}
+.qn-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--white);display:flex;align-items:center;justify-content:space-between;}
+.qn-title::after{content:'→';font-family:'Barlow Condensed',sans-serif;font-size:16px;color:var(--red);opacity:.7;transition:transform .2s;}
+.qn-card:hover .qn-title::after{transform:translateX(3px);opacity:1;}
 .qn-desc{font-family:'Barlow',sans-serif;font-size:11px;color:var(--muted);line-height:1.4;}
+.qn-nav-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted2);margin-bottom:.5rem;}
 
 /* SCHEDULE */
 .sched-note{background:var(--gray2);border-left:3px solid var(--red);padding:.875rem 1.25rem;margin-bottom:1.5rem;font-family:'Barlow',sans-serif;font-size:13px;color:var(--muted);line-height:1.6;}
 .sched-note strong{color:var(--red);font-weight:600;}
-.sched-blocks{display:flex;flex-direction:column;gap:1px;background:var(--gray2);}
-.sched-row{background:var(--black);display:grid;grid-template-columns:240px 1fr;transition:background .2s;}
-.sched-row:hover{background:var(--gray);}
-.sched-time{padding:1.25rem 1.5rem;border-right:1px solid var(--gray2);display:flex;flex-direction:column;justify-content:center;}
-.time-range{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--red);white-space:nowrap;line-height:1.2;}
-.time-dur{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:3px;}
+.sched-blocks{display:flex;flex-direction:column;gap:2px;}
+.sched-row{display:grid;grid-template-columns:220px 1fr;border-radius:4px;overflow:hidden;border:1px solid var(--gray2);}
+.sched-row:hover .sched-time,.sched-row:hover .sched-detail{filter:brightness(1.15);}
+.sched-time{padding:1.25rem 1.5rem;display:flex;flex-direction:column;justify-content:center;min-width:0;}
+.time-range{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;white-space:nowrap;line-height:1.2;}
+.time-dur{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;opacity:.7;margin-top:3px;}
 .sched-detail{padding:1.25rem 1.5rem;display:flex;flex-direction:column;justify-content:center;}
 .sched-who{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--white);margin-bottom:4px;}
-.sched-note-txt{font-family:'Barlow',sans-serif;font-size:13px;color:var(--muted);line-height:1.55;}
+.sched-note-txt{font-family:'Barlow',sans-serif;font-size:13px;line-height:1.55;}
 .lunch-rows{display:flex;flex-direction:column;gap:7px;}
-.lunch-row{display:flex;align-items:baseline;gap:10px;}
-.lt{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;color:rgba(250,250,248,.3);white-space:nowrap;min-width:140px;}
-.ld{font-family:'Barlow',sans-serif;font-size:13px;color:var(--muted);}
+.lunch-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.lt{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;white-space:nowrap;min-width:130px;opacity:.6;}
+.ld{font-family:'Barlow',sans-serif;font-size:13px;}
+/* row color themes */
+.sched-row-red .sched-time{background:#2a0a0a;color:#ff7066;border-right:1px solid #3a1010;}
+.sched-row-red .sched-detail{background:#1a0808;color:rgba(250,250,248,.7);}
+.sched-row-blue .sched-time{background:#0a1830;color:#6ab0ff;border-right:1px solid #101e38;}
+.sched-row-blue .sched-detail{background:#080f1e;color:rgba(250,250,248,.7);}
+.sched-row-muted .sched-time{background:#141414;color:rgba(250,250,248,.35);border-right:1px solid var(--gray2);}
+.sched-row-muted .sched-detail{background:#0f0f0f;color:rgba(250,250,248,.5);}
+.sched-row-green .sched-time{background:#0a1e0a;color:#5dda85;border-right:1px solid #102010;}
+.sched-row-green .sched-detail{background:#080f08;color:rgba(250,250,248,.7);}
 
 /* STATION COLOR KEY */
 .station-key{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:2rem;}
@@ -154,19 +200,19 @@ section{padding:4rem 1.5rem;border-bottom:1px solid var(--gray2);}
 .bring-desc{font-family:'Barlow',sans-serif;font-size:12px;color:var(--muted);line-height:1.5;}
 
 /* STATIONS */
-.stations-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1px;background:var(--gray2);}
-.station-card{background:var(--black);overflow:hidden;transition:background .2s;}
+.stations-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1px;background:var(--gray2);align-items:stretch;}
+.station-card{background:var(--black);overflow:hidden;transition:background .2s;display:flex;flex-direction:column;}
 .station-card:hover{background:var(--gray);}
 .station-header{padding:1.25rem 1.25rem 0;}
 .station-num{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--gray2);line-height:1;margin-bottom:-8px;}
 .station-name{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;color:var(--white);line-height:1.1;margin-bottom:6px;}
 .station-grades{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--red);border:1px solid var(--red);padding:2px 8px;margin-bottom:10px;}
-.station-desc{padding:0 1.25rem 1.25rem;font-family:'Barlow',sans-serif;font-size:13px;color:var(--muted);line-height:1.65;}
-.station-video{background:var(--gray2);padding:.875rem 1.25rem;border-top:1px solid var(--gray3);}
-.station-video-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:.75rem;}
-.yt-coming{font-family:'Barlow',sans-serif;font-size:12px;color:var(--muted2);font-style:italic;padding:4px 0;}
-.rules-btn{display:inline-flex;align-items:center;gap:8px;background:transparent;border:1px solid var(--gray3);color:var(--muted);text-decoration:none;padding:9px 16px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;transition:border-color .2s,color .2s;width:100%;margin-top:.75rem;}
-.rules-btn:hover{border-color:var(--red);color:var(--white);}
+.station-desc{padding:0 1.25rem 1rem;font-family:'Barlow',sans-serif;font-size:13px;color:var(--muted);line-height:1.65;flex:1;}
+.station-footer{background:var(--gray2);padding:1rem 1.25rem;border-top:1px solid var(--gray3);margin-top:auto;}
+.rules-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--red);border:none;color:var(--white);text-decoration:none;padding:11px 16px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;transition:background .2s;width:100%;margin-bottom:.75rem;}
+.rules-btn:hover{background:var(--red-dark);}
+.station-video-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem;margin-top:.25rem;}
+.yt-coming{font-family:'Barlow',sans-serif;font-size:12px;color:var(--muted2);font-style:italic;padding:2px 0;}
 
 /* FOOTER */
 footer{background:#050505;padding:2.5rem 1.5rem;border-top:2px solid var(--red);}
@@ -184,7 +230,11 @@ footer{background:#050505;padding:2.5rem 1.5rem;border-top:2px solid var(--red);
   .nav-links{display:none;}
   .nav-toggle{display:block;}
   .sched-row{grid-template-columns:1fr;}
-  .sched-time{border-right:none;border-bottom:1px solid var(--gray2);}
+  .sched-row-red .sched-time,.sched-row-blue .sched-time,.sched-row-muted .sched-time,.sched-row-green .sched-time{border-right:none;border-bottom:2px solid rgba(255,255,255,.08);padding:.875rem 1.25rem 0.75rem;}
+  .sched-row-red .sched-detail,.sched-row-blue .sched-detail,.sched-row-muted .sched-detail,.sched-row-green .sched-detail{padding:.75rem 1.25rem 1rem;}
+  .time-range{white-space:normal;}
+  .lt{min-width:0;display:block;margin-bottom:1px;}
+  .lunch-row{flex-direction:column;gap:1px;margin-bottom:8px;}
   .colors-strip{grid-template-columns:repeat(3,1fr);}
   .stations-grid{grid-template-columns:1fr;}
   .footer-inner{flex-direction:column;gap:1.5rem;}
@@ -226,7 +276,7 @@ footer{background:#050505;padding:2.5rem 1.5rem;border-top:2px solid var(--red);
   <h1 class="hero-title">FIELD<br><span class="acc">DAY</span></h1>
   <div class="hero-year">2026</div>
   <div class="hero-date">FRIDAY · MAY 1, 2026</div>
-  <div class="hero-sub">Kindergarten – 5th Grade · All Specialists Participate</div>
+  <div class="hero-sub">Kindergarten – 5th Grade · SLAM Nevada Elementary</div>
   <div class="cd-wrap">
     <div class="cd-label">Days Until Field Day</div>
     <div class="cd-num" id="countdown-num">--</div>
@@ -237,36 +287,38 @@ footer{background:#050505;padding:2.5rem 1.5rem;border-top:2px solid var(--red);
 <!-- TICKER -->
 <div class="ticker">
   <span class="ticker-inner">
-    &nbsp;&nbsp;⚡ FIELD DAY 2026 &nbsp;·&nbsp; SLAM BULLS &nbsp;·&nbsp; MAY 1ST &nbsp;·&nbsp; K–5 &nbsp;·&nbsp; LET'S GET IT &nbsp;·&nbsp; WEAR YOUR CLASS COLOR &nbsp;·&nbsp; NO FLIP FLOPS &nbsp;·&nbsp; BRING SUNSCREEN &nbsp;·&nbsp; ⚡ FIELD DAY 2026 &nbsp;·&nbsp; SLAM BULLS &nbsp;·&nbsp; MAY 1ST &nbsp;·&nbsp; K–5 &nbsp;·&nbsp; LET'S GET IT &nbsp;·&nbsp; WEAR YOUR CLASS COLOR &nbsp;·&nbsp; NO FLIP FLOPS &nbsp;·&nbsp; BRING SUNSCREEN &nbsp;·&nbsp;
+    &nbsp;&nbsp;🤚 SLAM! HIGH FIVE &nbsp;·&nbsp; ACCOUNTABILITY &nbsp;·&nbsp; RESPECT &nbsp;·&nbsp; LEADERSHIP &nbsp;·&nbsp; PERSEVERANCE &nbsp;·&nbsp; INTEGRITY &nbsp;·&nbsp; 🤚 SLAM! HIGH FIVE &nbsp;·&nbsp; ACCOUNTABILITY &nbsp;·&nbsp; RESPECT &nbsp;·&nbsp; LEADERSHIP &nbsp;·&nbsp; PERSEVERANCE &nbsp;·&nbsp; INTEGRITY &nbsp;·&nbsp;
   </span>
 </div>
+
 
 <!-- QUICK NAV for teachers -->
 <section style="padding:2rem 1.5rem;background:var(--gray);">
   <div class="container">
     <div class="section-tag">Quick Access</div>
-    <div class="quick-nav" style="margin-top:.75rem;">
-      <a href="#schedule" class="qn-card">
+    <div class="qn-nav-label" style="margin-top:.5rem;">Jump to section ↓</div>
+    <div class="quick-nav" style="margin-top:.5rem;">
+      <a href="#schedule" class="qn-card reveal reveal-delay-1">
         <div class="qn-icon">🕐</div>
         <div class="qn-title">Schedule</div>
         <div class="qn-desc">Day-of times for all grade bands</div>
       </a>
-      <a href="#rotations" class="qn-card">
+      <a href="#rotations" class="qn-card reveal reveal-delay-2">
         <div class="qn-icon">🔄</div>
         <div class="qn-title">My Rotation</div>
         <div class="qn-desc">Find your class & rotation order</div>
       </a>
-      <a href="#map" class="qn-card">
+      <a href="#map" class="qn-card reveal reveal-delay-3">
         <div class="qn-icon">🗺️</div>
         <div class="qn-title">Field Map</div>
         <div class="qn-desc">Station locations & rotation flow</div>
       </a>
-      <a href="#stations" class="qn-card">
+      <a href="#stations" class="qn-card reveal reveal-delay-4">
         <div class="qn-icon">🎯</div>
         <div class="qn-title">Stations</div>
         <div class="qn-desc">Activity rules & how-to videos</div>
       </a>
-      <a href="#info" class="qn-card">
+      <a href="#info" class="qn-card reveal reveal-delay-5">
         <div class="qn-icon">📋</div>
         <div class="qn-title">Student Info</div>
         <div class="qn-desc">Class colors, what to bring</div>
@@ -278,23 +330,29 @@ footer{background:#050505;padding:2.5rem 1.5rem;border-top:2px solid var(--red);
 <!-- SCHEDULE -->
 <section id="schedule">
   <div class="container">
-    <div class="section-tag">Day-of Timeline</div>
-    <h2 class="section-title">Schedule</h2>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;">
+      <div>
+        <div class="section-tag">Day-of Timeline</div>
+        <h2 class="section-title" style="margin-bottom:0;">Schedule</h2>
+      </div>
+      <div id="weather-card" style="background:var(--gray2);border:1px solid var(--gray3);border-left:3px solid var(--red);padding:.875rem 1.25rem;min-width:220px;flex-shrink:0;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:.5rem;">☀️ May 1 · Henderson, NV</div>
+        <div id="weather-data"><span class="weather-loading">Loading forecast...</span></div>
+        <div style="font-family:'Barlow',sans-serif;font-size:11px;color:var(--muted2);margin-top:.4rem;">Outdoor event — dress for the heat!</div>
+      </div>
+    </div>
     <div class="sched-note"><strong>Note:</strong> Students will not have recess or specials this day. Specialists will be a part of helping with field day.</div>
     <div class="sched-blocks">
-      <div class="sched-row">
+      <div class="sched-row sched-row-red">
         <div class="sched-time"><div class="time-range">8:30 – 10:30 AM</div><div class="time-dur">2 hours</div></div>
         <div class="sched-detail"><div class="sched-who">3rd – 5th Grade · Field Day</div><div class="sched-note-txt">Upper grades take the field first and rotate through all 7 activity stations including Hot Shot in the Cafegym.</div></div>
       </div>
-      <div class="sched-row">
+      <div class="sched-row sched-row-blue">
         <div class="sched-time"><div class="time-range">10:30 – 11:10 AM</div><div class="time-dur">40 minutes</div></div>
         <div class="sched-detail"><div class="sched-who">Dry Time — All Grades</div><div class="sched-note-txt">Transition period. Students dry off and reset before lunch.</div></div>
       </div>
-      <div class="sched-row" style="background:var(--gray);">
-        <div class="sched-time" style="border-right-color:var(--gray2);">
-          <div class="time-range" style="color:rgba(250,250,248,.3);font-size:15px;">11:10 AM – 12:05 PM</div>
-          <div class="time-dur">Lunch Block</div>
-        </div>
+      <div class="sched-row sched-row-muted">
+        <div class="sched-time"><div class="time-range" style="font-size:15px;">11:10 AM – 12:05 PM</div><div class="time-dur">Lunch Block</div></div>
         <div class="sched-detail">
           <div class="lunch-rows">
             <div class="lunch-row"><span class="lt">11:10 – 11:30 AM</span><span class="ld">3rd–5th Lunch (no recess)</span></div>
@@ -303,7 +361,7 @@ footer{background:#050505;padding:2.5rem 1.5rem;border-top:2px solid var(--red);
           </div>
         </div>
       </div>
-      <div class="sched-row">
+      <div class="sched-row sched-row-green">
         <div class="sched-time"><div class="time-range">12:30 – 2:30 PM</div><div class="time-dur">2 hours</div></div>
         <div class="sched-detail"><div class="sched-who">K – 2nd Grade · Field Day</div><div class="sched-note-txt">Little Bulls take over after lunch. K–2 students dismissed directly from their classrooms. 6 station rotation — no Hot Shot.</div></div>
       </div>
@@ -355,20 +413,20 @@ footer{background:#050505;padding:2.5rem 1.5rem;border-top:2px solid var(--red);
           </thead>
           <tbody>
             <tr class="grade-header"><td colspan="7">Kindergarten</td></tr>
-            <tr data-name="gray"><td>Gray</td><td><span class="sp sp-pop">Popsicles</span></td><td><span class="sp sp-obs">Obstacle Course</span></td><td><span class="sp sp-rpc">RPC Splash</span></td><td><span class="sp sp-sp">Splash Pong</span></td><td><span class="sp sp-pan">Pancake Party</span></td><td><span class="sp sp-oly">Olympic Torch Relay</span></td></tr>
-            <tr data-name="martin"><td>Martin</td><td><span class="sp sp-pop">Popsicles</span></td><td><span class="sp sp-obs">Obstacle Course</span></td><td><span class="sp sp-rpc">RPC Splash</span></td><td><span class="sp sp-sp">Splash Pong</span></td><td><span class="sp sp-pan">Pancake Party</span></td><td><span class="sp sp-oly">Olympic Torch Relay</span></td></tr>
-            <tr data-name="rollans"><td>Rollans</td><td><span class="sp sp-obs">Obstacle Course</span></td><td><span class="sp sp-rpc">RPC Splash</span></td><td><span class="sp sp-sp">Splash Pong</span></td><td><span class="sp sp-pan">Pancake Party</span></td><td><span class="sp sp-oly">Olympic Torch Relay</span></td><td><span class="sp sp-pop">Popsicles</span></td></tr>
-            <tr data-name="vela"><td>Vela</td><td><span class="sp sp-obs">Obstacle Course</span></td><td><span class="sp sp-rpc">RPC Splash</span></td><td><span class="sp sp-sp">Splash Pong</span></td><td><span class="sp sp-pan">Pancake Party</span></td><td><span class="sp sp-oly">Olympic Torch Relay</span></td><td><span class="sp sp-pop">Popsicles</span></td></tr>
+            <tr data-name="gray"><td>Gray</td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td></tr>
+            <tr data-name="martin"><td>Martin</td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td></tr>
+            <tr data-name="rollans"><td>Rollans</td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td></tr>
+            <tr data-name="vela"><td>Vela</td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td></tr>
             <tr class="grade-header"><td colspan="7">1st Grade</td></tr>
-            <tr data-name="weber"><td>Weber</td><td><span class="sp sp-rpc">RPC Splash</span></td><td><span class="sp sp-sp">Splash Pong</span></td><td><span class="sp sp-pan">Pancake Party</span></td><td><span class="sp sp-oly">Olympic Torch Relay</span></td><td><span class="sp sp-pop">Popsicles</span></td><td><span class="sp sp-obs">Obstacle Course</span></td></tr>
-            <tr data-name="finch"><td>Finch</td><td><span class="sp sp-rpc">RPC Splash</span></td><td><span class="sp sp-sp">Splash Pong</span></td><td><span class="sp sp-pan">Pancake Party</span></td><td><span class="sp sp-oly">Olympic Torch Relay</span></td><td><span class="sp sp-pop">Popsicles</span></td><td><span class="sp sp-obs">Obstacle Course</span></td></tr>
-            <tr data-name="luangrath"><td>Luangrath</td><td><span class="sp sp-sp">Splash Pong</span></td><td><span class="sp sp-pan">Pancake Party</span></td><td><span class="sp sp-oly">Olympic Torch Relay</span></td><td><span class="sp sp-pop">Popsicles</span></td><td><span class="sp sp-obs">Obstacle Course</span></td><td><span class="sp sp-rpc">RPC Splash</span></td></tr>
-            <tr data-name="c.casipong casipong"><td>C. Casipong</td><td><span class="sp sp-sp">Splash Pong</span></td><td><span class="sp sp-pan">Pancake Party</span></td><td><span class="sp sp-oly">Olympic Torch Relay</span></td><td><span class="sp sp-pop">Popsicles</span></td><td><span class="sp sp-obs">Obstacle Course</span></td><td><span class="sp sp-rpc">RPC Splash</span></td></tr>
+            <tr data-name="weber"><td>Weber</td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td></tr>
+            <tr data-name="finch"><td>Finch</td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td></tr>
+            <tr data-name="luangrath"><td>Luangrath</td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td></tr>
+            <tr data-name="c.casipong casipong"><td>C. Casipong</td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td></tr>
             <tr class="grade-header"><td colspan="7">2nd Grade</td></tr>
-            <tr data-name="byrd"><td>Byrd</td><td><span class="sp sp-pan">Pancake Party</span></td><td><span class="sp sp-oly">Olympic Torch Relay</span></td><td><span class="sp sp-pop">Popsicles</span></td><td><span class="sp sp-obs">Obstacle Course</span></td><td><span class="sp sp-rpc">RPC Splash</span></td><td><span class="sp sp-sp">Splash Pong</span></td></tr>
-            <tr data-name="j.casipong j. casipong"><td>J. Casipong</td><td><span class="sp sp-pan">Pancake Party</span></td><td><span class="sp sp-oly">Olympic Torch Relay</span></td><td><span class="sp sp-pop">Popsicles</span></td><td><span class="sp sp-obs">Obstacle Course</span></td><td><span class="sp sp-rpc">RPC Splash</span></td><td><span class="sp sp-sp">Splash Pong</span></td></tr>
-            <tr data-name="gomez"><td>Gomez</td><td><span class="sp sp-oly">Olympic Torch Relay</span></td><td><span class="sp sp-pop">Popsicles</span></td><td><span class="sp sp-obs">Obstacle Course</span></td><td><span class="sp sp-rpc">RPC Splash</span></td><td><span class="sp sp-sp">Splash Pong</span></td><td><span class="sp sp-pan">Pancake Party</span></td></tr>
-            <tr data-name="guzman"><td>Guzman</td><td><span class="sp sp-oly">Olympic Torch Relay</span></td><td><span class="sp sp-pop">Popsicles</span></td><td><span class="sp sp-obs">Obstacle Course</span></td><td><span class="sp sp-rpc">RPC Splash</span></td><td><span class="sp sp-sp">Splash Pong</span></td><td><span class="sp sp-pan">Pancake Party</span></td></tr>
+            <tr data-name="byrd"><td>Byrd</td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td></tr>
+            <tr data-name="j.casipong j. casipong"><td>J. Casipong</td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td></tr>
+            <tr data-name="gomez"><td>Gomez</td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td></tr>
+            <tr data-name="guzman"><td>Guzman</td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td></tr>
           </tbody>
         </table>
       </div>
@@ -395,20 +453,20 @@ footer{background:#050505;padding:2.5rem 1.5rem;border-top:2px solid var(--red);
             </tr>
           </thead>
           <tbody>
-            <tr data-name="lewis"><td>Lewis</td><td><span class="sp sp-pop">Popsicles</span></td><td><span class="sp sp-obs">Obstacle Course</span></td><td><span class="sp sp-rpc">RPC Splash</span></td><td><span class="sp sp-sp">Splash Pong</span></td><td><span class="sp sp-pan">Pancake Party</span></td><td><span class="sp sp-hot">Hot Shot</span></td><td><span class="sp sp-oly">Olympic Torch Relay</span></td></tr>
-            <tr data-name="a.ramirez a. ramirez ramirez"><td>A. Ramirez</td><td><span class="sp sp-pop">Popsicles</span></td><td><span class="sp sp-obs">Obstacle Course</span></td><td><span class="sp sp-rpc">RPC Splash</span></td><td><span class="sp sp-sp">Splash Pong</span></td><td><span class="sp sp-pan">Pancake Party</span></td><td><span class="sp sp-hot">Hot Shot</span></td><td><span class="sp sp-oly">Olympic Torch Relay</span></td></tr>
-            <tr data-name="buchanan"><td>Buchanan</td><td><span class="sp sp-obs">Obstacle Course</span></td><td><span class="sp sp-rpc">RPC Splash</span></td><td><span class="sp sp-sp">Splash Pong</span></td><td><span class="sp sp-pan">Pancake Party</span></td><td><span class="sp sp-hot">Hot Shot</span></td><td><span class="sp sp-oly">Olympic Torch Relay</span></td><td><span class="sp sp-pop">Popsicles</span></td></tr>
-            <tr data-name="j.ramirez j. ramirez"><td>J. Ramirez</td><td><span class="sp sp-obs">Obstacle Course</span></td><td><span class="sp sp-rpc">RPC Splash</span></td><td><span class="sp sp-sp">Splash Pong</span></td><td><span class="sp sp-pan">Pancake Party</span></td><td><span class="sp sp-hot">Hot Shot</span></td><td><span class="sp sp-oly">Olympic Torch Relay</span></td><td><span class="sp sp-pop">Popsicles</span></td></tr>
-            <tr data-name="galvan"><td>Galvan</td><td><span class="sp sp-rpc">RPC Splash</span></td><td><span class="sp sp-sp">Splash Pong</span></td><td><span class="sp sp-pan">Pancake Party</span></td><td><span class="sp sp-hot">Hot Shot</span></td><td><span class="sp sp-oly">Olympic Torch Relay</span></td><td><span class="sp sp-pop">Popsicles</span></td><td><span class="sp sp-obs">Obstacle Course</span></td></tr>
-            <tr data-name="maxwell"><td>Maxwell</td><td><span class="sp sp-rpc">RPC Splash</span></td><td><span class="sp sp-sp">Splash Pong</span></td><td><span class="sp sp-pan">Pancake Party</span></td><td><span class="sp sp-hot">Hot Shot</span></td><td><span class="sp sp-oly">Olympic Torch Relay</span></td><td><span class="sp sp-pop">Popsicles</span></td><td><span class="sp sp-obs">Obstacle Course</span></td></tr>
-            <tr data-name="fish"><td>Fish</td><td><span class="sp sp-sp">Splash Pong</span></td><td><span class="sp sp-pan">Pancake Party</span></td><td><span class="sp sp-hot">Hot Shot</span></td><td><span class="sp sp-oly">Olympic Torch Relay</span></td><td><span class="sp sp-pop">Popsicles</span></td><td><span class="sp sp-obs">Obstacle Course</span></td><td><span class="sp sp-rpc">RPC Splash</span></td></tr>
-            <tr data-name="swanson"><td>Swanson</td><td><span class="sp sp-sp">Splash Pong</span></td><td><span class="sp sp-pan">Pancake Party</span></td><td><span class="sp sp-hot">Hot Shot</span></td><td><span class="sp sp-oly">Olympic Torch Relay</span></td><td><span class="sp sp-pop">Popsicles</span></td><td><span class="sp sp-obs">Obstacle Course</span></td><td><span class="sp sp-rpc">RPC Splash</span></td></tr>
-            <tr data-name="laspina"><td>Laspina</td><td><span class="sp sp-pan">Pancake Party</span></td><td><span class="sp sp-hot">Hot Shot</span></td><td><span class="sp sp-oly">Olympic Torch Relay</span></td><td><span class="sp sp-pop">Popsicles</span></td><td><span class="sp sp-obs">Obstacle Course</span></td><td><span class="sp sp-rpc">RPC Splash</span></td><td><span class="sp sp-sp">Splash Pong</span></td></tr>
-            <tr data-name="tumanavao"><td>Tumanavao</td><td><span class="sp sp-pan">Pancake Party</span></td><td><span class="sp sp-hot">Hot Shot</span></td><td><span class="sp sp-oly">Olympic Torch Relay</span></td><td><span class="sp sp-pop">Popsicles</span></td><td><span class="sp sp-obs">Obstacle Course</span></td><td><span class="sp sp-rpc">RPC Splash</span></td><td><span class="sp sp-sp">Splash Pong</span></td></tr>
-            <tr data-name="bobadilla christensen bobadilla/christensen"><td>Bobadilla/Christensen</td><td><span class="sp sp-hot">Hot Shot</span></td><td><span class="sp sp-oly">Olympic Torch Relay</span></td><td><span class="sp sp-pop">Popsicles</span></td><td><span class="sp sp-obs">Obstacle Course</span></td><td><span class="sp sp-rpc">RPC Splash</span></td><td><span class="sp sp-sp">Splash Pong</span></td><td><span class="sp sp-pan">Pancake Party</span></td></tr>
-            <tr data-name="law christensen law/christensen"><td>Law/Christensen</td><td><span class="sp sp-hot">Hot Shot</span></td><td><span class="sp sp-oly">Olympic Torch Relay</span></td><td><span class="sp sp-pop">Popsicles</span></td><td><span class="sp sp-obs">Obstacle Course</span></td><td><span class="sp sp-rpc">RPC Splash</span></td><td><span class="sp sp-sp">Splash Pong</span></td><td><span class="sp sp-pan">Pancake Party</span></td></tr>
-            <tr data-name="buford christensen buford/christensen"><td>Buford/Christensen</td><td><span class="sp sp-oly">Olympic Torch Relay</span></td><td><span class="sp sp-pop">Popsicles</span></td><td><span class="sp sp-obs">Obstacle Course</span></td><td><span class="sp sp-rpc">RPC Splash</span></td><td><span class="sp sp-sp">Splash Pong</span></td><td><span class="sp sp-pan">Pancake Party</span></td><td><span class="sp sp-hot">Hot Shot</span></td></tr>
-            <tr data-name="young christensen young/christensen"><td>Young/Christensen</td><td><span class="sp sp-oly">Olympic Torch Relay</span></td><td><span class="sp sp-pop">Popsicles</span></td><td><span class="sp sp-obs">Obstacle Course</span></td><td><span class="sp sp-rpc">RPC Splash</span></td><td><span class="sp sp-sp">Splash Pong</span></td><td><span class="sp sp-pan">Pancake Party</span></td><td><span class="sp sp-hot">Hot Shot</span></td></tr>
+            <tr data-name="lewis"><td>Lewis</td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td><td><a href="rules-hotshot.html" target="_blank" class="sp sp-hot">Hot Shot</a></td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td></tr>
+            <tr data-name="a.ramirez a. ramirez ramirez"><td>A. Ramirez</td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td><td><a href="rules-hotshot.html" target="_blank" class="sp sp-hot">Hot Shot</a></td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td></tr>
+            <tr data-name="buchanan"><td>Buchanan</td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td><td><a href="rules-hotshot.html" target="_blank" class="sp sp-hot">Hot Shot</a></td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td></tr>
+            <tr data-name="j.ramirez j. ramirez"><td>J. Ramirez</td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td><td><a href="rules-hotshot.html" target="_blank" class="sp sp-hot">Hot Shot</a></td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td></tr>
+            <tr data-name="galvan"><td>Galvan</td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td><td><a href="rules-hotshot.html" target="_blank" class="sp sp-hot">Hot Shot</a></td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td></tr>
+            <tr data-name="maxwell"><td>Maxwell</td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td><td><a href="rules-hotshot.html" target="_blank" class="sp sp-hot">Hot Shot</a></td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td></tr>
+            <tr data-name="fish"><td>Fish</td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td><td><a href="rules-hotshot.html" target="_blank" class="sp sp-hot">Hot Shot</a></td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td></tr>
+            <tr data-name="swanson"><td>Swanson</td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td><td><a href="rules-hotshot.html" target="_blank" class="sp sp-hot">Hot Shot</a></td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td></tr>
+            <tr data-name="laspina"><td>Laspina</td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td><td><a href="rules-hotshot.html" target="_blank" class="sp sp-hot">Hot Shot</a></td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td></tr>
+            <tr data-name="tumanavao"><td>Tumanavao</td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td><td><a href="rules-hotshot.html" target="_blank" class="sp sp-hot">Hot Shot</a></td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td></tr>
+            <tr data-name="bobadilla christensen bobadilla/christensen"><td>Bobadilla/Christensen</td><td><a href="rules-hotshot.html" target="_blank" class="sp sp-hot">Hot Shot</a></td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td></tr>
+            <tr data-name="law christensen law/christensen"><td>Law/Christensen</td><td><a href="rules-hotshot.html" target="_blank" class="sp sp-hot">Hot Shot</a></td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td></tr>
+            <tr data-name="buford christensen buford/christensen"><td>Buford/Christensen</td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td><td><a href="rules-hotshot.html" target="_blank" class="sp sp-hot">Hot Shot</a></td></tr>
+            <tr data-name="young christensen young/christensen"><td>Young/Christensen</td><td><a href="rules-olympictorch.html" target="_blank" class="sp sp-oly">Olympic Torch Relay</a></td><td><a href="rules-popsicles.html" target="_blank" class="sp sp-pop">Popsicles</a></td><td><a href="rules-obstaclecourse.html" target="_blank" class="sp sp-obs">Obstacle Course</a></td><td><a href="rules-rpcsplash.html" target="_blank" class="sp sp-rpc">RPC Splash</a></td><td><a href="rules-splashpong.html" target="_blank" class="sp sp-sp">Splash Pong</a></td><td><a href="rules-pancakeparty.html" target="_blank" class="sp sp-pan">Pancake Party</a></td><td><a href="rules-hotshot.html" target="_blank" class="sp sp-hot">Hot Shot</a></td></tr>
           </tbody>
         </table>
       </div>
@@ -552,12 +610,11 @@ footer{background:#050505;padding:2.5rem 1.5rem;border-top:2px solid var(--red);
           <!-- Arrow 3: RPC Splash → Splash Pong (down, same column) -->
           <line x1="765" y1="244" x2="765" y2="254" stroke="#FF3B2F" stroke-width="4.5" marker-end="url(#arrK2)"/>
 
-          <!-- Arrow 4: Splash Pong → Pancake Party (left) -->
-          <line x1="684" y1="320" x2="678" y2="320" stroke="#FF3B2F" stroke-width="4.5"/>
-          <path d="M682 320 L480 290" stroke="#FF3B2F" stroke-width="4.5" fill="none" marker-end="url(#arrK2)"/>
+          <!-- Arrow 4: Splash Pong → Pancake Party (left, shorter - lands at right edge of Pancake Party) -->
+          <path d="M684 320 L676 320 L676 340 L640 340" stroke="#FF3B2F" stroke-width="4.5" fill="none" marker-end="url(#arrK2)"/>
 
-          <!-- Arrow 5: Pancake Party → Olympic Torch Relay (left) -->
-          <line x1="469" y1="280" x2="458" y2="280" stroke="#FF3B2F" stroke-width="4.5" marker-end="url(#arrK2)"/>
+          <!-- Arrow 5: Pancake Party → Olympic Torch Relay (left, from left edge of Pancake Party box) -->
+          <line x1="469" y1="265" x2="458" y2="265" stroke="#FF3B2F" stroke-width="4.5" marker-end="url(#arrK2)"/>
 
           <!-- Arrow 6: Olympic Torch Relay → Popsicles (left and up, along left edge) -->
           <path d="M194 270 Q60 270 60 270 L60 180" stroke="#FF3B2F" stroke-width="4.5" fill="none" marker-end="url(#arrK2)"/>
@@ -757,67 +814,40 @@ footer{background:#050505;padding:2.5rem 1.5rem;border-top:2px solid var(--red);
     <div class="section-tag">Activities</div>
     <h2 class="section-title">Stations</h2>
     <div class="stations-grid">
-      <div class="station-card">
+      <div class="station-card reveal reveal-delay-1">
         <div class="station-header"><div class="station-num">01</div><div class="station-name">Obstacle Course</div><div class="station-grades">All Grades · K–5</div></div>
         <div class="station-desc">Crawl under tunnels, leap over hurdles, balance across beams, and sprint to the finish. Tests agility, coordination, and determination from start to end.</div>
-        <div class="station-video">
-          <div class="station-video-label">How to Play</div>
-          <div class="yt-coming">Video coming soon</div>
-          <a href="rules-obstaclecourse.html" target="_blank" class="rules-btn">📋 View Rules</a>
-        </div>
+        <div class="station-footer"><a href="rules-obstaclecourse.html" target="_blank" class="rules-btn">📋 View Rules</a><div class="station-video-label">How to Play</div><div class="yt-coming">Video coming soon</div></div>
       </div>
-      <div class="station-card">
+      <div class="station-card reveal reveal-delay-2">
         <div class="station-header"><div class="station-num">02</div><div class="station-name">Olympic Torch Relay</div><div class="station-grades">All Grades · K–5</div></div>
         <div class="station-desc">Channel your inner Olympian. Teams pass a baton around the course as fast as possible — clean handoffs and solid sprinting are the keys to gold.</div>
-        <div class="station-video">
-          <div class="station-video-label">How to Play</div>
-          <div class="yt-coming">Video coming soon</div>
-          <a href="rules-olympictorch.html" target="_blank" class="rules-btn">📋 View Rules</a>
-        </div>
+        <div class="station-footer"><a href="rules-olympictorch.html" target="_blank" class="rules-btn">📋 View Rules</a><div class="station-video-label">How to Play</div><div class="yt-coming">Video coming soon</div></div>
       </div>
-      <div class="station-card">
+      <div class="station-card reveal reveal-delay-3">
         <div class="station-header"><div class="station-num">03</div><div class="station-name">Pancake Party</div><div class="station-grades">All Grades · K–5 · Kinder Playground</div></div>
         <div class="station-desc">Located at the Kinder Playground. Grab a spatula and flip your pancake (beanbag) as high as you can — then catch it! Breakfast has never been this competitive.</div>
-        <div class="station-video">
-          <div class="station-video-label">How to Play</div>
-          <div class="yt-coming">Video coming soon</div>
-          <a href="rules-pancakeparty.html" target="_blank" class="rules-btn">📋 View Rules</a>
-        </div>
+        <div class="station-footer"><a href="rules-pancakeparty.html" target="_blank" class="rules-btn">📋 View Rules</a><div class="station-video-label">How to Play</div><div class="yt-coming">Video coming soon</div></div>
       </div>
-      <div class="station-card">
+      <div class="station-card reveal reveal-delay-4">
         <div class="station-header"><div class="station-num">04</div><div class="station-name">RPC Splash</div><div class="station-grades">All Grades · K–5</div></div>
         <div class="station-desc">Rock-Paper-Scissors meets water. Face off against an opponent — the loser gets splashed. Fast, wet, and totally unpredictable. Towel required.</div>
-        <div class="station-video">
-          <div class="station-video-label">How to Play</div>
-          <div class="yt-coming">Video coming soon</div>
-          <a href="rules-rpcsplash.html" target="_blank" class="rules-btn">📋 View Rules</a>
-        </div>
+        <div class="station-footer"><a href="rules-rpcsplash.html" target="_blank" class="rules-btn">📋 View Rules</a><div class="station-video-label">How to Play</div><div class="yt-coming">Video coming soon</div></div>
       </div>
-      <div class="station-card">
+      <div class="station-card reveal reveal-delay-5">
         <div class="station-header"><div class="station-num">05</div><div class="station-name">Splash Pong</div><div class="station-grades">All Grades · K–5</div></div>
         <div class="station-desc">Toss ping pong balls into water cups to soak your opponent. Accuracy is everything — the more cups you sink, the wetter they get.</div>
-        <div class="station-video">
-          <div class="station-video-label">How to Play</div>
-          <div class="yt-coming">Video coming soon</div>
-          <a href="rules-splashpong.html" target="_blank" class="rules-btn">📋 View Rules</a>
-        </div>
+        <div class="station-footer"><a href="rules-splashpong.html" target="_blank" class="rules-btn">📋 View Rules</a><div class="station-video-label">How to Play</div><div class="yt-coming">Video coming soon</div></div>
       </div>
-      <div class="station-card">
+      <div class="station-card reveal reveal-delay-6">
         <div class="station-header"><div class="station-num">06</div><div class="station-name">Popsicles Cool Down</div><div class="station-grades">All Grades · Big Playground</div></div>
         <div class="station-desc">Located at the Big Playground. After rotating through stations, students cool off here with a popsicle, rest up, and cheer on their classmates. You earned it, Bulls.</div>
-        <div class="station-video">
-          <div class="station-video-label">Station Info</div>
-          <a href="rules-popsicles.html" target="_blank" class="rules-btn">📋 View Details</a>
-        </div>
+        <div class="station-footer"><a href="rules-popsicles.html" target="_blank" class="rules-btn">📋 View Details</a><div class="station-video-label" style="visibility:hidden;">How to Play</div><div class="yt-coming" style="visibility:hidden;">Video coming soon</div></div>
       </div>
-      <div class="station-card">
+      <div class="station-card reveal reveal-delay-7">
         <div class="station-header"><div class="station-num">07</div><div class="station-name">Hot Shot</div><div class="station-grades">Grades 3–5 Only · Inside Cafegym</div></div>
         <div class="station-desc">Basketball shooting challenge inside the Cafegym. Knock down as many shots as possible from multiple spots. Upper grades only — precision under pressure.</div>
-        <div class="station-video">
-          <div class="station-video-label">How to Play</div>
-          <div class="yt-coming">Video coming soon</div>
-          <a href="rules-hotshot.html" target="_blank" class="rules-btn">📋 View Rules</a>
-        </div>
+        <div class="station-footer"><a href="rules-hotshot.html" target="_blank" class="rules-btn">📋 View Rules</a><div class="station-video-label">How to Play</div><div class="yt-coming">Video coming soon</div></div>
       </div>
     </div>
   </div>
@@ -901,6 +931,40 @@ function filterTeachers(group,val){
 // MOBILE NAV
 function toggleMenu(){document.getElementById('mobile-menu').classList.toggle('open');}
 function closeMenu(){document.getElementById('mobile-menu').classList.remove('open');}
+
+// SCROLL REVEAL
+var revealObserver=new IntersectionObserver(function(entries){
+  entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');revealObserver.unobserve(e.target);}});
+},{threshold:0.12});
+document.querySelectorAll('.reveal').forEach(function(el){revealObserver.observe(el);});
+
+// WEATHER - Open-Meteo (free, no API key)
+// Henderson NV coords: 36.0395, -114.9817
+(function(){
+  var url='https://api.open-meteo.com/v1/forecast?latitude=36.0395&longitude=-114.9817&daily=temperature_2m_max,temperature_2m_min,weathercode,precipitation_sum,windspeed_10m_max&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=America%2FLos_Angeles&start_date=2026-05-01&end_date=2026-05-01';
+  var el=document.getElementById('weather-data');
+  if(!el)return;
+  var codes={0:'Clear Sky',1:'Mainly Clear',2:'Partly Cloudy',3:'Overcast',45:'Foggy',61:'Light Rain',63:'Rain',65:'Heavy Rain',80:'Rain Showers',95:'Thunderstorm'};
+  var icons={0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',61:'🌧️',63:'🌧️',80:'🌦️',95:'⛈️'};
+  fetch(url).then(function(r){return r.json();}).then(function(d){
+    var day=d.daily;
+    var code=day.weathercode[0];
+    var desc=codes[code]||'Clear';
+    var icon=icons[code]||'🌤️';
+    var hi=Math.round(day.temperature_2m_max[0]);
+    var lo=Math.round(day.temperature_2m_min[0]);
+    var wind=Math.round(day.windspeed_10m_max[0]);
+    var rain=day.precipitation_sum[0];
+    el.innerHTML=
+      '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px;">'
+      +'<span style="font-family:\'Bebas Neue\',sans-serif;font-size:32px;color:#FAFAF8;letter-spacing:2px;line-height:1;">'+icon+' '+hi+'°F</span>'
+      +'<span style="font-family:\'Barlow\',sans-serif;font-size:13px;color:rgba(250,250,248,.5);">/ '+lo+'°F</span>'
+      +'</div>'
+      +'<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;font-weight:600;letter-spacing:1px;color:rgba(250,250,248,.6);">'+desc+' · 💨 '+wind+' mph'+(rain>0?' · 🌧️ '+rain+'"':'')+'</div>';
+  }).catch(function(){
+    el.innerHTML='<span style="font-family:\'Barlow\',sans-serif;font-size:12px;color:rgba(250,250,248,.3);font-style:italic;">Forecast loads closer to May 1</span>';
+  });
+})();
 
 </script>
 </body>
