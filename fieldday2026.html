@@ -52,19 +52,19 @@ nav{position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.97);backdrop-fi
 @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
 /* COUNTDOWN PULSE */
-@keyframes pulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.06);opacity:.85;}}
-.cd-num{font-family:'Bebas Neue',sans-serif;font-size:clamp(72px,14vw,120px);color:var(--red);letter-spacing:4px;line-height:1;animation:pulse 2.4s ease-in-out infinite;}
+@keyframes cdpulse{0%,100%{opacity:1;}50%{opacity:.6;}}
+.cd-num{font-family:'Bebas Neue',sans-serif;font-size:clamp(72px,14vw,120px);color:var(--red);letter-spacing:4px;line-height:1;display:block;animation:cdpulse 2.4s ease-in-out infinite;}
 
 /* SCROLL REVEAL */
-.reveal{opacity:0;transform:translateY(28px);transition:opacity .55s ease,transform .55s ease;}
-.reveal.visible{opacity:1;transform:translateY(0);}
-.reveal-delay-1{transition-delay:.1s;}
-.reveal-delay-2{transition-delay:.2s;}
-.reveal-delay-3{transition-delay:.3s;}
-.reveal-delay-4{transition-delay:.4s;}
-.reveal-delay-5{transition-delay:.5s;}
-.reveal-delay-6{transition-delay:.6s;}
-.reveal-delay-7{transition-delay:.7s;}
+.js-loaded .reveal{opacity:0;transform:translateY(28px);transition:opacity .55s ease,transform .55s ease;}
+.js-loaded .reveal.visible{opacity:1;transform:translateY(0);}
+.js-loaded .reveal-delay-1{transition-delay:.08s;}
+.js-loaded .reveal-delay-2{transition-delay:.16s;}
+.js-loaded .reveal-delay-3{transition-delay:.24s;}
+.js-loaded .reveal-delay-4{transition-delay:.32s;}
+.js-loaded .reveal-delay-5{transition-delay:.4s;}
+.js-loaded .reveal-delay-6{transition-delay:.48s;}
+.js-loaded .reveal-delay-7{transition-delay:.56s;}
 
 /* STATION PILL LINKS in rotation table */
 .sp{display:inline-block;padding:3px 10px;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;white-space:nowrap;text-decoration:none;transition:filter .15s;}
@@ -305,7 +305,7 @@ footer{background:#050505;padding:2.5rem 1.5rem;border-top:2px solid var(--red);
   <div class="hero-sub">Kindergarten – 5th Grade · SLAM Nevada Elementary</div>
   <div class="cd-wrap">
     <div class="cd-label">Days Until Field Day</div>
-    <div class="cd-num" id="countdown-num">--</div>
+    <div class="cd-num"><span id="countdown-num">--</span></div>
     <div class="cd-sub" id="countdown-sub">Days to go · May 1, 2026</div>
   </div>
 </section>
@@ -394,12 +394,55 @@ footer{background:#050505;padding:2.5rem 1.5rem;border-top:2px solid var(--red);
               <div class="time-range">10:30 – 11:10 AM</div>
               <div class="time-dur">40 minutes</div>
             </div>
-            <div class="sched-badge">3rd – 5th Grade</div>
+            <div class="sched-badge">Top Athletes · 3rd–5th</div>
           </div>
           <div class="sched-divider"></div>
           <div class="sched-body">
-            <div class="sched-who">Dry Time</div>
-            <div class="sched-note-txt">Transition period. Students dry off and reset before lunch.</div>
+            <div class="sched-who">🏅 Jump the River Tournament</div>
+            <div class="sched-note-txt">Top 7 students from each grade level (3rd, 4th, 5th) compete in a jump rope distance challenge. Contestants were selected based on combined Shuttle Run + Speed Test scores. All other students cheer on their classmates!</div>
+            <div style="margin-top:1rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.75rem;">
+
+              <div style="background:#0a1830;border:1px solid #1a3a6a;border-radius:4px;padding:.75rem;">
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#6ab0ff;margin-bottom:.5rem;">3rd Grade</div>
+                <div style="font-family:'Barlow',sans-serif;font-size:12px;color:rgba(250,250,248,.75);line-height:2;">
+                  Ezekiel Amador &nbsp;<span style="color:#6ab0ff;font-size:10px;">13.61</span><br>
+                  Axel Romero &nbsp;<span style="color:#6ab0ff;font-size:10px;">14.50</span><br>
+                  Alex Rosales &nbsp;<span style="color:#6ab0ff;font-size:10px;">14.52</span><br>
+                  Ryken Racadio &nbsp;<span style="color:#6ab0ff;font-size:10px;">14.76</span><br>
+                  Noah Mattix &nbsp;<span style="color:#6ab0ff;font-size:10px;">14.97</span><br>
+                  Armani Evans &nbsp;<span style="color:#6ab0ff;font-size:10px;">15.00</span><br>
+                  Aaron Edwards &nbsp;<span style="color:#6ab0ff;font-size:10px;">15.11</span>
+                </div>
+              </div>
+
+              <div style="background:#0a1830;border:1px solid #1a3a6a;border-radius:4px;padding:.75rem;">
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#6ab0ff;margin-bottom:.5rem;">4th Grade</div>
+                <div style="font-family:'Barlow',sans-serif;font-size:12px;color:rgba(250,250,248,.75);line-height:2;">
+                  Cashess Tabangcura &nbsp;<span style="color:#6ab0ff;font-size:10px;">12.79</span><br>
+                  Niko Brown &nbsp;<span style="color:#6ab0ff;font-size:10px;">13.48</span><br>
+                  Coltyn Yadao &nbsp;<span style="color:#6ab0ff;font-size:10px;">13.57</span><br>
+                  Gabby Jeter &nbsp;<span style="color:#6ab0ff;font-size:10px;">13.95</span><br>
+                  Joey Lial &nbsp;<span style="color:#6ab0ff;font-size:10px;">13.99</span><br>
+                  Ryler Lum &nbsp;<span style="color:#6ab0ff;font-size:10px;">14.09</span><br>
+                  Isiah Dominguez &nbsp;<span style="color:#6ab0ff;font-size:10px;">14.27</span>
+                </div>
+              </div>
+
+              <div style="background:#0a1830;border:1px solid #1a3a6a;border-radius:4px;padding:.75rem;">
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#6ab0ff;margin-bottom:.5rem;">5th Grade</div>
+                <div style="font-family:'Barlow',sans-serif;font-size:12px;color:rgba(250,250,248,.75);line-height:2;">
+                  Joziah Pagalan &nbsp;<span style="color:#6ab0ff;font-size:10px;">12.89</span><br>
+                  Elias Ivory &nbsp;<span style="color:#6ab0ff;font-size:10px;">12.95</span><br>
+                  RJ Richardson &nbsp;<span style="color:#6ab0ff;font-size:10px;">13.28</span><br>
+                  London Moh Moh &nbsp;<span style="color:#6ab0ff;font-size:10px;">13.44</span><br>
+                  Noah Proudfoot &nbsp;<span style="color:#6ab0ff;font-size:10px;">13.55</span><br>
+                  Donterius Phillips &nbsp;<span style="color:#6ab0ff;font-size:10px;">13.83</span><br>
+                  Zane Garrett &nbsp;<span style="color:#6ab0ff;font-size:10px;">14.16</span>
+                </div>
+              </div>
+
+            </div>
+            <div style="font-family:'Barlow',sans-serif;font-size:11px;color:rgba(250,250,248,.3);margin-top:.75rem;">Scores = Shuttle Run best time + Speed Test time (lower = faster)</div>
           </div>
         </div>
       </div>
@@ -958,6 +1001,7 @@ footer{background:#050505;padding:2.5rem 1.5rem;border-top:2px solid var(--red);
 
 <script>
 // COUNTDOWN
+document.body.classList.add('js-loaded');
 function updateCountdown(){
   var fd=new Date('2026-05-01T00:00:00'),now=new Date();
   var days=Math.ceil((fd-now)/86400000);
@@ -1011,8 +1055,12 @@ function closeMenu(){document.getElementById('mobile-menu').classList.remove('op
 // SCROLL REVEAL
 var revealObserver=new IntersectionObserver(function(entries){
   entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');revealObserver.unobserve(e.target);}});
-},{threshold:0.12});
+},{threshold:0.05,rootMargin:'0px 0px -20px 0px'});
 document.querySelectorAll('.reveal').forEach(function(el){revealObserver.observe(el);});
+// Fallback: make everything visible after 800ms in case observer doesn't fire
+setTimeout(function(){
+  document.querySelectorAll('.reveal').forEach(function(el){el.classList.add('visible');});
+},800);
 
 // WEATHER - Open-Meteo (free, no API key)
 // Henderson NV coords: 36.0395, -114.9817
@@ -1041,7 +1089,6 @@ document.querySelectorAll('.reveal').forEach(function(el){revealObserver.observe
     el.innerHTML='<span style="font-family:\'Barlow\',sans-serif;font-size:12px;color:rgba(250,250,248,.3);font-style:italic;">Forecast loads closer to May 1</span>';
   });
 })();
-
 </script>
 </body>
 </html>
