@@ -106,28 +106,58 @@ section{padding:4rem 1.5rem;border-bottom:1px solid var(--gray2);}
 /* SCHEDULE */
 .sched-note{background:var(--gray2);border-left:3px solid var(--red);padding:.875rem 1.25rem;margin-bottom:1.5rem;font-family:'Barlow',sans-serif;font-size:13px;color:var(--muted);line-height:1.6;}
 .sched-note strong{color:var(--red);font-weight:600;}
-.sched-blocks{display:flex;flex-direction:column;gap:2px;}
-.sched-row{display:grid;grid-template-columns:220px 1fr;border-radius:4px;overflow:hidden;border:1px solid var(--gray2);}
-.sched-row:hover .sched-time,.sched-row:hover .sched-detail{filter:brightness(1.15);}
-.sched-time{padding:1.25rem 1.5rem;display:flex;flex-direction:column;justify-content:center;min-width:0;}
-.time-range{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;white-space:nowrap;line-height:1.2;}
-.time-dur{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;opacity:.7;margin-top:3px;}
-.sched-detail{padding:1.25rem 1.5rem;display:flex;flex-direction:column;justify-content:center;}
-.sched-who{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--white);margin-bottom:4px;}
-.sched-note-txt{font-family:'Barlow',sans-serif;font-size:13px;line-height:1.55;}
-.lunch-rows{display:flex;flex-direction:column;gap:7px;}
-.lunch-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
-.lt{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;white-space:nowrap;min-width:130px;opacity:.6;}
+.sched-blocks{display:flex;flex-direction:column;gap:10px;}
+.sched-card{border-radius:6px;overflow:hidden;border:1px solid var(--gray2);}
+.sched-card-inner{display:flex;flex-direction:column;}
+.sched-top{padding:1rem 1.25rem .75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
+.sched-time-block{display:flex;flex-direction:column;}
+.time-range{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;line-height:1.1;}
+.time-dur{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;opacity:.6;margin-top:2px;}
+.sched-badge{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;border-radius:3px;white-space:nowrap;flex-shrink:0;}
+.sched-divider{height:1px;margin:0 1.25rem;opacity:.2;}
+.sched-body{padding:.875rem 1.25rem 1.125rem;}
+.sched-who{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;margin-bottom:5px;}
+.sched-note-txt{font-family:'Barlow',sans-serif;font-size:13px;line-height:1.6;}
+.lunch-rows{display:flex;flex-direction:column;gap:0;}
+.lunch-row{display:flex;gap:12px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);align-items:baseline;}
+.lunch-row:last-child{border-bottom:none;}
+.lt{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.5px;white-space:nowrap;min-width:110px;opacity:.5;}
 .ld{font-family:'Barlow',sans-serif;font-size:13px;}
-/* row color themes */
-.sched-row-red .sched-time{background:#2a0a0a;color:#ff7066;border-right:1px solid #3a1010;}
-.sched-row-red .sched-detail{background:#1a0808;color:rgba(250,250,248,.7);}
-.sched-row-blue .sched-time{background:#0a1830;color:#6ab0ff;border-right:1px solid #101e38;}
-.sched-row-blue .sched-detail{background:#080f1e;color:rgba(250,250,248,.7);}
-.sched-row-muted .sched-time{background:#141414;color:rgba(250,250,248,.35);border-right:1px solid var(--gray2);}
-.sched-row-muted .sched-detail{background:#0f0f0f;color:rgba(250,250,248,.5);}
-.sched-row-green .sched-time{background:#0a1e0a;color:#5dda85;border-right:1px solid #102010;}
-.sched-row-green .sched-detail{background:#080f08;color:rgba(250,250,248,.7);}
+/* card color themes */
+.sched-card-red{background:#1a0808;border-color:#3a1010;}
+.sched-card-red .sched-top{background:#2a0a0a;}
+.sched-card-red .time-range{color:#ff7066;}
+.sched-card-red .time-dur{color:#ff7066;}
+.sched-card-red .sched-divider{background:#ff7066;}
+.sched-card-red .sched-who{color:#FAFAF8;}
+.sched-card-red .sched-note-txt{color:rgba(250,250,248,.65);}
+.sched-card-red .sched-badge{background:rgba(213,43,30,.25);color:#ff7066;}
+.sched-card-blue{background:#080f1e;border-color:#101e38;}
+.sched-card-blue .sched-top{background:#0a1830;}
+.sched-card-blue .time-range{color:#6ab0ff;}
+.sched-card-blue .time-dur{color:#6ab0ff;}
+.sched-card-blue .sched-divider{background:#6ab0ff;}
+.sched-card-blue .sched-who{color:#FAFAF8;}
+.sched-card-blue .sched-note-txt{color:rgba(250,250,248,.65);}
+.sched-card-blue .sched-badge{background:rgba(26,110,216,.25);color:#6ab0ff;}
+.sched-card-muted{background:#0d0d0d;border-color:#1e1e1e;}
+.sched-card-muted .sched-top{background:#141414;}
+.sched-card-muted .time-range{color:rgba(250,250,248,.4);}
+.sched-card-muted .time-dur{color:rgba(250,250,248,.3);}
+.sched-card-muted .sched-divider{background:rgba(250,250,248,.1);}
+.sched-card-muted .sched-who{color:rgba(250,250,248,.5);}
+.sched-card-muted .sched-note-txt{color:rgba(250,250,248,.4);}
+.sched-card-muted .sched-badge{background:rgba(255,255,255,.06);color:rgba(250,250,248,.4);}
+.sched-card-muted .lt{opacity:.4;}
+.sched-card-muted .ld{color:rgba(250,250,248,.5);}
+.sched-card-green{background:#080f08;border-color:#102010;}
+.sched-card-green .sched-top{background:#0a1e0a;}
+.sched-card-green .time-range{color:#5dda85;}
+.sched-card-green .time-dur{color:#5dda85;}
+.sched-card-green .sched-divider{background:#5dda85;}
+.sched-card-green .sched-who{color:#FAFAF8;}
+.sched-card-green .sched-note-txt{color:rgba(250,250,248,.65);}
+.sched-card-green .sched-badge{background:rgba(34,168,85,.25);color:#5dda85;}
 
 /* STATION COLOR KEY */
 .station-key{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:2rem;}
@@ -229,17 +259,12 @@ footer{background:#050505;padding:2.5rem 1.5rem;border-top:2px solid var(--red);
 @media(max-width:700px){
   .nav-links{display:none;}
   .nav-toggle{display:block;}
-  .sched-row{grid-template-columns:1fr;}
-  .sched-row-red .sched-time,.sched-row-blue .sched-time,.sched-row-muted .sched-time,.sched-row-green .sched-time{border-right:none;border-bottom:2px solid rgba(255,255,255,.08);padding:.875rem 1.25rem 0.75rem;}
-  .sched-row-red .sched-detail,.sched-row-blue .sched-detail,.sched-row-muted .sched-detail,.sched-row-green .sched-detail{padding:.75rem 1.25rem 1rem;}
-  .time-range{white-space:normal;}
-  .lt{min-width:0;display:block;margin-bottom:1px;}
-  .lunch-row{flex-direction:column;gap:1px;margin-bottom:8px;}
   .colors-strip{grid-template-columns:repeat(3,1fr);}
   .stations-grid{grid-template-columns:1fr;}
   .footer-inner{flex-direction:column;gap:1.5rem;}
   section{padding:3rem 1rem;}
   .quick-nav{grid-template-columns:repeat(2,1fr);}
+  #weather-card{width:100%;}
 }
 @media(max-width:400px){
   .colors-strip{grid-template-columns:repeat(2,1fr);}
@@ -343,28 +368,78 @@ footer{background:#050505;padding:2.5rem 1.5rem;border-top:2px solid var(--red);
     </div>
     <div class="sched-note"><strong>Note:</strong> Students will not have recess or specials this day. Specialists will be a part of helping with field day.</div>
     <div class="sched-blocks">
-      <div class="sched-row sched-row-red">
-        <div class="sched-time"><div class="time-range">8:30 – 10:30 AM</div><div class="time-dur">2 hours</div></div>
-        <div class="sched-detail"><div class="sched-who">3rd – 5th Grade · Field Day</div><div class="sched-note-txt">Upper grades take the field first and rotate through all 7 activity stations including Hot Shot in the Cafegym.</div></div>
-      </div>
-      <div class="sched-row sched-row-blue">
-        <div class="sched-time"><div class="time-range">10:30 – 11:10 AM</div><div class="time-dur">40 minutes</div></div>
-        <div class="sched-detail"><div class="sched-who">Dry Time — All Grades</div><div class="sched-note-txt">Transition period. Students dry off and reset before lunch.</div></div>
-      </div>
-      <div class="sched-row sched-row-muted">
-        <div class="sched-time"><div class="time-range" style="font-size:15px;">11:10 AM – 12:05 PM</div><div class="time-dur">Lunch Block</div></div>
-        <div class="sched-detail">
-          <div class="lunch-rows">
-            <div class="lunch-row"><span class="lt">11:10 – 11:30 AM</span><span class="ld">3rd–5th Lunch (no recess)</span></div>
-            <div class="lunch-row"><span class="lt">11:30 – 11:45 AM</span><span class="ld">Clean &amp; reset cafeteria</span></div>
-            <div class="lunch-row"><span class="lt">11:45 – 12:05 PM</span><span class="ld">K–2nd Lunch (no recess)</span></div>
+
+      <div class="sched-card sched-card-red">
+        <div class="sched-card-inner">
+          <div class="sched-top">
+            <div class="sched-time-block">
+              <div class="time-range">8:30 – 10:30 AM</div>
+              <div class="time-dur">2 hours</div>
+            </div>
+            <div class="sched-badge">3rd – 5th Grade</div>
+          </div>
+          <div class="sched-divider"></div>
+          <div class="sched-body">
+            <div class="sched-who">Field Day — Upper Grades</div>
+            <div class="sched-note-txt">Upper grades take the field first and rotate through all 7 activity stations including Hot Shot in the Cafegym.</div>
           </div>
         </div>
       </div>
-      <div class="sched-row sched-row-green">
-        <div class="sched-time"><div class="time-range">12:30 – 2:30 PM</div><div class="time-dur">2 hours</div></div>
-        <div class="sched-detail"><div class="sched-who">K – 2nd Grade · Field Day</div><div class="sched-note-txt">Little Bulls take over after lunch. K–2 students dismissed directly from their classrooms. 6 station rotation — no Hot Shot.</div></div>
+
+      <div class="sched-card sched-card-blue">
+        <div class="sched-card-inner">
+          <div class="sched-top">
+            <div class="sched-time-block">
+              <div class="time-range">10:30 – 11:10 AM</div>
+              <div class="time-dur">40 minutes</div>
+            </div>
+            <div class="sched-badge">All Grades</div>
+          </div>
+          <div class="sched-divider"></div>
+          <div class="sched-body">
+            <div class="sched-who">Dry Time</div>
+            <div class="sched-note-txt">Transition period. Students dry off and reset before lunch.</div>
+          </div>
+        </div>
       </div>
+
+      <div class="sched-card sched-card-muted">
+        <div class="sched-card-inner">
+          <div class="sched-top">
+            <div class="sched-time-block">
+              <div class="time-range" style="font-size:18px;">11:10 AM – 12:05 PM</div>
+              <div class="time-dur">Lunch Block</div>
+            </div>
+            <div class="sched-badge">All Grades</div>
+          </div>
+          <div class="sched-divider"></div>
+          <div class="sched-body">
+            <div class="lunch-rows">
+              <div class="lunch-row"><span class="lt">11:10 – 11:30</span><span class="ld">3rd–5th Lunch (no recess)</span></div>
+              <div class="lunch-row"><span class="lt">11:30 – 11:45</span><span class="ld">Clean &amp; reset cafeteria</span></div>
+              <div class="lunch-row"><span class="lt">11:45 – 12:05</span><span class="ld">K–2nd Lunch (no recess)</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sched-card sched-card-green">
+        <div class="sched-card-inner">
+          <div class="sched-top">
+            <div class="sched-time-block">
+              <div class="time-range">12:30 – 2:30 PM</div>
+              <div class="time-dur">2 hours</div>
+            </div>
+            <div class="sched-badge">K – 2nd Grade</div>
+          </div>
+          <div class="sched-divider"></div>
+          <div class="sched-body">
+            <div class="sched-who">Field Day — Little Bulls</div>
+            <div class="sched-note-txt">K–2 students take over after lunch. Dismissed directly from classrooms. 6 station rotation — no Hot Shot.</div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
