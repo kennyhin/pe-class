@@ -201,16 +201,10 @@ section{padding:4rem 1.5rem;border-bottom:1px solid var(--gray2);}
 .teacher-search::placeholder{color:rgba(250,250,248,.3);font-size:14px;}
 .search-icon{
   font-family:'Bebas Neue',sans-serif;
-  font-size:20px;
+  font-size:16px;
   letter-spacing:2px;
   color:var(--red);
   white-space:nowrap;
-}
-.search-label{
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:10px;font-weight:700;letter-spacing:3px;
-  text-transform:uppercase;color:var(--red);
-  margin-bottom:3px;
 }
 
 /* ROTATION TABLE */
@@ -575,13 +569,8 @@ footer{background:#050505;padding:2.5rem 1.5rem;border-top:2px solid var(--red);
     <!-- K-2 ROTATION -->
     <div class="rot-panel active" id="rot-k2">
       <div class="teacher-search-wrap">
-        <div style="display:flex;flex-direction:column;gap:4px;flex:1;">
-          <span class="search-label">Find Your Class</span>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <span class="search-icon">→</span>
-            <input class="teacher-search" type="text" placeholder="Type your teacher's last name..." oninput="filterTeachers('k2',this.value)" id="search-k2"/>
-          </div>
-        </div>
+        <span class="search-icon">FIND YOUR CLASS →</span>
+        <input class="teacher-search" type="text" placeholder="Type teacher name (e.g. Gray, Weber, Byrd...)" oninput="filterTeachers('k2',this.value)" id="search-k2"/>
       </div>
       <div class="rot-table-wrap">
         <table class="rot-table" id="table-k2">
@@ -620,13 +609,8 @@ footer{background:#050505;padding:2.5rem 1.5rem;border-top:2px solid var(--red);
     <!-- 3-5 ROTATION -->
     <div class="rot-panel" id="rot-35">
       <div class="teacher-search-wrap">
-        <div style="display:flex;flex-direction:column;gap:4px;flex:1;">
-          <span class="search-label">Find Your Class</span>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <span class="search-icon">→</span>
-            <input class="teacher-search" type="text" placeholder="Type your teacher's last name..." oninput="filterTeachers('35',this.value)" id="search-35"/>
-          </div>
-        </div>
+        <span class="search-icon">FIND YOUR CLASS →</span>
+        <input class="teacher-search" type="text" placeholder="Type teacher name (e.g. Lewis, Fish, Maxwell...)" oninput="filterTeachers('35',this.value)" id="search-35"/>
       </div>
       <div class="rot-table-wrap">
         <table class="rot-table" id="table-35">
