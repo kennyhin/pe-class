@@ -173,11 +173,45 @@ section{padding:4rem 1.5rem;border-bottom:1px solid var(--gray2);}
 .rot-panel.active{display:block;}
 
 /* TEACHER FILTER */
-.teacher-search-wrap{padding:1rem;background:var(--gray2);display:flex;gap:8px;align-items:center;margin-bottom:1px;}
-.teacher-search{flex:1;background:var(--black);border:1px solid var(--gray3);color:var(--white);font-family:'Barlow',sans-serif;font-size:14px;padding:10px 14px;outline:none;transition:border-color .2s;}
-.teacher-search:focus{border-color:var(--red);}
-.teacher-search::placeholder{color:var(--muted2);font-size:13px;}
-.search-icon{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+.teacher-search-wrap{
+  padding:1.25rem 1.5rem;
+  background:linear-gradient(135deg,#1a0808 0%,#1a1a1a 100%);
+  border:1px solid rgba(213,43,30,.3);
+  border-left:4px solid var(--red);
+  display:flex;gap:12px;align-items:center;
+  margin-bottom:2px;
+  box-shadow:0 4px 20px rgba(213,43,30,.1);
+}
+.teacher-search{
+  flex:1;
+  background:#0d0d0d;
+  border:1px solid rgba(213,43,30,.25);
+  border-radius:3px;
+  color:var(--white);
+  font-family:'Barlow',sans-serif;
+  font-size:15px;
+  padding:13px 16px;
+  outline:none;
+  transition:border-color .2s, box-shadow .2s;
+}
+.teacher-search:focus{
+  border-color:var(--red);
+  box-shadow:0 0 0 3px rgba(213,43,30,.15);
+}
+.teacher-search::placeholder{color:rgba(250,250,248,.3);font-size:14px;}
+.search-icon{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:20px;
+  letter-spacing:2px;
+  color:var(--red);
+  white-space:nowrap;
+}
+.search-label{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:10px;font-weight:700;letter-spacing:3px;
+  text-transform:uppercase;color:var(--red);
+  margin-bottom:3px;
+}
 
 /* ROTATION TABLE */
 .rot-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
@@ -541,8 +575,14 @@ footer{background:#050505;padding:2.5rem 1.5rem;border-top:2px solid var(--red);
     <!-- K-2 ROTATION -->
     <div class="rot-panel active" id="rot-k2">
       <div class="teacher-search-wrap">
-        <span class="search-icon">🔍 Find class:</span>
-        <input class="teacher-search" type="text" placeholder="Type teacher name (e.g. Gray, Weber, Byrd...)" oninput="filterTeachers('k2',this.value)" id="search-k2"/>
+        <div style="display:flex;flex-direction:column;gap:4px;flex:1;">
+          <span class="search-label">Find Your Class</span>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="search-icon">→</span>
+            <input class="teacher-search" type="text" placeholder="Type your teacher's last name..." oninput="filterTeachers('k2',this.value)" id="search-k2"/>
+          </div>
+        </div>
+      </div>
       </div>
       <div class="rot-table-wrap">
         <table class="rot-table" id="table-k2">
@@ -581,8 +621,14 @@ footer{background:#050505;padding:2.5rem 1.5rem;border-top:2px solid var(--red);
     <!-- 3-5 ROTATION -->
     <div class="rot-panel" id="rot-35">
       <div class="teacher-search-wrap">
-        <span class="search-icon">🔍 Find class:</span>
-        <input class="teacher-search" type="text" placeholder="Type teacher name (e.g. Lewis, Fish, Laspina...)" oninput="filterTeachers('35',this.value)" id="search-35"/>
+        <div style="display:flex;flex-direction:column;gap:4px;flex:1;">
+          <span class="search-label">Find Your Class</span>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="search-icon">→</span>
+            <input class="teacher-search" type="text" placeholder="Type your teacher's last name..." oninput="filterTeachers('35',this.value)" id="search-35"/>
+          </div>
+        </div>
+      </div>
       </div>
       <div class="rot-table-wrap">
         <table class="rot-table" id="table-35">
