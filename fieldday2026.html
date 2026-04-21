@@ -68,7 +68,8 @@ nav{position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.97);backdrop-fi
 
 /* HIGHLIGHTS VIDEO CARD */
 .hero-video-wrap{position:relative;z-index:1;margin-top:2rem;width:100%;max-width:560px;}
-.hero-video-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem;text-align:center;}
+.hero-video-label{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--white);margin-bottom:.6rem;text-align:center;}
+.hero-video-label span{color:var(--red);}
 .hero-video-thumb{position:relative;width:100%;aspect-ratio:16/9;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:4px;overflow:hidden;cursor:pointer;}
 .hero-video-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s ease;}
 .hero-video-thumb:hover img{transform:scale(1.03);}
@@ -381,14 +382,9 @@ footer{background:#050505;padding:2.5rem 1.5rem;border-top:2px solid var(--red);
 
   <!-- HIGHLIGHTS VIDEO -->
   <div class="hero-video-wrap">
-    <div class="hero-video-label">📹 23–24 Field Day Highlights</div>
-    <div class="hero-video-thumb" id="hero-vid-thumb" onclick="loadHeroVideo()">
-      <img src="https://img.youtube.com/vi/sV7VwQlT3BU/maxresdefault.jpg" alt="Field Day 23-24 Highlights" loading="lazy"/>
-      <div class="hero-play-btn">
-        <div class="hero-play-icon">
-          <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
-        </div>
-      </div>
+    <div class="hero-video-label">📹 <span>23–24</span> Field Day Highlights</div>
+    <div class="hero-video-thumb" id="hero-vid-thumb">
+      <iframe src="https://www.youtube.com/embed/sV7VwQlT3BU?autoplay=1&mute=1&rel=0&loop=1&playlist=sV7VwQlT3BU" allow="autoplay; fullscreen" allowfullscreen></iframe>
     </div>
   </div>
 
