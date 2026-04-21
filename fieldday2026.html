@@ -66,7 +66,18 @@ nav{position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.97);backdrop-fi
 .js-loaded .reveal-delay-6{transition-delay:.48s;}
 .js-loaded .reveal-delay-7{transition-delay:.56s;}
 
-/* STATION PILL LINKS in rotation table */
+/* HIGHLIGHTS VIDEO CARD */
+.hero-video-wrap{position:relative;z-index:1;margin-top:2rem;width:100%;max-width:560px;}
+.hero-video-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem;text-align:center;}
+.hero-video-thumb{position:relative;width:100%;aspect-ratio:16/9;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:4px;overflow:hidden;cursor:pointer;}
+.hero-video-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s ease;}
+.hero-video-thumb:hover img{transform:scale(1.03);}
+.hero-video-thumb iframe{width:100%;height:100%;border:none;display:block;}
+.hero-play-btn{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.35);transition:background .2s;}
+.hero-play-btn:hover{background:rgba(0,0,0,.15);}
+.hero-play-icon{width:64px;height:64px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 24px rgba(213,43,30,.5);transition:transform .2s;}
+.hero-play-btn:hover .hero-play-icon{transform:scale(1.1);}
+.hero-play-icon svg{width:24px;height:24px;fill:#fff;margin-left:4px;}
 .sp{display:inline-block;padding:3px 10px;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;white-space:nowrap;text-decoration:none;transition:filter .15s;}
 .sp:hover{filter:brightness(1.3);}
 .sp-pop{background:rgba(26,110,216,.25);color:#6ab0ff;}
@@ -367,6 +378,20 @@ footer{background:#050505;padding:2.5rem 1.5rem;border-top:2px solid var(--red);
     <div class="cd-label">Days Until Field Day</div>
     <div class="cd-num" id="countdown-num">12</div>
   </div>
+
+  <!-- HIGHLIGHTS VIDEO -->
+  <div class="hero-video-wrap">
+    <div class="hero-video-label">📹 23–24 Field Day Highlights</div>
+    <div class="hero-video-thumb" id="hero-vid-thumb" onclick="loadHeroVideo()">
+      <img src="https://img.youtube.com/vi/sV7VwQlT3BU/maxresdefault.jpg" alt="Field Day 23-24 Highlights" loading="lazy"/>
+      <div class="hero-play-btn">
+        <div class="hero-play-icon">
+          <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </section>
 
 <!-- TICKER -->
@@ -1102,6 +1127,11 @@ footer{background:#050505;padding:2.5rem 1.5rem;border-top:2px solid var(--red);
 
 <script>
 // All interactive functions defined first so onclick handlers always find them
+function loadHeroVideo(){
+  var wrap = document.getElementById('hero-vid-thumb');
+  wrap.innerHTML = '<iframe src="https://www.youtube.com/embed/sV7VwQlT3BU?autoplay=1&rel=0" allow="autoplay; fullscreen" allowfullscreen></iframe>';
+}
+
 function toggleSched(card){
   var isOpen = card.classList.contains('open');
   card.classList.toggle('open', !isOpen);
