@@ -50,6 +50,27 @@
     .hero, .rules-wrap { padding-left:1.25rem; padding-right:1.25rem; }
     .print-btn { margin-left:1.25rem; }
   }
+
+  /* VIDEO CARD */
+  .video-section { max-width:760px; margin:0 auto; padding:0 2rem 2.5rem; }
+  .video-label { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700;
+    letter-spacing:3px; text-transform:uppercase; color:var(--red); margin-bottom:.75rem; }
+  .video-card { position:relative; width:100%; aspect-ratio:16/9; background:#0d0d0d;
+    border:1px solid #2a2a2a; border-radius:4px; overflow:hidden; cursor:pointer; }
+  .video-card img { width:100%; height:100%; object-fit:cover; display:block;
+    transition:transform .3s ease; }
+  .video-card:hover img { transform:scale(1.03); }
+  .video-card iframe { width:100%; height:100%; border:none; display:block; }
+  .play-btn { position:absolute; inset:0; display:flex; align-items:center;
+    justify-content:center; background:rgba(0,0,0,.4); transition:background .2s; }
+  .play-btn:hover { background:rgba(0,0,0,.2); }
+  .play-icon { width:64px; height:64px; background:var(--red); border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 4px 24px rgba(213,43,30,.55); transition:transform .2s; }
+  .play-btn:hover .play-icon { transform:scale(1.1); }
+  .play-icon svg { width:22px; height:22px; fill:white; margin-left:4px; }
+  .video-caption { margin-top:.6rem; font-family:'Barlow',sans-serif; font-size:12px;
+    color:var(--muted); }
 </style>
 </head>
 <body>
@@ -65,6 +86,27 @@
   <div class="station-tag">All Grades · K–5</div>
   <div class="objective"><strong>Objective:</strong> Carry your torch around the course without dropping the fire (ball). Pass it to your teammate and cheer them on. Every student goes once.</div>
 </div>
+
+
+<div class="video-section">
+  <div class="video-label">▶ How To Play</div>
+  <div class="video-card" id="torch-video">
+    <img src="https://img.youtube.com/vi/PRzL12QGf1I/maxresdefault.jpg" alt="Olympic Torch Relay — How to Play"/>
+    <div class="play-btn" onclick="loadVideo()">
+      <div class="play-icon">
+        <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+      </div>
+    </div>
+  </div>
+  <div class="video-caption">Watch a full demo before the station opens.</div>
+</div>
+
+<script>
+function loadVideo() {
+  var card = document.getElementById('torch-video');
+  card.innerHTML = '<iframe src="https://www.youtube.com/embed/PRzL12QGf1I?autoplay=1&rel=0" allow="autoplay; fullscreen" allowfullscreen></iframe>';
+}
+</script>
 
 <div class="rules-wrap">
   <div class="rules-title">📋 Game Rules</div>
