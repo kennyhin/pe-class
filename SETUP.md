@@ -62,9 +62,13 @@ endpoint. Add these tabs to the Google Sheet:
 
 **FAQ**
 
-| Question | Answer |
-|---|---|
-| What ages do you serve? | Kindergarten through 5th grade. |
+| Question | Answer | Keywords |
+|---|---|---|
+| When does soccer season start? | Soccer season starts in September. | soccer, season, start, fall |
+
+The page only shows the first 3 FAQ rows in the Q&A accordion, but the
+question form searches every FAQ row for possible answers. Add comma-separated
+keywords to make matching more reliable.
 
 Parent questions submitted from the website are saved automatically in a
 **Questions** tab:

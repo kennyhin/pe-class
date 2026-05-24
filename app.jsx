@@ -677,15 +677,18 @@ function faqTokens(text) {
 
 function findFaqMatches(question, faq) {
   const queryTokens = Array.from(new Set(faqTokens(question)));
-  if (queryTokens.length < 2) return [];
+  if (queryTokens.length < 1) return [];
 
   return faq
     .map((item) => {
       const haystack = faqTokens(`${item.q} ${item.a}`);
       const haystackSet = new Set(haystack);
-      const score = queryTokens.reduce((sum, token) => (
-        haystackSet.has(token) ? sum + 1 : sum
-      ), 0);
+      const keywordSet = new Set(faqTokens(item.keywords || ""));
+      const score = queryTokens.reduce((sum, token) => {
+        if (keywordSet.has(token)) return sum + 4;
+        if (haystackSet.has(token)) return sum + 1;
+        return sum;
+      }, 0);
       return { ...item, score };
     })
     .filter((item) => item.score > 0)
@@ -807,14 +810,15 @@ function AskQuestionForm({ endpoint, faq }) {
 
 function QA({ faq, endpoint }) {
   const [open, setOpen] = useState(0);
+  const visibleFaq = faq.slice(0, 3);
   return (
     <div className="card qa">
       <div className="card-head">
         <span className="card-eyebrow">Q&amp;A</span>
-        <span className="card-meta">{faq.length} {faq.length === 1 ? "question" : "questions"}</span>
+        <span className="card-meta">{visibleFaq.length} shown</span>
       </div>
       <div className="qa-list">
-        {faq.map((item, i) => {
+        {visibleFaq.map((item, i) => {
           const isOpen = open === i;
           return (
             <div key={i} className={`qa-item ${isOpen ? "open" : ""}`}>

@@ -12,7 +12,7 @@
  * Optional content tabs:
  *   Events: Date | Type | Title | Time
  *   Posts:  Name | Handle | Time | Body | Accent
- *   FAQ:    Question | Answer
+ *   FAQ:    Question | Answer | Keywords
  *
  * Questions columns (created automatically on first parent question):
  *   Timestamp | Name | Email | Question | User Agent
@@ -165,7 +165,8 @@ function _faq(ss) {
   return _rows(ss, FAQ_SHEET_NAME).map(function (row) {
     return {
       q: String(row.question || row.q || '').trim(),
-      a: String(row.answer || row.a || '').trim()
+      a: String(row.answer || row.a || '').trim(),
+      keywords: String(row.keywords || '').trim()
     };
   }).filter(function (item) {
     return item.q && item.a;
