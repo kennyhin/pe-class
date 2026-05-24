@@ -787,6 +787,46 @@ body { overflow-x: hidden; }
   border-color: rgba(128,255,0,0.55);
   box-shadow: 0 0 0 3px rgba(128,255,0,0.10);
 }
+.ask-suggestions {
+  border: 1px solid rgba(128,255,0,0.22);
+  border-radius: 12px;
+  background: rgba(128,255,0,0.06);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ask-suggestions-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--slam-lime);
+}
+.ask-suggestion {
+  border-radius: 9px;
+  background: rgba(10, 10, 10, 0.36);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.ask-suggestion summary {
+  padding: 10px 12px;
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+  cursor: pointer;
+}
+.ask-suggestion p {
+  margin: 0;
+  padding: 0 12px 12px;
+  color: var(--fg-muted);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
 .ask-actions {
   display: flex;
   align-items: center;

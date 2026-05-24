@@ -659,9 +659,44 @@ function Feed({ posts }) {
 }
 
 // --- Q&A ---
-function AskQuestionForm({ endpoint }) {
+const FAQ_STOP_WORDS = new Set([
+  "about", "after", "again", "answer", "because", "before", "bring", "child",
+  "could", "does", "from", "have", "know", "like", "need", "parent", "question",
+  "should", "that", "their", "there", "they", "this", "what", "when", "where",
+  "which", "will", "with", "would", "your",
+]);
+
+function faqTokens(text) {
+  return String(text || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, " ")
+    .split(/\s+/)
+    .map((token) => token.trim())
+    .filter((token) => token.length > 2 && !FAQ_STOP_WORDS.has(token));
+}
+
+function findFaqMatches(question, faq) {
+  const queryTokens = Array.from(new Set(faqTokens(question)));
+  if (queryTokens.length < 2) return [];
+
+  return faq
+    .map((item) => {
+      const haystack = faqTokens(`${item.q} ${item.a}`);
+      const haystackSet = new Set(haystack);
+      const score = queryTokens.reduce((sum, token) => (
+        haystackSet.has(token) ? sum + 1 : sum
+      ), 0);
+      return { ...item, score };
+    })
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3);
+}
+
+function AskQuestionForm({ endpoint, faq }) {
   const [form, setForm] = useState({ name: "", email: "", question: "" });
   const [status, setStatus] = useState({ kind: "idle", msg: "" });
+  const matches = findFaqMatches(form.question, faq);
 
   function update(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -747,6 +782,17 @@ function AskQuestionForm({ endpoint }) {
         rows={3}
         required
       />
+      {matches.length > 0 && (
+        <div className="ask-suggestions" aria-live="polite">
+          <div className="ask-suggestions-label">Possible answers</div>
+          {matches.map((item, i) => (
+            <details className="ask-suggestion" key={`${item.q}-${i}`}>
+              <summary>{item.q}</summary>
+              <p>{item.a}</p>
+            </details>
+          ))}
+        </div>
+      )}
       <div className="ask-actions">
         <button className="ask-submit" type="submit" disabled={status.kind === "sending"}>
           {status.kind === "sending" ? "Sending..." : "Send question"}
@@ -789,7 +835,7 @@ function QA({ faq, endpoint }) {
           );
         })}
       </div>
-      <AskQuestionForm endpoint={endpoint} />
+      <AskQuestionForm endpoint={endpoint} faq={faq} />
     </div>
   );
 }
