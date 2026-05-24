@@ -11,7 +11,7 @@
  *
  * Optional content tabs:
  *   Events: Date | Type | Sport | Title | Time | Location | Opponent | Notes
- *   Posts:  Name | Handle | Time | Body | Accent
+ *   Posts:  Date | Sport | Name | Handle | Body | Link
  *   FAQ:    Question | Answer | Keywords
  *
  * Questions columns (created automatically on first parent question):
@@ -206,17 +206,50 @@ function _ensureEventsSheet(ss) {
 }
 
 function _posts(ss) {
+  _ensurePostsSheet(ss);
   return _rows(ss, POSTS_SHEET_NAME).map(function (row) {
     return {
+      date: _dateKey(row.date || row.time),
+      sport: String(row.sport || '').trim(),
       name: String(row.name || '').trim(),
       handle: String(row.handle || '').trim(),
       time: String(row.time || '').trim(),
       body: String(row.body || '').trim(),
-      accent: String(row.accent || '').trim()
+      link: String(row.link || row.url || '').trim()
     };
   }).filter(function (post) {
     return post.name && post.body;
+  }).sort(function (a, b) {
+    return String(b.date || '').localeCompare(String(a.date || ''));
   });
+}
+
+function _ensurePostsSheet(ss) {
+  var headers = ['Date', 'Sport', 'Name', 'Handle', 'Body', 'Link'];
+  var sheet = ss.getSheetByName(POSTS_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(POSTS_SHEET_NAME);
+    sheet.appendRow(headers);
+    sheet.appendRow([
+      new Date(),
+      'Basketball',
+      'SLAM! Athletics',
+      '@slamES',
+      'Summer camp registration opens Monday.',
+      ''
+    ]);
+  }
+
+  _ensureHeaders(sheet, headers);
+  sheet.getRange(1, 1, 1, sheet.getLastColumn()).setFontWeight('bold');
+  sheet.setFrozenRows(1);
+
+  var sportRule = SpreadsheetApp.newDataValidation()
+    .requireValueInList(SPORTS, true)
+    .setAllowInvalid(false)
+    .build();
+  var sportColumn = _headerColumn(sheet, 'Sport');
+  if (sportColumn) sheet.getRange(2, sportColumn, Math.max(200, sheet.getMaxRows() - 1), 1).setDataValidation(sportRule);
 }
 
 function _faq(ss) {

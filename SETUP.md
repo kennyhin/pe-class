@@ -85,9 +85,15 @@ to fill in both `Type` and `Sport` on every Events row.
 
 **Posts**
 
-| Name | Handle | Time | Body | Accent |
-|---|---|---|---|---|
-| SLAM! Athletics | @slamES | 1d | Summer camp registration opens Monday. | lime |
+| Date | Sport | Name | Handle | Body | Link |
+|---|---|---|---|---|---|
+| 2026-05-24 | Basketball | Coach Marcus | @coachmarc | Practice moved indoors tonight. Gym B, same time. |  |
+| 2026-05-23 | Soccer | SLAM! Athletics | @slamES | Spring league finals this Saturday. Schedule: https://example.com/schedule | https://example.com/signup |
+
+Posts are sorted newest-first by the `Date` column, no matter where they sit in
+the sheet. The `Sport` column controls the icon. Paste a full URL into `Body`
+to make it clickable inside the post, or put one clean URL in `Link` to show a
+separate call-to-action link.
 
 **FAQ**
 

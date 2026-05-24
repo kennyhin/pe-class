@@ -340,23 +340,45 @@ body { overflow-x: hidden; }
 
 /* ---- Generic card chrome ---- */
 .card {
-  background: var(--bg-surface);
+  background: linear-gradient(180deg, rgba(28, 28, 28, 0.92), rgba(14, 14, 14, 0.92));
   border: 1px solid var(--border);
   border-radius: 20px;
   padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   transition: border-color var(--dur-base) var(--ease-out),
               transform var(--dur-base) var(--ease-out);
 }
+.feed { border-color: rgba(128,255,0,0.22); }
+.cal { border-color: rgba(218,0,22,0.24); }
+.qa { border-color: rgba(255,255,255,0.16); }
 .card:hover { border-color: var(--border-strong); }
 .card-head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  padding-bottom: 12px;
+  margin: -24px -24px 0;
+  padding: 18px 24px 16px;
   border-bottom: 1px solid var(--border);
+  background: linear-gradient(90deg, rgba(255,255,255,0.08), rgba(255,255,255,0.025));
+}
+.feed .card-head {
+  background: linear-gradient(90deg, rgba(128,255,0,0.16), rgba(128,255,0,0.03));
+  border-bottom-color: rgba(128,255,0,0.22);
+}
+.cal .card-head {
+  background: linear-gradient(90deg, rgba(218,0,22,0.2), rgba(218,0,22,0.035));
+  border-bottom-color: rgba(218,0,22,0.24);
+}
+.qa .card-head {
+  background: linear-gradient(90deg, rgba(255,255,255,0.12), rgba(128,255,0,0.035));
+  border-bottom-color: rgba(255,255,255,0.16);
 }
 .card-eyebrow {
   font-family: var(--font-display);
@@ -668,32 +690,30 @@ body { overflow-x: hidden; }
 .feed-list {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 10px;
 }
 .post {
   display: flex;
   gap: 12px;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--border);
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.035);
 }
-.post:last-child { border-bottom: none; padding-bottom: 0; }
-.post:first-child { padding-top: 0; }
 .post-avatar {
   width: 38px;
   height: 38px;
-  border-radius: 999px;
+  border-radius: 12px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-display);
-  font-size: 14px;
-  letter-spacing: -0.02em;
-  background: var(--slam-coal);
+  font-size: 22px;
+  line-height: 1;
+  background: rgba(10,10,10,0.58);
+  border: 1px solid rgba(255,255,255,0.08);
   color: var(--slam-white);
 }
-.post-avatar.accent-red { background: var(--slam-red); color: var(--slam-white); }
-.post-avatar.accent-lime { background: var(--slam-lime); color: var(--slam-black); }
 .post-body { flex: 1; min-width: 0; }
 .post-meta {
   display: flex;
@@ -712,12 +732,38 @@ body { overflow-x: hidden; }
   font-size: 11px;
   color: var(--fg-dim);
 }
+.post-date {
+  margin-left: auto;
+  color: var(--slam-lime);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
 .post-text {
   font-family: var(--font-sans);
   font-size: 13.5px;
   line-height: 1.45;
   color: var(--fg);
   margin: 6px 0 10px;
+}
+.post-link,
+.post-cta {
+  color: var(--slam-lime);
+  font-weight: 700;
+  text-decoration: none;
+}
+.post-link:hover,
+.post-cta:hover { text-decoration: underline; }
+.post-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 .post-stats {
   display: flex;
@@ -970,6 +1016,7 @@ body { overflow-x: hidden; }
   .happening { margin: 42px 10px; }
   .happening-title { font-size: clamp(34px, 12vw, 48px); }
   .card { padding: 18px; border-radius: 16px; gap: 14px; }
+  .card-head { margin: -18px -18px 0; padding: 16px 18px 14px; }
   .card-head { align-items: flex-start; gap: 8px; }
   .card-eyebrow { font-size: 20px; }
   .cal-grid { gap: 3px; }
@@ -983,7 +1030,8 @@ body { overflow-x: hidden; }
   .cal-month-event { grid-template-columns: 38px 1fr; gap: 8px; padding: 7px; }
   .cal-month-day { width: 38px; min-height: 36px; }
   .post { gap: 10px; }
-  .post-avatar { width: 34px; height: 34px; font-size: 12px; }
+  .post-avatar { width: 34px; height: 34px; font-size: 20px; border-radius: 10px; }
+  .post-date { width: 100%; margin-left: 0; }
   .qa-q { gap: 10px; font-size: 13.5px; }
   .qa-a { padding-right: 0; }
   .ask-row { grid-template-columns: 1fr; }

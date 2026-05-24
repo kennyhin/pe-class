@@ -393,32 +393,32 @@ const DEFAULT_EVENTS = [
 
 const DEFAULT_POSTS = [
   {
+    date: "2026-05-24",
+    sport: "Basketball",
     name: "Coach Marcus",
     handle: "@coachmarc",
-    time: "2h",
     body: "Practice moved indoors tonight — field's a mud pit. Gym B, same time. Bring water bottles.",
-    accent: "red",
   },
   {
+    date: "2026-05-23",
+    sport: "Soccer",
     name: "SLAM! Athletics",
     handle: "@slamES",
-    time: "1d",
     body: "Spring league finals THIS Saturday. 4 fields, 8 games, 100+ kids. Come loud.",
-    accent: "lime",
   },
   {
+    date: "2026-05-22",
+    sport: "Basketball",
     name: "Coach Riley",
     handle: "@rileyhoops",
-    time: "2d",
     body: "Mason hit his first three-pointer in a game today. The bench EXPLODED. This is why we coach.",
-    accent: "lime",
   },
   {
+    date: "2026-05-20",
+    sport: "Other",
     name: "SLAM! Athletics",
     handle: "@slamES",
-    time: "4d",
     body: "Summer camp registration opens Monday at 9AM. K-5, 8 weeks, every kid plays every game.",
-    accent: "red",
   },
 ];
 
@@ -522,6 +522,42 @@ function formatEventDate(dateKey) {
     weekday: "short",
     month: "short",
     day: "numeric",
+  });
+}
+
+function formatPostDate(dateKey) {
+  const date = new Date(`${String(dateKey || "").slice(0, 10)}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleDateString("default", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function postDateKey(post) {
+  return String(post?.date || post?.time || "").slice(0, 10);
+}
+
+function sortPostsByDate(a, b) {
+  return postDateKey(b).localeCompare(postDateKey(a))
+    || String(b.name || "").localeCompare(String(a.name || ""));
+}
+
+function linkifyText(text) {
+  const parts = String(text || "").split(/(https?:\/\/[^\s]+)/g);
+  return parts.map((part, i) => {
+    if (!/^https?:\/\//i.test(part)) return part;
+    const cleanUrl = part.replace(/[),.]+$/, "");
+    const trailing = part.slice(cleanUrl.length);
+    return (
+      <React.Fragment key={`${cleanUrl}-${i}`}>
+        <a className="post-link" href={cleanUrl} target="_blank" rel="noopener noreferrer">
+          {cleanUrl.replace(/^https?:\/\//i, "").replace(/\/$/, "")}
+        </a>
+        {trailing}
+      </React.Fragment>
+    );
   });
 }
 
@@ -789,6 +825,7 @@ function Calendar({ events, loading }) {
 
 // --- Updates feed (Twitter/X style) ---
 function Feed({ posts, loading }) {
+  const sortedPosts = [...posts].sort(sortPostsByDate);
   return (
     <div className="card feed">
       <div className="card-head">
@@ -798,24 +835,27 @@ function Feed({ posts, loading }) {
       <div className="feed-list">
         {loading ? (
           <div className="cal-empty">Loading updates...</div>
-        ) : posts.length === 0 ? (
+        ) : sortedPosts.length === 0 ? (
           <div className="cal-empty">No updates yet.</div>
-        ) : posts.map((p, i) => {
-          const accent = (p.accent || "").toLowerCase() === "lime" ? "lime"
-                       : (p.accent || "").toLowerCase() === "red"  ? "red"
-                       : "neutral";
-          const initials = String(p.name || "?")
-            .split(/\s+/).filter(Boolean)
-            .map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+        ) : sortedPosts.map((p, i) => {
+          const icon = getEventIcon({ sport: p.sport, title: p.sport, type: "event" });
+          const dateLabel = formatPostDate(postDateKey(p));
+          const link = String(p.link || "").trim();
           return (
             <article key={i} className="post">
-              <div className={`post-avatar accent-${accent}`}>{initials}</div>
+              <div className="post-avatar" aria-label={p.sport || "Update"}>{icon}</div>
               <div className="post-body">
                 <div className="post-meta">
                   <span className="post-name">{p.name}</span>
-                  <span className="post-handle">{p.handle}{p.time ? ` · ${p.time}` : ""}</span>
+                  <span className="post-handle">{p.handle}</span>
+                  {dateLabel && <span className="post-date">{dateLabel}</span>}
                 </div>
-                <p className="post-text">{p.body}</p>
+                <p className="post-text">{linkifyText(p.body)}</p>
+                {link && (
+                  <a className="post-cta" href={link} target="_blank" rel="noopener noreferrer">
+                    Open link <Icon name="arrow-right" size={13} />
+                  </a>
+                )}
               </div>
             </article>
           );
@@ -986,7 +1026,7 @@ function QA({ faq, endpoint, loading }) {
   return (
     <div className="card qa">
       <div className="card-head">
-        <span className="card-eyebrow">Q&amp;A</span>
+        <span className="card-eyebrow">Q and A</span>
         <span className="card-meta">{loading ? "loading" : `${visibleFaq.length} shown`}</span>
       </div>
       <div className="qa-list">
