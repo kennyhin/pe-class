@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  
+  <rect x="0" y="0" width="200" height="200" rx="36" fill="#0A0A0A"></rect>
+  <text x="32" y="158" font-family="Anton, Archivo Black, Impact, sans-serif" font-size="180" fill="#FAFAFA">S</text>
+  <text x="116" y="158" font-family="Anton, Archivo Black, Impact, sans-serif" font-size="180" fill="#C6FF3D">!</text>
+</svg>

@@ -1,0 +1,284 @@
+/* ============================================================
+   SLAM! Elementary Athletics — Design Tokens
+   Dark-first. Black is the canvas; red and lime are the noise.
+   ============================================================ */
+
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap");
+
+/* ---------- BRAND DISPLAY FAMILY ----------
+   "NCAA Illinois Fighting Illini" — a collegiate athletic block face.
+   Regular = the workhorse display weight.
+   Bold = louder accents (statlines, score, championships).
+   Outline = stencil/halftone overlays and large-scale brand moments. */
+@font-face {
+  font-family: "Illini";
+  src: url("fonts/ncaa_illinois_fighting_illini.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Illini";
+  src: url("fonts/ncaa_illinois_fighting_illinibold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Illini Outline";
+  src: url("fonts/ncaa_illinois_fighting_illini_outline.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* ---------- BRAND COLORS (raw) — aligned to PMS spec ---------- */
+  --slam-black:        #000000;   /* PMS Black */
+  --slam-ink:          #141414;   /* surface 1 */
+  --slam-coal:         #1F1F1F;   /* surface 2 */
+  --slam-graphite:     #2A2A2A;   /* border */
+  --slam-smoke:        #3D3D3D;   /* border strong */
+  --slam-fog:          #6B6B6B;   /* muted fg */
+  --slam-cool-gray:    #7D9398;   /* PMS Cool Gray 8C — neutral */
+  --slam-chalk:        #A1A1A1;   /* dim fg */
+  --slam-bone:         #E8E8E6;   /* off-white */
+  --slam-white:        #FFFFFF;   /* PMS White */
+
+  --slam-red:          #DA0016;   /* PMS 186C — primary accent */
+  --slam-red-deep:     #A8000F;   /* pressed/hover red */
+  --slam-red-soft:     #2A0405;   /* red wash bg */
+
+  --slam-lime:         #80FF00;   /* PMS 802C · Fluor. Green — secondary accent */
+  --slam-lime-deep:    #66CC00;   /* pressed/hover lime */
+  --slam-lime-soft:    #142A00;   /* lime wash bg */
+
+  /* ---------- SEMANTIC — DARK (default) ---------- */
+  --bg:                var(--slam-black);
+  --bg-surface:        var(--slam-ink);
+  --bg-raised:         var(--slam-coal);
+  --bg-overlay:        rgba(10, 10, 10, 0.72);
+
+  --border:            var(--slam-graphite);
+  --border-strong:     var(--slam-smoke);
+  --border-accent:     var(--slam-lime);
+
+  --fg:                var(--slam-white);
+  --fg-muted:          var(--slam-chalk);
+  --fg-dim:            var(--slam-fog);
+  --fg-inverse:        var(--slam-black);
+
+  --accent:            var(--slam-red);
+  --accent-hover:      var(--slam-red-deep);
+  --accent-fg:         var(--slam-white);
+
+  --accent-2:          var(--slam-lime);
+  --accent-2-hover:    var(--slam-lime-deep);
+  --accent-2-fg:       var(--slam-black);
+
+  /* ---------- STATUS ---------- */
+  --success:           var(--slam-lime);
+  --success-fg:        var(--slam-black);
+  --danger:            var(--slam-red);
+  --danger-fg:         var(--slam-white);
+  --warning:           #FFB23D;
+  --info:              #5BC0FF;
+
+  /* ---------- TYPE FAMILIES ---------- */
+  --font-display:  "Illini", "Archivo Black", "Impact", sans-serif;      /* collegiate athletic block — the SLAM voice */
+  --font-display-outline: "Illini Outline", "Illini", "Impact", sans-serif; /* stencil/outline accent */
+  --font-sans:     "Space Grotesk", "Archivo", system-ui, sans-serif;     /* body + UI */
+  --font-mono:     "Space Mono", ui-monospace, "SF Mono", monospace;      /* numbers, tags, scoreboard */
+
+  /* ---------- TYPE SCALE ---------- */
+  --fs-12: 0.75rem;
+  --fs-14: 0.875rem;
+  --fs-16: 1rem;
+  --fs-18: 1.125rem;
+  --fs-20: 1.25rem;
+  --fs-24: 1.5rem;
+  --fs-32: 2rem;
+  --fs-40: 2.5rem;
+  --fs-56: 3.5rem;
+  --fs-72: 4.5rem;
+  --fs-96: 6rem;
+  --fs-128: 8rem;
+
+  --lh-tight:   0.92;
+  --lh-snug:    1.1;
+  --lh-normal:  1.5;
+  --lh-loose:   1.7;
+
+  --tracking-tight:   -0.02em;
+  --tracking-snug:    -0.01em;
+  --tracking-normal:  0;
+  --tracking-wide:    0.04em;
+  --tracking-shout:   0.08em;   /* uppercase eyebrows */
+
+  /* ---------- SPACING (4pt grid) ---------- */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-32: 128px;
+
+  /* ---------- RADII (rounded, never cutesy) ---------- */
+  --radius-xs: 4px;     /* tags, inline pills */
+  --radius-sm: 8px;     /* inputs, small cards */
+  --radius-md: 12px;    /* cards */
+  --radius-lg: 20px;    /* feature cards */
+  --radius-xl: 28px;    /* hero panels */
+  --radius-pill: 999px; /* buttons, chips */
+
+  /* ---------- SHADOWS (sparingly — dark UI prefers borders) ---------- */
+  --shadow-sm:  0 1px 2px rgba(0,0,0,0.5);
+  --shadow-md:  0 4px 12px rgba(0,0,0,0.45), 0 1px 2px rgba(0,0,0,0.6);
+  --shadow-lg:  0 12px 32px rgba(0,0,0,0.55), 0 2px 6px rgba(0,0,0,0.6);
+  --shadow-glow-red:  0 0 0 4px rgba(255,45,45,0.18);
+  --shadow-glow-lime: 0 0 0 4px rgba(198,255,61,0.22);
+
+  /* ---------- MOTION ---------- */
+  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-snap:   cubic-bezier(0.5, 1.5, 0.6, 1);   /* small overshoot for "slam" feel */
+  --dur-fast:    120ms;
+  --dur-base:    200ms;
+  --dur-slow:    420ms;
+}
+
+/* ---------- LIGHT MODE (inverted — the away jersey) ---------- */
+[data-theme="light"] {
+  --bg:            #FAFAF8;
+  --bg-surface:    #FFFFFF;
+  --bg-raised:     #F3F3F0;
+  --bg-overlay:    rgba(250, 250, 248, 0.8);
+
+  --border:        #E2E2DE;
+  --border-strong: #BEBEB8;
+
+  --fg:            var(--slam-black);
+  --fg-muted:      #3D3D3D;
+  --fg-dim:        #6B6B6B;
+  --fg-inverse:    var(--slam-white);
+
+  --accent-fg:     var(--slam-white);
+  --accent-2-fg:   var(--slam-black);
+}
+
+/* ============================================================
+   SEMANTIC ELEMENT STYLES
+   ============================================================ */
+html, body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: var(--fs-16);
+  line-height: var(--lh-normal);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* DISPLAY — huge condensed Anton, the SLAM voice */
+.t-display, h1.display {
+  font-family: var(--font-display);
+  font-size: clamp(var(--fs-72), 12vw, var(--fs-128));
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-snug);
+  text-transform: uppercase;
+  font-weight: 400;   /* Anton is one weight; bold via size */
+}
+
+h1, .t-h1 {
+  font-family: var(--font-display);
+  font-size: var(--fs-72);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-snug);
+  text-transform: uppercase;
+  font-weight: 400;
+  margin: 0;
+}
+
+h2, .t-h2 {
+  font-family: var(--font-display);
+  font-size: var(--fs-56);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-snug);
+  text-transform: uppercase;
+  font-weight: 400;
+  margin: 0;
+}
+
+h3, .t-h3 {
+  font-family: var(--font-sans);
+  font-size: var(--fs-32);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tracking-tight);
+  font-weight: 700;
+  margin: 0;
+}
+
+h4, .t-h4 {
+  font-family: var(--font-sans);
+  font-size: var(--fs-24);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tracking-tight);
+  font-weight: 600;
+  margin: 0;
+}
+
+p, .t-body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-16);
+  line-height: var(--lh-normal);
+  color: var(--fg);
+  margin: 0;
+}
+
+.t-body-lg {
+  font-size: var(--fs-20);
+  line-height: var(--lh-normal);
+}
+
+.t-body-sm {
+  font-size: var(--fs-14);
+  line-height: var(--lh-normal);
+  color: var(--fg-muted);
+}
+
+.t-eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  letter-spacing: var(--tracking-shout);
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  font-weight: 700;
+}
+
+.t-mono, code, kbd {
+  font-family: var(--font-mono);
+  font-size: 0.95em;
+}
+
+.t-stat {
+  font-family: var(--font-display);
+  font-size: var(--fs-96);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-snug);
+  font-weight: 400;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+a:hover { opacity: 0.7; }

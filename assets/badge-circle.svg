@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  
+  <circle cx="100" cy="100" r="100" fill="#FF2D2D"></circle>
+  <text x="50%" y="56%" text-anchor="middle" dominant-baseline="middle" font-family="Anton, Archivo Black, Impact, sans-serif" font-size="120" fill="#FAFAFA" letter-spacing="-2">SLAM</text>
+  <text x="50%" y="84%" text-anchor="middle" dominant-baseline="middle" font-family="Space Mono, monospace" font-weight="700" font-size="14" fill="#FAFAFA" letter-spacing="3">ELEMENTARY · ATHLETICS</text>
+</svg>
