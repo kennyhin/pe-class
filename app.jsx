@@ -679,18 +679,22 @@ function findFaqMatches(question, faq) {
   const queryTokens = Array.from(new Set(faqTokens(question)));
   if (queryTokens.length < 1) return [];
 
+  function scoreBy(text) {
+    const tokens = new Set(faqTokens(text));
+    return queryTokens.reduce((sum, token) => (
+      tokens.has(token) ? sum + 1 : sum
+    ), 0);
+  }
+
+  const keywordMatches = faq
+    .map((item) => ({ ...item, score: scoreBy(item.keywords || "") }))
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  if (keywordMatches.length) return keywordMatches.slice(0, 3);
+
   return faq
-    .map((item) => {
-      const haystack = faqTokens(`${item.q} ${item.a}`);
-      const haystackSet = new Set(haystack);
-      const keywordSet = new Set(faqTokens(item.keywords || ""));
-      const score = queryTokens.reduce((sum, token) => {
-        if (keywordSet.has(token)) return sum + 4;
-        if (haystackSet.has(token)) return sum + 1;
-        return sum;
-      }, 0);
-      return { ...item, score };
-    })
+    .map((item) => ({ ...item, score: scoreBy(`${item.q} ${item.a}`) }))
     .filter((item) => item.score > 0)
     .sort((a, b) => b.score - a.score)
     .slice(0, 3);

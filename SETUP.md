@@ -67,8 +67,10 @@ endpoint. Add these tabs to the Google Sheet:
 | When does soccer season start? | Soccer season starts in September. | soccer, season, start, fall |
 
 The page only shows the first 3 FAQ rows in the Q&A accordion, but the
-question form searches every FAQ row for possible answers. Add comma-separated
-keywords to make matching more reliable.
+question form searches every FAQ row for possible answers. It checks the
+`Keywords` column first, then falls back to `Question` and `Answer` text only
+when no keyword match exists. Add comma-separated keywords to control what gets
+suggested.
 
 Parent questions submitted from the website are saved automatically in a
 **Questions** tab:

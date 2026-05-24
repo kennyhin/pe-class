@@ -162,6 +162,7 @@ function _posts(ss) {
 }
 
 function _faq(ss) {
+  _ensureFaqSheet(ss);
   return _rows(ss, FAQ_SHEET_NAME).map(function (row) {
     return {
       q: String(row.question || row.q || '').trim(),
@@ -171,6 +172,28 @@ function _faq(ss) {
   }).filter(function (item) {
     return item.q && item.a;
   });
+}
+
+function _ensureFaqSheet(ss) {
+  var sheet = ss.getSheetByName(FAQ_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(FAQ_SHEET_NAME);
+    sheet.appendRow(['Question', 'Answer', 'Keywords']);
+    sheet.getRange('A1:C1').setFontWeight('bold');
+    sheet.setFrozenRows(1);
+    return;
+  }
+
+  var lastColumn = Math.max(1, sheet.getLastColumn());
+  var headers = sheet.getRange(1, 1, 1, lastColumn).getValues()[0].map(function (header) {
+    return String(header).trim().toLowerCase();
+  });
+
+  if (headers.indexOf('keywords') === -1) {
+    sheet.getRange(1, lastColumn + 1).setValue('Keywords');
+    sheet.getRange(1, 1, 1, lastColumn + 1).setFontWeight('bold');
+    sheet.setFrozenRows(1);
+  }
 }
 
 function _rows(ss, sheetName) {
