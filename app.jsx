@@ -389,10 +389,11 @@ function Footer() {
 
 // ---------------------------------------------------------------------------
 // "What's happening" — calendar · feed · Q&A
+// Content comes from the Apps Script endpoint (Posts/Events/FAQ sheet tabs);
+// these arrays are fallbacks shown before the fetch completes or if it fails.
 // ---------------------------------------------------------------------------
 
-// --- Calendar ---
-const EVENTS = [
+const DEFAULT_EVENTS = [
   { date: "2026-05-27", type: "practice", title: "Basketball · Grades 3-5", time: "5:30 PM · Gym B" },
   { date: "2026-05-29", type: "game",     title: "Soccer Friday Night Lights", time: "6:00 PM · East Field" },
   { date: "2026-06-02", type: "practice", title: "T-Ball · Grades K-2", time: "4:30 PM · Field 1" },
@@ -401,23 +402,109 @@ const EVENTS = [
   { date: "2026-06-14", type: "event",    title: "Summer Camp Kickoff", time: "9:00 AM · Main Gym" },
 ];
 
-function Calendar() {
-  // Static month — May 2026 (Friday-start month for clean look). Day-of-week
-  // indexing here is the standard JS getDay() (Sun=0).
-  const monthLabel = "May 2026";
-  const daysInMonth = 31;
-  const firstDayOfWeek = 5; // May 1, 2026 is a Friday
-  const today = 23;
+const DEFAULT_POSTS = [
+  {
+    name: "Coach Marcus",
+    handle: "@coachmarc",
+    time: "2h",
+    body: "Practice moved indoors tonight — field's a mud pit. Gym B, same time. Bring water bottles.",
+    accent: "red",
+  },
+  {
+    name: "SLAM! Athletics",
+    handle: "@slamES",
+    time: "1d",
+    body: "Spring league finals THIS Saturday. 4 fields, 8 games, 100+ kids. Come loud.",
+    accent: "lime",
+  },
+  {
+    name: "Coach Riley",
+    handle: "@rileyhoops",
+    time: "2d",
+    body: "Mason hit his first three-pointer in a game today. The bench EXPLODED. This is why we coach.",
+    accent: "lime",
+  },
+  {
+    name: "SLAM! Athletics",
+    handle: "@slamES",
+    time: "4d",
+    body: "Summer camp registration opens Monday at 9AM. K-5, 8 weeks, every kid plays every game.",
+    accent: "red",
+  },
+];
+
+const DEFAULT_FAQ = [
+  { q: "What ages do you serve?", a: "Kindergarten through 5th grade (ages 5-11). Programs are split by age band so kids play with peers their own size and skill level." },
+  { q: "How much does it cost?", a: "Most seasons run $240 for 8 weeks (1 practice + 1 game per week). Scholarships available — just ask." },
+  { q: "Are coaches certified?", a: "Every coach is CPR + first-aid certified, background-checked, and trained on our developmental model." },
+  { q: "What if my kid has never played before?", a: "Perfect. That's exactly who we built this for. Every program starts with fundamentals — running, throwing, catching, sportsmanship. No experience required." },
+  { q: "Can I get a refund if my kid hates it?", a: "Yes. Full refund within the first 2 weeks, no questions asked." },
+];
+
+// Pulls all three content arrays from the Apps Script endpoint on mount.
+// Returns the fallback arrays until the fetch resolves, so the page is never
+// blank. If the fetch fails (CORS, network, sheet empty, etc.), the fallbacks
+// remain — no error UI for content, just defaults.
+function useContent(endpoint) {
+  const [content, setContent] = useState({
+    posts: DEFAULT_POSTS,
+    events: DEFAULT_EVENTS,
+    faq: DEFAULT_FAQ,
+    loaded: false,
+  });
+
+  useEffect(() => {
+    if (!endpoint) return;
+    let cancelled = false;
+    fetch(`${endpoint}?action=all&t=${Date.now()}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (cancelled) return;
+        setContent((prev) => ({
+          posts:  Array.isArray(data.posts)  && data.posts.length  ? data.posts  : prev.posts,
+          events: Array.isArray(data.events) && data.events.length ? data.events : prev.events,
+          faq:    Array.isArray(data.faq)    && data.faq.length    ? data.faq    : prev.faq,
+          loaded: true,
+        }));
+      })
+      .catch(() => {
+        // Silent fail — keep fallback content.
+        if (!cancelled) setContent((prev) => ({ ...prev, loaded: true }));
+      });
+    return () => { cancelled = true; };
+  }, [endpoint]);
+
+  return content;
+}
+
+function Calendar({ events }) {
+  // Show the current month, dynamically. Today is highlighted.
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const today = now.getDate();
+  const monthLabel = now.toLocaleString("default", { month: "long", year: "numeric" });
+
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDayOfWeek = new Date(year, month, 1).getDay();
 
   const cells = [];
   for (let i = 0; i < firstDayOfWeek; i++) cells.push(null);
   for (let d = 1; d <= daysInMonth; d++) cells.push(d);
 
-  const eventDays = EVENTS
-    .filter((e) => e.date.startsWith("2026-05"))
-    .map((e) => parseInt(e.date.slice(-2), 10));
+  // Which days this month have events?
+  const monthPrefix = `${year}-${String(month + 1).padStart(2, "0")}`;
+  const eventDays = events
+    .filter((e) => String(e.date || "").startsWith(monthPrefix))
+    .map((e) => parseInt(String(e.date).slice(8, 10), 10))
+    .filter((n) => !isNaN(n));
 
-  const upcoming = EVENTS.slice(0, 3);
+  // Upcoming = next 3 events from today onwards (then any future ones)
+  const todayStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(today).padStart(2, "0")}`;
+  const upcoming = events
+    .filter((e) => String(e.date || "") >= todayStr)
+    .sort((a, b) => String(a.date).localeCompare(String(b.date)))
+    .slice(0, 3);
 
   return (
     <div className="card cal">
@@ -450,18 +537,49 @@ function Calendar() {
 
       <div className="cal-upcoming">
         <div className="cal-upcoming-label">Up next</div>
-        {upcoming.map((e, i) => {
-          const dt = new Date(e.date + "T00:00:00");
-          const dayName = ["SUN","MON","TUE","WED","THU","FRI","SAT"][dt.getDay()];
-          const dayNum = dt.getDate();
+        {upcoming.length === 0 ? (
+          <div className="cal-empty">No upcoming events. Check back soon.</div>
+        ) : upcoming.map((e, i) => {
+          const type = String(e.type || "event").toLowerCase();
+          const sportIcon = {
+            practice: "🏃",
+            game:     "🏆",
+            event:    "🎉",
+            basketball: "🏀",
+            soccer:   "⚽",
+            baseball: "⚾",
+            softball: "🥎",
+            football: "🏈",
+            volleyball: "🏐",
+            tennis:   "🎾",
+            swimming: "🏊",
+            track:    "🏃",
+            camp:     "⛺",
+          };
+          // Pick icon: check if the event title contains a sport name first,
+          // then fall back to the event type.
+          const titleLower = String(e.title || "").toLowerCase();
+          const icon =
+            titleLower.includes("basketball") ? "🏀" :
+            titleLower.includes("soccer")     ? "⚽" :
+            titleLower.includes("baseball")   ? "⚾" :
+            titleLower.includes("softball")   ? "🥎" :
+            titleLower.includes("football")   ? "🏈" :
+            titleLower.includes("volleyball") ? "🏐" :
+            titleLower.includes("tennis")     ? "🎾" :
+            titleLower.includes("swim")       ? "🏊" :
+            titleLower.includes("track")      ? "🏃" :
+            titleLower.includes("camp")       ? "⛺" :
+            titleLower.includes("bbq")        ? "🔥" :
+            titleLower.includes("championship") ? "🏆" :
+            sportIcon[type] || "📅";
           return (
             <div key={i} className="cal-event">
-              <div className="cal-event-date">
-                <span className="cal-event-dow">{dayName}</span>
-                <span className="cal-event-day">{dayNum}</span>
+              <div className="cal-event-icon">
+                <span className="cal-event-emoji">{icon}</span>
               </div>
               <div className="cal-event-body">
-                <div className={`cal-event-tag tag-${e.type}`}>{e.type}</div>
+                <div className={`cal-event-tag tag-${type}`}>{type}</div>
                 <div className="cal-event-title">{e.title}</div>
                 <div className="cal-event-time">{e.time}</div>
               </div>
@@ -474,42 +592,7 @@ function Calendar() {
 }
 
 // --- Updates feed (Twitter/X style) ---
-const POSTS = [
-  {
-    name: "Coach Marcus",
-    handle: "@coachmarc",
-    time: "2h",
-    body: "Practice moved indoors tonight — field's a mud pit. Gym B, same time. Bring water bottles.",
-    likes: 24, replies: 3, reposts: 6,
-    accent: "red",
-  },
-  {
-    name: "SLAM! Athletics",
-    handle: "@slamES",
-    time: "1d",
-    body: "Spring league finals THIS Saturday. 4 fields, 8 games, 100+ kids. Come loud. 🎙️",
-    likes: 142, replies: 18, reposts: 31,
-    accent: "lime",
-  },
-  {
-    name: "Coach Riley",
-    handle: "@rileyhoops",
-    time: "2d",
-    body: "Mason hit his first three-pointer in a game today. The bench EXPLODED. This is why we coach.",
-    likes: 89, replies: 12, reposts: 4,
-    accent: "lime",
-  },
-  {
-    name: "SLAM! Athletics",
-    handle: "@slamES",
-    time: "4d",
-    body: "Summer camp registration opens Monday at 9AM. K-5, 8 weeks, every kid plays every game. Don't sleep on this.",
-    likes: 67, replies: 9, reposts: 14,
-    accent: "red",
-  },
-];
-
-function Feed() {
+function Feed({ posts }) {
   return (
     <div className="card feed">
       <div className="card-head">
@@ -517,64 +600,44 @@ function Feed() {
         <span className="card-meta">@slamES</span>
       </div>
       <div className="feed-list">
-        {POSTS.map((p, i) => (
-          <article key={i} className="post">
-            <div className={`post-avatar accent-${p.accent}`}>
-              {p.name.split(" ").map((w) => w[0]).join("").slice(0, 2)}
-            </div>
-            <div className="post-body">
-              <div className="post-meta">
-                <span className="post-name">{p.name}</span>
-                <span className="post-handle">{p.handle} · {p.time}</span>
+        {posts.length === 0 ? (
+          <div className="cal-empty">No updates yet.</div>
+        ) : posts.map((p, i) => {
+          const accent = (p.accent || "").toLowerCase() === "lime" ? "lime"
+                       : (p.accent || "").toLowerCase() === "red"  ? "red"
+                       : "neutral";
+          const initials = String(p.name || "?")
+            .split(/\s+/).filter(Boolean)
+            .map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+          return (
+            <article key={i} className="post">
+              <div className={`post-avatar accent-${accent}`}>{initials}</div>
+              <div className="post-body">
+                <div className="post-meta">
+                  <span className="post-name">{p.name}</span>
+                  <span className="post-handle">{p.handle}{p.time ? ` · ${p.time}` : ""}</span>
+                </div>
+                <p className="post-text">{p.body}</p>
               </div>
-              <p className="post-text">{p.body}</p>
-              <div className="post-stats">
-                <span><Icon name="message-circle" size={13} /> {p.replies}</span>
-                <span><Icon name="repeat" size={13} /> {p.reposts}</span>
-                <span><Icon name="heart" size={13} /> {p.likes}</span>
-              </div>
-            </div>
-          </article>
-        ))}
+            </article>
+          );
+        })}
       </div>
     </div>
   );
 }
 
 // --- Q&A ---
-const FAQ = [
-  {
-    q: "What ages do you serve?",
-    a: "Kindergarten through 5th grade (ages 5-11). Programs are split by age band — K-2, 3-5 — so kids play with peers their own size and skill level.",
-  },
-  {
-    q: "How much does it cost?",
-    a: "Most seasons run $240 for 8 weeks (1 practice + 1 game per week). Camps and one-off events are priced separately. Scholarships available — just ask.",
-  },
-  {
-    q: "Are coaches certified?",
-    a: "Every coach is CPR + first-aid certified, background-checked, and trained on our developmental model. We don't hire random parents off Craigslist.",
-  },
-  {
-    q: "What if my kid has never played before?",
-    a: "Perfect. That's exactly who we built this for. Every program starts with fundamentals — running, throwing, catching, sportsmanship. No experience required.",
-  },
-  {
-    q: "Can I get a refund if my kid hates it?",
-    a: "Yes. Full refund within the first 2 weeks, no questions asked. We'd rather you find the right fit than feel stuck.",
-  },
-];
-
-function QA() {
+function QA({ faq }) {
   const [open, setOpen] = useState(0);
   return (
     <div className="card qa">
       <div className="card-head">
         <span className="card-eyebrow">Q&amp;A</span>
-        <span className="card-meta">{FAQ.length} questions</span>
+        <span className="card-meta">{faq.length} {faq.length === 1 ? "question" : "questions"}</span>
       </div>
       <div className="qa-list">
-        {FAQ.map((item, i) => {
+        {faq.map((item, i) => {
           const isOpen = open === i;
           return (
             <div key={i} className={`qa-item ${isOpen ? "open" : ""}`}>
@@ -599,7 +662,8 @@ function QA() {
   );
 }
 
-function WhatsHappening() {
+function WhatsHappening({ endpoint }) {
+  const { posts, events, faq } = useContent(endpoint);
   return (
     <section className="happening" data-screen-label="02 Happening">
       <div className="happening-head">
@@ -607,9 +671,9 @@ function WhatsHappening() {
         <p className="happening-sub">Schedules · Updates · Answers</p>
       </div>
       <div className="happening-grid">
-        <Calendar />
-        <Feed />
-        <QA />
+        <Calendar events={events} />
+        <Feed posts={posts} />
+        <QA faq={faq} />
       </div>
     </section>
   );
@@ -626,7 +690,7 @@ function App() {
     <div className="page">
       <Nav />
       <Hero bg={t.heroBg} endpoint={t.signupEndpoint} />
-      <WhatsHappening />
+      <WhatsHappening endpoint={t.signupEndpoint} />
 
       <TweaksPanel title="Tweaks">
         <TweakSection label="Hero background" />
