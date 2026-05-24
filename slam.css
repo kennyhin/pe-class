@@ -40,8 +40,6 @@ body { overflow-x: hidden; }
   height: 48px;
   width: auto;
   display: block;
-  /* PNG has black background — blends with the dark pill */
-  mix-blend-mode: screen;
 }
 
 /* ============== HERO ============== */
@@ -124,9 +122,6 @@ body { overflow-x: hidden; }
   width: clamp(280px, 46vw, 560px);
   height: auto;
   margin: 0 auto;
-  /* PNG has solid black background — screen blend lets it sit on the
-     dark pattern without a visible box around it. */
-  mix-blend-mode: screen;
   filter: drop-shadow(0 0 40px rgba(128, 255, 0, 0.18));
   opacity: 0;
   transform: scale(0.92);
