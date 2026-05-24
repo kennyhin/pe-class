@@ -1,13 +1,18 @@
 /**
  * SLAM! Athletics — Newsletter Signup Endpoint
  * --------------------------------------------
- * Receives an email from the landing page form and appends a row to a Google Sheet.
+ * Receives newsletter signups and serves site content from Google Sheet tabs.
  *
  * Deploy as a Web App (see SETUP.md). You'll get a URL ending in /exec — paste
  * that URL into the Tweaks panel on the landing page.
  *
- * Sheet columns (created automatically on first run):
+ * Signups columns (created automatically on first run):
  *   Timestamp | Email | Source | User Agent
+ *
+ * Optional content tabs:
+ *   Events: Date | Type | Title | Time
+ *   Posts:  Name | Handle | Time | Body | Accent
+ *   FAQ:    Question | Answer
  */
 
 // ---- CONFIG ---------------------------------------------------------------
@@ -16,6 +21,9 @@
 // Or paste a sheet ID here to write to a different sheet.
 var SHEET_ID = '';
 var SHEET_NAME = 'Signups';
+var EVENTS_SHEET_NAME = 'Events';
+var POSTS_SHEET_NAME = 'Posts';
+var FAQ_SHEET_NAME = 'FAQ';
 // ---------------------------------------------------------------------------
 
 function doPost(e) {
@@ -62,9 +70,24 @@ function doPost(e) {
   }
 }
 
-function doGet() {
+function doGet(e) {
+  var params = (e && e.parameter) || {};
+  if (String(params.action || '').toLowerCase() === 'all') {
+    try {
+      var ss = _spreadsheet();
+      return _json({
+        ok: true,
+        events: _events(ss),
+        posts: _posts(ss),
+        faq: _faq(ss)
+      });
+    } catch (err) {
+      return _json({ ok: false, error: String(err), events: [], posts: [], faq: [] });
+    }
+  }
+
   return ContentService
-    .createTextOutput('SLAM! Athletics signup endpoint is live. POST email here.')
+    .createTextOutput('SLAM! Athletics endpoint is live. POST email signups or GET ?action=all for site content.')
     .setMimeType(ContentService.MimeType.TEXT);
 }
 
@@ -72,4 +95,79 @@ function _json(obj) {
   return ContentService
     .createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+function _spreadsheet() {
+  var ss = SHEET_ID
+    ? SpreadsheetApp.openById(SHEET_ID)
+    : SpreadsheetApp.getActiveSpreadsheet();
+
+  if (!ss) {
+    throw new Error('No spreadsheet bound. Open the sheet first, then Extensions → Apps Script.');
+  }
+
+  return ss;
+}
+
+function _events(ss) {
+  return _rows(ss, EVENTS_SHEET_NAME).map(function (row) {
+    return {
+      date: _dateKey(row.date),
+      type: String(row.type || 'event').trim(),
+      title: String(row.title || '').trim(),
+      time: String(row.time || '').trim()
+    };
+  }).filter(function (event) {
+    return event.date && event.title;
+  });
+}
+
+function _posts(ss) {
+  return _rows(ss, POSTS_SHEET_NAME).map(function (row) {
+    return {
+      name: String(row.name || '').trim(),
+      handle: String(row.handle || '').trim(),
+      time: String(row.time || '').trim(),
+      body: String(row.body || '').trim(),
+      accent: String(row.accent || '').trim()
+    };
+  }).filter(function (post) {
+    return post.name && post.body;
+  });
+}
+
+function _faq(ss) {
+  return _rows(ss, FAQ_SHEET_NAME).map(function (row) {
+    return {
+      q: String(row.question || row.q || '').trim(),
+      a: String(row.answer || row.a || '').trim()
+    };
+  }).filter(function (item) {
+    return item.q && item.a;
+  });
+}
+
+function _rows(ss, sheetName) {
+  var sheet = ss.getSheetByName(sheetName);
+  if (!sheet || sheet.getLastRow() < 2) return [];
+
+  var values = sheet.getDataRange().getValues();
+  var headers = values.shift().map(function (header) {
+    return String(header).trim().toLowerCase();
+  });
+
+  return values.map(function (valuesRow) {
+    var row = {};
+    headers.forEach(function (header, index) {
+      row[header] = valuesRow[index];
+    });
+    return row;
+  });
+}
+
+function _dateKey(value) {
+  if (Object.prototype.toString.call(value) === '[object Date]' && !isNaN(value.getTime())) {
+    return Utilities.formatDate(value, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+  }
+  return String(value || '').trim().slice(0, 10);
 }

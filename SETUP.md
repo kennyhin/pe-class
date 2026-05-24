@@ -43,6 +43,32 @@ via a tiny Google Apps Script "middleman." 10-minute setup, no ongoing cost.
 
 Duplicates are skipped automatically.
 
+## Optional: website content tabs
+
+The landing page can also read public-facing content from the same Apps Script
+endpoint. Add these tabs to the Google Sheet:
+
+**Events**
+
+| Date | Type | Title | Time |
+|---|---|---|---|
+| 2026-05-27 | practice | Basketball · Grades 3-5 | 5:30 PM · Gym B |
+
+**Posts**
+
+| Name | Handle | Time | Body | Accent |
+|---|---|---|---|---|
+| SLAM! Athletics | @slamES | 1d | Summer camp registration opens Monday. | lime |
+
+**FAQ**
+
+| Question | Answer |
+|---|---|
+| What ages do you serve? | Kindergarten through 5th grade. |
+
+After editing `apps-script.gs`, deploy a new Apps Script version so the website
+uses the updated content endpoint.
+
 ## Sending the newsletter
 
 Once you have a list, you have options:

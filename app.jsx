@@ -270,13 +270,7 @@ function SignupForm({ endpoint, accent }) {
 // Sections
 // ---------------------------------------------------------------------------
 function Nav() {
-  return (
-    <nav className="nav" data-screen-label="Nav">
-      <a className="nav-logo-link" href="#top" aria-label="SLAM! Athletics home">
-        <img src="assets/slam-logo.png" alt="SLAM! Athletics" className="nav-logo-img" />
-      </a>
-    </nav>
-  );
+  return null;
 }
 
 // Word-by-word reveal for the welcome headline.
@@ -465,6 +459,20 @@ function getEventIcon(event) {
   }[type] || "📅";
 }
 
+function eventDateKey(event) {
+  return String(event?.date || "").slice(0, 10);
+}
+
+function formatEventDate(dateKey) {
+  const date = new Date(`${dateKey}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return "Selected day";
+  return date.toLocaleDateString("default", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 // Pulls all three content arrays from the Apps Script endpoint on mount.
 // Returns the fallback arrays until the fetch resolves, so the page is never
 // blank. If the fetch fails (CORS, network, sheet empty, etc.), the fallbacks
@@ -507,6 +515,8 @@ function Calendar({ events }) {
   const year = now.getFullYear();
   const month = now.getMonth();
   const today = now.getDate();
+  const todayStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(today).padStart(2, "0")}`;
+  const [selectedDate, setSelectedDate] = useState(todayStr);
   const monthLabel = now.toLocaleString("default", { month: "long", year: "numeric" });
 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -519,16 +529,17 @@ function Calendar({ events }) {
   // Which days this month have events?
   const monthPrefix = `${year}-${String(month + 1).padStart(2, "0")}`;
   const eventDays = events
-    .filter((e) => String(e.date || "").startsWith(monthPrefix))
-    .map((e) => parseInt(String(e.date).slice(8, 10), 10))
+    .filter((e) => eventDateKey(e).startsWith(monthPrefix))
+    .map((e) => parseInt(eventDateKey(e).slice(8, 10), 10))
     .filter((n) => !isNaN(n));
 
-  // Upcoming = next 3 events from today onwards (then any future ones)
-  const todayStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(today).padStart(2, "0")}`;
-  const upcoming = events
-    .filter((e) => String(e.date || "") >= todayStr)
-    .sort((a, b) => String(a.date).localeCompare(String(b.date)))
-    .slice(0, 3);
+  const monthEvents = events
+    .filter((e) => eventDateKey(e).startsWith(monthPrefix))
+    .sort((a, b) => eventDateKey(a).localeCompare(eventDateKey(b)));
+
+  const selectedEvents = events
+    .filter((e) => eventDateKey(e) === selectedDate)
+    .sort((a, b) => String(a.time || "").localeCompare(String(b.time || "")));
 
   return (
     <div className="card cal">
@@ -547,23 +558,29 @@ function Calendar({ events }) {
           if (d === null) return <span key={i} className="cal-cell empty" />;
           const hasEvent = eventDays.includes(d);
           const isToday = d === today;
+          const dayKey = `${monthPrefix}-${String(d).padStart(2, "0")}`;
+          const isSelected = selectedDate === dayKey;
           return (
-            <span
+            <button
               key={i}
-              className={`cal-cell${isToday ? " today" : ""}${hasEvent ? " has-event" : ""}`}
+              type="button"
+              className={`cal-cell${isToday ? " today" : ""}${hasEvent ? " has-event" : ""}${isSelected ? " selected" : ""}`}
+              onClick={() => setSelectedDate(dayKey)}
+              aria-pressed={isSelected}
+              aria-label={`${formatEventDate(dayKey)}${hasEvent ? ", has events" : ""}`}
             >
               {d}
               {hasEvent && <span className="cal-dot" />}
-            </span>
+            </button>
           );
         })}
       </div>
 
       <div className="cal-upcoming">
-        <div className="cal-upcoming-label">Up next</div>
-        {upcoming.length === 0 ? (
-          <div className="cal-empty">No upcoming events. Check back soon.</div>
-        ) : upcoming.map((e, i) => {
+        <div className="cal-upcoming-label">{formatEventDate(selectedDate)}</div>
+        {selectedEvents.length === 0 ? (
+          <div className="cal-empty">No events scheduled for this day.</div>
+        ) : selectedEvents.map((e, i) => {
           const type = String(e.type || "event").toLowerCase();
           const icon = getEventIcon(e);
           return (
@@ -577,6 +594,27 @@ function Calendar({ events }) {
                 <div className="cal-event-time">{e.time}</div>
               </div>
             </div>
+          );
+        })}
+      </div>
+
+      <div className="cal-month-list">
+        <div className="cal-upcoming-label">This month</div>
+        {monthEvents.length === 0 ? (
+          <div className="cal-empty">No events listed for {monthLabel}.</div>
+        ) : monthEvents.map((e, i) => {
+          const dateKey = eventDateKey(e);
+          const dayNum = parseInt(dateKey.slice(8, 10), 10);
+          return (
+            <button
+              key={`${dateKey}-${i}`}
+              type="button"
+              className={`cal-month-event${selectedDate === dateKey ? " selected" : ""}`}
+              onClick={() => setSelectedDate(dateKey)}
+            >
+              <span className="cal-month-day">{Number.isNaN(dayNum) ? "?" : dayNum}</span>
+              <span className="cal-month-title">{getEventIcon(e)} {e.title}</span>
+            </button>
           );
         })}
       </div>
