@@ -484,6 +484,20 @@ body { overflow-x: hidden; }
   color: var(--slam-white);
   margin-top: 2px;
 }
+.cal-event-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  background: var(--slam-coal);
+  border-radius: 12px;
+}
+.cal-event-emoji {
+  font-size: 24px;
+  line-height: 1;
+}
 .cal-event-body { flex: 1; min-width: 0; }
 .cal-event-tag {
   display: inline-block;
@@ -512,6 +526,13 @@ body { overflow-x: hidden; }
   letter-spacing: 0.06em;
   color: var(--fg-muted);
   margin-top: 3px;
+}
+.cal-empty {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--fg-dim);
+  padding: 8px 0;
+  font-style: italic;
 }
 
 /* ---- Feed ---- */
