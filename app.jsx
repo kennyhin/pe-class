@@ -389,7 +389,7 @@ function Footer() {
 // ---------------------------------------------------------------------------
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "heroBg": "pattern",
-  "signupEndpoint": ""
+  "signupEndpoint": "https://script.google.com/macros/s/AKfycbxX77wDe5fHka_2uuybQVdUMKZG2eMRdc_LD7-D_3I3X1Rnz931gWNA05UIc3TAdp9v/exec"
 }/*EDITMODE-END*/;
 
 function App() {
