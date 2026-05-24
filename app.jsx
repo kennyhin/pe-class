@@ -441,6 +441,30 @@ const DEFAULT_FAQ = [
   { q: "Can I get a refund if my kid hates it?", a: "Yes. Full refund within the first 2 weeks, no questions asked." },
 ];
 
+function getEventIcon(event) {
+  const title = String(event?.title || "").toLowerCase();
+  const type = String(event?.type || "event").toLowerCase();
+
+  if (title.includes("basketball")) return "🏀";
+  if (title.includes("soccer")) return "⚽";
+  if (title.includes("t-ball") || title.includes("baseball")) return "⚾";
+  if (title.includes("softball")) return "🥎";
+  if (title.includes("football")) return "🏈";
+  if (title.includes("volleyball")) return "🏐";
+  if (title.includes("tennis")) return "🎾";
+  if (title.includes("swim")) return "🏊";
+  if (title.includes("track") || title.includes("running")) return "🏃";
+  if (title.includes("camp")) return "⛺";
+  if (title.includes("bbq")) return "🔥";
+  if (title.includes("championship")) return "🏆";
+
+  return {
+    practice: "🏃",
+    game: "🏆",
+    event: "🎉",
+  }[type] || "📅";
+}
+
 // Pulls all three content arrays from the Apps Script endpoint on mount.
 // Returns the fallback arrays until the fetch resolves, so the page is never
 // blank. If the fetch fails (CORS, network, sheet empty, etc.), the fallbacks
@@ -541,38 +565,7 @@ function Calendar({ events }) {
           <div className="cal-empty">No upcoming events. Check back soon.</div>
         ) : upcoming.map((e, i) => {
           const type = String(e.type || "event").toLowerCase();
-          const sportIcon = {
-            practice: "🏃",
-            game:     "🏆",
-            event:    "🎉",
-            basketball: "🏀",
-            soccer:   "⚽",
-            baseball: "⚾",
-            softball: "🥎",
-            football: "🏈",
-            volleyball: "🏐",
-            tennis:   "🎾",
-            swimming: "🏊",
-            track:    "🏃",
-            camp:     "⛺",
-          };
-          // Pick icon: check if the event title contains a sport name first,
-          // then fall back to the event type.
-          const titleLower = String(e.title || "").toLowerCase();
-          const icon =
-            titleLower.includes("basketball") ? "🏀" :
-            titleLower.includes("soccer")     ? "⚽" :
-            titleLower.includes("baseball")   ? "⚾" :
-            titleLower.includes("softball")   ? "🥎" :
-            titleLower.includes("football")   ? "🏈" :
-            titleLower.includes("volleyball") ? "🏐" :
-            titleLower.includes("tennis")     ? "🎾" :
-            titleLower.includes("swim")       ? "🏊" :
-            titleLower.includes("track")      ? "🏃" :
-            titleLower.includes("camp")       ? "⛺" :
-            titleLower.includes("bbq")        ? "🔥" :
-            titleLower.includes("championship") ? "🏆" :
-            sportIcon[type] || "📅";
+          const icon = getEventIcon(e);
           return (
             <div key={i} className="cal-event">
               <div className="cal-event-icon">
