@@ -95,6 +95,14 @@ the sheet. The `Sport` column controls the icon. Paste a full URL into `Body`
 to make it clickable inside the post, or put one clean URL in `Link` to show a
 separate call-to-action link.
 
+Parent shoutouts submitted from the website are saved automatically in a
+**Shoutouts** tab for approval. It uses the exact same columns as Posts so you
+can copy an approved row straight into the Posts tab:
+
+| Date | Sport | Name | Handle | Body | Link |
+|---|---|---|---|---|---|
+| 2026-05-24 | Basketball | Maya's mom |  | Huge shoutout to Maya for her first basket today. |  |
+
 **FAQ**
 
 | Question | Answer | Keywords |

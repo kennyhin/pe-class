@@ -422,6 +422,20 @@ const DEFAULT_POSTS = [
   },
 ];
 
+const SPORT_OPTIONS = [
+  "Basketball",
+  "Soccer",
+  "Track and Field",
+  "Cross Country",
+  "Cheer",
+  "Volleyball",
+  "Flag Football",
+  "Baseball",
+  "Softball",
+  "Tennis",
+  "Other",
+];
+
 const DEFAULT_FAQ = [
   { q: "What ages do you serve?", a: "Kindergarten through 5th grade (ages 5-11). Programs are split by age band so kids play with peers their own size and skill level." },
   { q: "How much does it cost?", a: "Most seasons run $240 for 8 weeks (1 practice + 1 game per week). Scholarships available — just ask." },
@@ -824,7 +838,106 @@ function Calendar({ events, loading }) {
 }
 
 // --- Updates feed (Twitter/X style) ---
-function Feed({ posts, loading }) {
+function ShoutoutForm({ endpoint }) {
+  const [form, setForm] = useState({ name: "", sport: "Basketball", body: "" });
+  const [status, setStatus] = useState({ kind: "idle", msg: "" });
+
+  function update(field, value) {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  }
+
+  async function submit(e) {
+    e.preventDefault();
+    const name = form.name.trim();
+    const body = form.body.trim();
+    if (name.length < 2) {
+      setStatus({ kind: "error", msg: "Add a name first." });
+      return;
+    }
+    if (body.length < 8) {
+      setStatus({ kind: "error", msg: "Add a little more to the shoutout." });
+      return;
+    }
+
+    setStatus({ kind: "sending", msg: "Sending..." });
+
+    try {
+      const key = "slam_parent_shoutouts";
+      const prev = JSON.parse(localStorage.getItem(key) || "[]");
+      prev.push({ ...form, name, body, at: new Date().toISOString() });
+      localStorage.setItem(key, JSON.stringify(prev.slice(-50)));
+    } catch (_) {}
+
+    if (!endpoint) {
+      setStatus({ kind: "success", msg: "Saved locally for review." });
+      setForm({ name: "", sport: form.sport, body: "" });
+      return;
+    }
+
+    try {
+      const fd = new FormData();
+      fd.append("action", "shoutout");
+      fd.append("name", name);
+      fd.append("sport", form.sport);
+      fd.append("body", body);
+      await fetch(endpoint, { method: "POST", body: fd, mode: "no-cors" });
+      setStatus({ kind: "success", msg: "Shoutout sent for review." });
+      setForm({ name: "", sport: form.sport, body: "" });
+    } catch (_) {
+      setStatus({ kind: "error", msg: "Could not reach the sheet. Saved locally." });
+    }
+  }
+
+  return (
+    <form className="shoutout-form" onSubmit={submit}>
+      <div className="shoutout-head">
+        <div>
+          <div className="shoutout-title">Parent shoutout</div>
+          <div className="shoutout-sub">Send a quick win for review.</div>
+        </div>
+        <div className="shoutout-icon" aria-hidden="true">📣</div>
+      </div>
+      <div className="shoutout-row">
+        <input
+          className="shoutout-input"
+          value={form.name}
+          onChange={(e) => update("name", e.target.value)}
+          placeholder="Name"
+          autoComplete="name"
+          required
+        />
+        <select
+          className="shoutout-input"
+          value={form.sport}
+          onChange={(e) => update("sport", e.target.value)}
+          aria-label="Sport"
+        >
+          {SPORT_OPTIONS.map((sport) => (
+            <option key={sport} value={sport}>{sport}</option>
+          ))}
+        </select>
+      </div>
+      <textarea
+        className="shoutout-textarea"
+        value={form.body}
+        onChange={(e) => update("body", e.target.value)}
+        placeholder="Shoutout"
+        rows={3}
+        required
+      />
+      <div className="shoutout-actions">
+        <button className="shoutout-submit" type="submit" disabled={status.kind === "sending"}>
+          {status.kind === "sending" ? "Sending..." : "Send shoutout"}
+        </button>
+        <span className={`shoutout-status ${status.kind}`} role="status" aria-live="polite">
+          {status.msg}
+        </span>
+      </div>
+    </form>
+  );
+}
+
+function Feed({ posts, loading, endpoint }) {
   const sortedPosts = [...posts].sort(sortPostsByDate);
   return (
     <div className="card feed">
@@ -861,6 +974,7 @@ function Feed({ posts, loading }) {
           );
         })}
       </div>
+      <ShoutoutForm endpoint={endpoint} />
     </div>
   );
 }
@@ -1021,13 +1135,12 @@ function AskQuestionForm({ endpoint, faq }) {
 }
 
 function QA({ faq, endpoint, loading }) {
-  const [open, setOpen] = useState(0);
+  const [open, setOpen] = useState(-1);
   const visibleFaq = faq.slice(0, 3);
   return (
     <div className="card qa">
       <div className="card-head">
         <span className="card-eyebrow">Q and A</span>
-        <span className="card-meta">{loading ? "loading" : `${visibleFaq.length} shown`}</span>
       </div>
       <div className="qa-list">
         {loading ? (
@@ -1068,7 +1181,7 @@ function WhatsHappening({ endpoint }) {
         <p className="happening-sub">Schedules · Updates · Answers</p>
       </div>
       <div className="happening-grid">
-        <Feed posts={posts} loading={loading} />
+        <Feed posts={posts} loading={loading} endpoint={endpoint} />
         <Calendar events={events} loading={loading} />
         <QA faq={faq} endpoint={endpoint} loading={loading} />
       </div>

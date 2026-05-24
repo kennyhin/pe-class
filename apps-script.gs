@@ -16,6 +16,9 @@
  *
  * Questions columns (created automatically on first parent question):
  *   Timestamp | Name | Email | Question | User Agent
+ *
+ * Shoutouts columns (created automatically on first parent shoutout):
+ *   Date | Sport | Name | Handle | Body | Link
  */
 
 // ---- CONFIG ---------------------------------------------------------------
@@ -28,6 +31,7 @@ var EVENTS_SHEET_NAME = 'Events';
 var POSTS_SHEET_NAME = 'Posts';
 var FAQ_SHEET_NAME = 'FAQ';
 var QUESTIONS_SHEET_NAME = 'Questions';
+var SHOUTOUTS_SHEET_NAME = 'Shoutouts';
 var EVENT_TYPES = ['event', 'practice', 'game'];
 var SPORTS = [
   'Basketball',
@@ -52,6 +56,9 @@ function doPost(e) {
 
     if (action === 'question') {
       return _saveQuestion(ss, params);
+    }
+    if (action === 'shoutout') {
+      return _saveShoutout(ss, params);
     }
 
     var sheet = ss.getSheetByName(SHEET_NAME);
@@ -106,6 +113,23 @@ function _saveQuestion(ss, params) {
   }
 
   sheet.appendRow([new Date(), name, email, question, ua]);
+  return _json({ ok: true });
+}
+
+function _saveShoutout(ss, params) {
+  var name = String(params.name || '').trim();
+  var sport = String(params.sport || 'Other').trim();
+  var body = String(params.body || params.shoutout || '').trim();
+
+  if (name.length < 2) {
+    return _json({ ok: false, error: 'Name is required' });
+  }
+  if (body.length < 8) {
+    return _json({ ok: false, error: 'Shoutout is too short' });
+  }
+
+  var sheet = _ensurePostLikeSheet(ss, SHOUTOUTS_SHEET_NAME, false);
+  sheet.appendRow([new Date(), sport, name, '', body, '']);
   return _json({ ok: true });
 }
 
@@ -225,19 +249,25 @@ function _posts(ss) {
 }
 
 function _ensurePostsSheet(ss) {
+  _ensurePostLikeSheet(ss, POSTS_SHEET_NAME, true);
+}
+
+function _ensurePostLikeSheet(ss, sheetName, addExample) {
   var headers = ['Date', 'Sport', 'Name', 'Handle', 'Body', 'Link'];
-  var sheet = ss.getSheetByName(POSTS_SHEET_NAME);
+  var sheet = ss.getSheetByName(sheetName);
   if (!sheet) {
-    sheet = ss.insertSheet(POSTS_SHEET_NAME);
+    sheet = ss.insertSheet(sheetName);
     sheet.appendRow(headers);
-    sheet.appendRow([
-      new Date(),
-      'Basketball',
-      'SLAM! Athletics',
-      '@slamES',
-      'Summer camp registration opens Monday.',
-      ''
-    ]);
+    if (addExample) {
+      sheet.appendRow([
+        new Date(),
+        'Basketball',
+        'SLAM! Athletics',
+        '@slamES',
+        'Summer camp registration opens Monday.',
+        ''
+      ]);
+    }
   }
 
   _ensureHeaders(sheet, headers);
@@ -250,6 +280,7 @@ function _ensurePostsSheet(ss) {
     .build();
   var sportColumn = _headerColumn(sheet, 'Sport');
   if (sportColumn) sheet.getRange(2, sportColumn, Math.max(200, sheet.getMaxRows() - 1), 1).setDataValidation(sportRule);
+  return sheet;
 }
 
 function _faq(ss) {
