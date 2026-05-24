@@ -49,6 +49,27 @@ function Icon({ name, size = 16, style }) {
           <path d="m9 12 2 2 4-4" />
         </svg>
       );
+    case "message-circle":
+      return (
+        <svg {...common}>
+          <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z" />
+        </svg>
+      );
+    case "repeat":
+      return (
+        <svg {...common}>
+          <path d="m17 2 4 4-4 4" />
+          <path d="M3 11v-1a4 4 0 0 1 4-4h14" />
+          <path d="m7 22-4-4 4-4" />
+          <path d="M21 13v1a4 4 0 0 1-4 4H3" />
+        </svg>
+      );
+    case "heart":
+      return (
+        <svg {...common}>
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+        </svg>
+      );
     default:
       return null;
   }
@@ -239,7 +260,7 @@ function SignupForm({ endpoint, accent }) {
 
       <div className="signup-footnote">
         <Icon name="shield-check" size={13} />
-        Season schedules · Coach updates · No spam, ever
+        No spam, ever · Unsubscribe any time
       </div>
     </div>
   );
@@ -251,73 +272,55 @@ function SignupForm({ endpoint, accent }) {
 function Nav() {
   return (
     <nav className="nav" data-screen-label="Nav">
-      <a className="nav-logo" href="#top">
-        SLAM<span className="bang">!</span>
-        <span className="tag">ELEMENTARY · ATHLETICS</span>
+      <a className="nav-logo-link" href="#top" aria-label="SLAM! Athletics home">
+        <img src="assets/slam-logo.png" alt="SLAM! Athletics" className="nav-logo-img" />
       </a>
-      <div className="nav-links">
-        <a>Programs</a>
-        <a>Coaches</a>
-        <a>Schedule</a>
-        <a>About</a>
-      </div>
-      <button className="nav-cta">
-        Find a program
-        <Icon name="arrow-right" size={14} />
-      </button>
     </nav>
   );
 }
 
+// Word-by-word reveal for the welcome headline.
+function AnimatedHeadline({ text, className }) {
+  const words = text.split(/(\s+)/); // keep whitespace
+  return (
+    <h1 className={className} aria-label={text}>
+      {words.map((w, i) => {
+        if (/^\s+$/.test(w)) return <React.Fragment key={i}>{w}</React.Fragment>;
+        return (
+          <span
+            className="word"
+            key={i}
+            style={{ animationDelay: `${0.08 * i + 0.15}s` }}
+          >
+            {w}
+          </span>
+        );
+      })}
+    </h1>
+  );
+}
+
 function Hero({ bg, endpoint }) {
-  // On red/lime backgrounds, soften eyebrow + body text
-  const isLight = bg === "lime";
-  const isRed = bg === "red";
   return (
     <section className="hero" id="top" data-screen-label="01 Hero">
       <HeroBackground variant={bg} />
-      <div className="hero-inner">
-        <div className="hero-eyebrow"
-             style={isLight ? { color: "var(--slam-black)", borderColor: "var(--slam-black)", background: "rgba(0,0,0,0.08)" }
-                    : isRed ? { color: "var(--slam-white)", borderColor: "var(--slam-white)", background: "rgba(255,255,255,0.12)" }
-                    : null}>
-          <span className="pulse" style={isLight ? { background: "var(--slam-black)", boxShadow: "0 0 12px rgba(0,0,0,0.3)" } : isRed ? { background: "var(--slam-white)", boxShadow: "0 0 12px rgba(255,255,255,0.5)" } : null} />
-          Fall 2026 registration · open now
+      <div className="hero-inner hero-center">
+        <div className="welcome-eyebrow">Welcome to</div>
+
+        <img
+          src="assets/slam-logo.png"
+          alt="SLAM! Athletics"
+          className="hero-logo"
+        />
+
+        <div className="signup-wrap-center">
+          <SignupForm endpoint={endpoint} accent="red" />
         </div>
 
-        <h1 className="hero-title"
-            style={isLight ? { color: "var(--slam-black)" } : null}>
-          Big sports<br />
-          energy <span className="accent-red"
-                       style={isLight ? { color: "var(--slam-black)" } : isRed ? { color: "var(--slam-white)" } : null}>for</span> small<br />
-          humans<span className="bang"
-                     style={isLight ? { color: "var(--slam-red)" } : null}>!</span>
-        </h1>
-
-        <p className="hero-sub"
-           style={isLight ? { color: "rgba(0,0,0,0.72)" } : isRed ? { color: "rgba(255,255,255,0.85)" } : null}>
-          Fundamentals-first sports programs for K&ndash;5. Every kid gets a touch.
-          Every kid gets a cheer. Drop your email and we'll send the season schedule
-          + a free trial pass.
+        <p className="hero-desc">
+          Sign up for our newsletter — schedules, sign-ups, and updates
+          on upcoming events, sent straight to your inbox.
         </p>
-
-        <SignupForm endpoint={endpoint} accent={isRed ? "lime" : "red"} />
-      </div>
-
-      <div className="hero-rail"
-           style={isLight ? { borderTopColor: "rgba(0,0,0,0.2)" } : isRed ? { borderTopColor: "rgba(255,255,255,0.25)" } : null}>
-        <div className="rail-stat">
-          <span className="rail-n" style={isLight ? { color: "var(--slam-black)" } : null}>12K</span>
-          <span className="rail-l" style={isLight ? { color: "rgba(0,0,0,0.6)" } : isRed ? { color: "rgba(255,255,255,0.75)" } : null}>Kids served</span>
-        </div>
-        <div className="rail-stat">
-          <span className="rail-n lime" style={isLight ? { color: "var(--slam-red)" } : null}>87<span style={{ fontSize: "0.6em" }}>%</span></span>
-          <span className="rail-l" style={isLight ? { color: "rgba(0,0,0,0.6)" } : isRed ? { color: "rgba(255,255,255,0.75)" } : null}>Return next season</span>
-        </div>
-        <div className="rail-stat">
-          <span className="rail-n red" style={isLight ? { color: "var(--slam-black)" } : isRed ? { color: "var(--slam-white)" } : null}>32</span>
-          <span className="rail-l" style={isLight ? { color: "rgba(0,0,0,0.6)" } : isRed ? { color: "rgba(255,255,255,0.75)" } : null}>Partner schools</span>
-        </div>
       </div>
     </section>
   );
@@ -385,11 +388,235 @@ function Footer() {
 }
 
 // ---------------------------------------------------------------------------
-// App with tweaks
+// "What's happening" — calendar · feed · Q&A
 // ---------------------------------------------------------------------------
+
+// --- Calendar ---
+const EVENTS = [
+  { date: "2026-05-27", type: "practice", title: "Basketball · Grades 3-5", time: "5:30 PM · Gym B" },
+  { date: "2026-05-29", type: "game",     title: "Soccer Friday Night Lights", time: "6:00 PM · East Field" },
+  { date: "2026-06-02", type: "practice", title: "T-Ball · Grades K-2", time: "4:30 PM · Field 1" },
+  { date: "2026-06-05", type: "event",    title: "Family BBQ + Skills Day", time: "11:00 AM · Park Pavilion" },
+  { date: "2026-06-10", type: "game",     title: "Championship — Spring League", time: "7:00 PM · Center Court" },
+  { date: "2026-06-14", type: "event",    title: "Summer Camp Kickoff", time: "9:00 AM · Main Gym" },
+];
+
+function Calendar() {
+  // Static month — May 2026 (Friday-start month for clean look). Day-of-week
+  // indexing here is the standard JS getDay() (Sun=0).
+  const monthLabel = "May 2026";
+  const daysInMonth = 31;
+  const firstDayOfWeek = 5; // May 1, 2026 is a Friday
+  const today = 23;
+
+  const cells = [];
+  for (let i = 0; i < firstDayOfWeek; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+  const eventDays = EVENTS
+    .filter((e) => e.date.startsWith("2026-05"))
+    .map((e) => parseInt(e.date.slice(-2), 10));
+
+  const upcoming = EVENTS.slice(0, 3);
+
+  return (
+    <div className="card cal">
+      <div className="card-head">
+        <span className="card-eyebrow">Calendar</span>
+        <span className="card-meta">{monthLabel}</span>
+      </div>
+
+      <div className="cal-dow">
+        {["S","M","T","W","T","F","S"].map((d, i) => (
+          <span key={i}>{d}</span>
+        ))}
+      </div>
+      <div className="cal-grid">
+        {cells.map((d, i) => {
+          if (d === null) return <span key={i} className="cal-cell empty" />;
+          const hasEvent = eventDays.includes(d);
+          const isToday = d === today;
+          return (
+            <span
+              key={i}
+              className={`cal-cell${isToday ? " today" : ""}${hasEvent ? " has-event" : ""}`}
+            >
+              {d}
+              {hasEvent && <span className="cal-dot" />}
+            </span>
+          );
+        })}
+      </div>
+
+      <div className="cal-upcoming">
+        <div className="cal-upcoming-label">Up next</div>
+        {upcoming.map((e, i) => {
+          const dt = new Date(e.date + "T00:00:00");
+          const dayName = ["SUN","MON","TUE","WED","THU","FRI","SAT"][dt.getDay()];
+          const dayNum = dt.getDate();
+          return (
+            <div key={i} className="cal-event">
+              <div className="cal-event-date">
+                <span className="cal-event-dow">{dayName}</span>
+                <span className="cal-event-day">{dayNum}</span>
+              </div>
+              <div className="cal-event-body">
+                <div className={`cal-event-tag tag-${e.type}`}>{e.type}</div>
+                <div className="cal-event-title">{e.title}</div>
+                <div className="cal-event-time">{e.time}</div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// --- Updates feed (Twitter/X style) ---
+const POSTS = [
+  {
+    name: "Coach Marcus",
+    handle: "@coachmarc",
+    time: "2h",
+    body: "Practice moved indoors tonight — field's a mud pit. Gym B, same time. Bring water bottles.",
+    likes: 24, replies: 3, reposts: 6,
+    accent: "red",
+  },
+  {
+    name: "SLAM! Athletics",
+    handle: "@slamES",
+    time: "1d",
+    body: "Spring league finals THIS Saturday. 4 fields, 8 games, 100+ kids. Come loud. 🎙️",
+    likes: 142, replies: 18, reposts: 31,
+    accent: "lime",
+  },
+  {
+    name: "Coach Riley",
+    handle: "@rileyhoops",
+    time: "2d",
+    body: "Mason hit his first three-pointer in a game today. The bench EXPLODED. This is why we coach.",
+    likes: 89, replies: 12, reposts: 4,
+    accent: "lime",
+  },
+  {
+    name: "SLAM! Athletics",
+    handle: "@slamES",
+    time: "4d",
+    body: "Summer camp registration opens Monday at 9AM. K-5, 8 weeks, every kid plays every game. Don't sleep on this.",
+    likes: 67, replies: 9, reposts: 14,
+    accent: "red",
+  },
+];
+
+function Feed() {
+  return (
+    <div className="card feed">
+      <div className="card-head">
+        <span className="card-eyebrow">Updates</span>
+        <span className="card-meta">@slamES</span>
+      </div>
+      <div className="feed-list">
+        {POSTS.map((p, i) => (
+          <article key={i} className="post">
+            <div className={`post-avatar accent-${p.accent}`}>
+              {p.name.split(" ").map((w) => w[0]).join("").slice(0, 2)}
+            </div>
+            <div className="post-body">
+              <div className="post-meta">
+                <span className="post-name">{p.name}</span>
+                <span className="post-handle">{p.handle} · {p.time}</span>
+              </div>
+              <p className="post-text">{p.body}</p>
+              <div className="post-stats">
+                <span><Icon name="message-circle" size={13} /> {p.replies}</span>
+                <span><Icon name="repeat" size={13} /> {p.reposts}</span>
+                <span><Icon name="heart" size={13} /> {p.likes}</span>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// --- Q&A ---
+const FAQ = [
+  {
+    q: "What ages do you serve?",
+    a: "Kindergarten through 5th grade (ages 5-11). Programs are split by age band — K-2, 3-5 — so kids play with peers their own size and skill level.",
+  },
+  {
+    q: "How much does it cost?",
+    a: "Most seasons run $240 for 8 weeks (1 practice + 1 game per week). Camps and one-off events are priced separately. Scholarships available — just ask.",
+  },
+  {
+    q: "Are coaches certified?",
+    a: "Every coach is CPR + first-aid certified, background-checked, and trained on our developmental model. We don't hire random parents off Craigslist.",
+  },
+  {
+    q: "What if my kid has never played before?",
+    a: "Perfect. That's exactly who we built this for. Every program starts with fundamentals — running, throwing, catching, sportsmanship. No experience required.",
+  },
+  {
+    q: "Can I get a refund if my kid hates it?",
+    a: "Yes. Full refund within the first 2 weeks, no questions asked. We'd rather you find the right fit than feel stuck.",
+  },
+];
+
+function QA() {
+  const [open, setOpen] = useState(0);
+  return (
+    <div className="card qa">
+      <div className="card-head">
+        <span className="card-eyebrow">Q&amp;A</span>
+        <span className="card-meta">{FAQ.length} questions</span>
+      </div>
+      <div className="qa-list">
+        {FAQ.map((item, i) => {
+          const isOpen = open === i;
+          return (
+            <div key={i} className={`qa-item ${isOpen ? "open" : ""}`}>
+              <button
+                className="qa-q"
+                onClick={() => setOpen(isOpen ? -1 : i)}
+                aria-expanded={isOpen}
+              >
+                <span>{item.q}</span>
+                <span className="qa-icon" aria-hidden="true">
+                  {isOpen ? "−" : "+"}
+                </span>
+              </button>
+              <div className="qa-a-wrap" style={{ maxHeight: isOpen ? 400 : 0 }}>
+                <p className="qa-a">{item.a}</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function WhatsHappening() {
+  return (
+    <section className="happening" data-screen-label="02 Happening">
+      <div className="happening-head">
+        <h2 className="happening-title">What's happening</h2>
+        <p className="happening-sub">Schedules · Updates · Answers</p>
+      </div>
+      <div className="happening-grid">
+        <Calendar />
+        <Feed />
+        <QA />
+      </div>
+    </section>
+  );
+}
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "heroBg": "pattern",
-  "signupEndpoint": "https://script.google.com/macros/s/AKfycbxX77wDe5fHka_2uuybQVdUMKZG2eMRdc_LD7-D_3I3X1Rnz931gWNA05UIc3TAdp9v/exec"
+  "signupEndpoint": "https://script.google.com/macros/s/AKfycbxKWDLcTjDwwXb-rNq9LTpqQwmlGgvLHZf9kJKDG7DHqwNp6vjaXD8S4ccG_41CBMfk/exec"
 }/*EDITMODE-END*/;
 
 function App() {
@@ -399,8 +626,7 @@ function App() {
     <div className="page">
       <Nav />
       <Hero bg={t.heroBg} endpoint={t.signupEndpoint} />
-      <About />
-      <Footer />
+      <WhatsHappening />
 
       <TweaksPanel title="Tweaks">
         <TweakSection label="Hero background" />
@@ -419,7 +645,7 @@ function App() {
           onChange={(v) => setTweak("signupEndpoint", v)}
         />
         <TweakButton
-          label="Download CSV"
+          label="View local backup"
           onClick={() => {
             const rows = JSON.parse(localStorage.getItem("slam_signups") || "[]");
             if (!rows.length) { alert("No local signups yet."); return; }

@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SLAM! — Setup Guide: Connect signups to Google Sheets</title>
+<link rel="stylesheet" href="colors_and_type.css" />
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg); }
+  body { font-family: var(--font-sans); line-height: 1.55; }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 56px 32px 120px; }
+
+  /* HEADER */
+  .top { display: flex; align-items: center; gap: 16px; margin-bottom: 48px; }
+  .mark {
+    font-family: var(--font-display);
+    font-size: 28px;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: var(--slam-white);
+    display: inline-flex; align-items: baseline;
+  }
+  .mark .bang { color: var(--slam-lime); }
+  .tag {
+    margin-left: 12px;
+    padding: 5px 12px;
+    background: var(--slam-coal);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--fg-muted);
+  }
+
+  /* PAGE TITLE */
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(48px, 7vw, 96px);
+    line-height: 0.9;
+    letter-spacing: -0.018em;
+    text-transform: uppercase;
+    color: var(--slam-white);
+    margin: 0 0 16px;
+  }
+  h1 .red { color: var(--slam-red); }
+  h1 .lime { color: var(--slam-lime); }
+
+  .lede {
+    font-size: 18px;
+    color: var(--fg-muted);
+    max-width: 640px;
+    margin: 0 0 40px;
+  }
+
+  .meta {
+    display: flex;
+    gap: 24px;
+    padding: 16px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 64px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+  }
+  .meta strong { color: var(--fg); font-weight: 700; margin-right: 8px; }
+
+  /* STEPS */
+  .step {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 28px;
+    padding: 48px 0;
+    border-top: 1px solid var(--border);
+  }
+  .step:first-of-type { border-top: none; padding-top: 0; }
+  .step-n {
+    font-family: var(--font-display);
+    font-size: 72px;
+    line-height: 0.85;
+    letter-spacing: -0.02em;
+    color: var(--slam-lime);
+  }
+  .step-body h2 {
+    font-family: var(--font-display);
+    font-size: 36px;
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: var(--slam-white);
+    margin: 8px 0 16px;
+  }
+  .step-body p { margin: 0 0 14px; color: var(--fg); font-size: 15.5px; }
+  .step-body p.note { color: var(--fg-muted); font-size: 14px; }
+
+  /* SUB-STEPS */
+  ol.sub {
+    counter-reset: sub;
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0;
+  }
+  ol.sub > li {
+    counter-increment: sub;
+    position: relative;
+    padding: 14px 0 14px 44px;
+    border-top: 1px solid var(--border);
+    font-size: 15.5px;
+    color: var(--fg);
+  }
+  ol.sub > li::before {
+    content: counter(sub);
+    position: absolute;
+    left: 0; top: 14px;
+    width: 28px; height: 28px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--fg-muted);
+    display: flex; align-items: center; justify-content: center;
+  }
+  ol.sub > li:first-child { border-top: none; }
+  ol.sub > li .why {
+    display: block;
+    font-size: 13px;
+    color: var(--fg-muted);
+    margin-top: 4px;
+  }
+
+  /* INLINE ELEMENTS */
+  kbd {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    background: var(--slam-coal);
+    border: 1px solid var(--border-strong);
+    border-bottom-width: 2px;
+    border-radius: 6px;
+    padding: 2px 8px;
+    color: var(--fg);
+    white-space: nowrap;
+  }
+  .menu {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    background: var(--slam-ink);
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    border-radius: 6px;
+    color: var(--slam-lime);
+    white-space: nowrap;
+  }
+  .url {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    background: var(--slam-ink);
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    border-radius: 6px;
+    color: var(--fg);
+  }
+  a.link {
+    color: var(--slam-lime);
+    text-decoration: none;
+    border-bottom: 1px solid var(--slam-lime);
+  }
+  a.link:hover { opacity: 0.75; }
+
+  /* CALLOUTS */
+  .callout {
+    margin-top: 18px;
+    padding: 16px 20px;
+    border-radius: 12px;
+    border-left: 4px solid var(--slam-lime);
+    background: rgba(128, 255, 0, 0.04);
+    font-size: 14px;
+    color: var(--fg);
+  }
+  .callout.warn {
+    border-left-color: var(--slam-red);
+    background: rgba(218, 0, 22, 0.05);
+  }
+  .callout strong {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--slam-lime);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .callout.warn strong { color: var(--slam-red); }
+
+  /* CODE BLOCK */
+  .code {
+    margin-top: 14px;
+    background: #0a0a0a;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--fg);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .code .com { color: var(--fg-dim); }
+  .code .kw  { color: var(--slam-lime); }
+  .code .str { color: #ffb23d; }
+
+  /* MOCK UI (Apps Script editor / Google deploy dialog screenshots) */
+  .mock {
+    margin-top: 18px;
+    background: #1e1e1e;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+  }
+  .mock-top {
+    background: #2a2a2a;
+    padding: 9px 12px;
+    display: flex; align-items: center; gap: 8px;
+    border-bottom: 1px solid #111;
+  }
+  .mock-top .dot { width: 11px; height: 11px; border-radius: 999px; background: #555; }
+  .mock-top .dot.r { background: #ff5f56; }
+  .mock-top .dot.y { background: #ffbd2e; }
+  .mock-top .dot.g { background: #27c93f; }
+  .mock-top .ttl {
+    margin-left: 14px;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    color: #bbb;
+  }
+  .mock-body {
+    padding: 0;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: #e8e8e6;
+  }
+
+  /* Sheets mock */
+  .sheet-grid { display: grid; grid-template-columns: 36px 1.6fr 1fr 0.8fr 1.4fr; }
+  .sheet-grid > div {
+    padding: 10px 12px;
+    border-right: 1px solid #2a2a2a;
+    border-bottom: 1px solid #2a2a2a;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: #d6d6d6;
+  }
+  .sheet-grid .hdr {
+    background: #292929;
+    color: #9fff5b;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .sheet-grid .row-n { background: #232323; color: #888; text-align: center; }
+
+  /* Deploy dialog mock */
+  .dlg {
+    background: #ffffff;
+    color: #1f1f1f;
+    padding: 24px 28px;
+    font-family: -apple-system, system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .dlg h3 { margin: 0 0 16px; font-size: 18px; color: #1a73e8; font-weight: 500; }
+  .dlg label { display: block; font-size: 12px; color: #555; margin: 14px 0 4px; font-weight: 500; }
+  .dlg .field {
+    border: 1px solid #dadce0;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: #1f1f1f;
+    background: #fff;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .dlg .field.highlight { border-color: #1a73e8; box-shadow: 0 0 0 3px rgba(26,115,232,0.18); }
+  .dlg .field .arrow { color: #777; }
+  .dlg .btns { margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px; }
+  .dlg .btn {
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .dlg .btn-p { background: #1a73e8; color: #fff; border: none; }
+  .dlg .btn-g { background: #fff; color: #1a73e8; border: 1px solid #dadce0; }
+
+  /* CTA AT BOTTOM */
+  .end {
+    margin-top: 80px;
+    padding: 48px 40px;
+    background: var(--slam-red);
+    color: var(--slam-white);
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .end::after {
+    content: "!";
+    position: absolute;
+    right: -40px; bottom: -160px;
+    font-family: var(--font-display);
+    font-size: 520px;
+    color: rgba(255,255,255,0.10);
+    line-height: 1;
+  }
+  .end h2 {
+    font-family: var(--font-display);
+    font-size: 56px;
+    line-height: 0.9;
+    letter-spacing: -0.015em;
+    text-transform: uppercase;
+    margin: 0 0 12px;
+    position: relative;
+  }
+  .end p { font-size: 16px; max-width: 560px; margin: 0; position: relative; opacity: 0.92; }
+
+  @media (max-width: 720px) {
+    .wrap { padding: 32px 20px 80px; }
+    .step { grid-template-columns: 1fr; gap: 8px; }
+    .step-n { font-size: 48px; }
+    .step-body h2 { font-size: 28px; }
+    .meta { flex-direction: column; gap: 8px; }
+    .sheet-grid { grid-template-columns: 28px 1.4fr 1fr 0.8fr; }
+    .sheet-grid > div:nth-child(5n) { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <span class="mark">SLAM<span class="bang">!</span></span>
+    <span class="tag">SETUP GUIDE</span>
+  </header>
+
+  <h1>Wire up <span class="red">signups</span> to your <span class="lime">sheet</span>.</h1>
+  <p class="lede">
+    The landing page collects emails. This guide connects it to a Google Sheet you control, in about 10 minutes,
+    using a free Google Apps Script as the middleman. No code on your side &mdash; just copy, paste, and click.
+  </p>
+
+  <div class="meta">
+    <div><strong>Time</strong> ~10 min</div>
+    <div><strong>Cost</strong> $0</div>
+    <div><strong>You'll need</strong> A Google account</div>
+  </div>
+
+  <!-- STEP 1 -->
+  <section class="step">
+    <div class="step-n">1</div>
+    <div class="step-body">
+      <h2>Make a fresh Google Sheet</h2>
+      <p>In a new browser tab, go to:</p>
+      <p><a class="link" href="https://sheets.new" target="_blank" rel="noopener">https://sheets.new</a></p>
+      <p class="note">Google creates an empty spreadsheet titled "Untitled spreadsheet." You don't need to add any columns &mdash; the script does that for you on the first signup.</p>
+
+      <ol class="sub">
+        <li>Click the title at the top-left ("Untitled spreadsheet") and rename it to something like <strong>SLAM! Newsletter Signups</strong>.</li>
+        <li>Leave the sheet open. We'll come back to it.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="step">
+    <div class="step-n">2</div>
+    <div class="step-body">
+      <h2>Open the Apps Script editor</h2>
+      <p>From inside the sheet, in the top menu, click:</p>
+      <p><span class="menu">Extensions</span> &nbsp;&rarr;&nbsp; <span class="menu">Apps Script</span></p>
+      <p class="note">A new tab opens with the Apps Script editor &mdash; it looks like a simplified code editor. There's a default function called <code>myFunction</code> in the middle of the screen.</p>
+
+      <ol class="sub">
+        <li>Select <em>everything</em> in the editor (<kbd>&#8984;</kbd>+<kbd>A</kbd> on Mac, <kbd>Ctrl</kbd>+<kbd>A</kbd> on Windows) and delete it. The editor should now be empty.</li>
+        <li>Open the file <strong>apps-script.gs</strong> from this project, select all of its contents, and copy.</li>
+        <li>Paste into the empty Apps Script editor.</li>
+        <li>Save: click the floppy-disk icon &nbsp;<span class="menu">💾</span>&nbsp; in the toolbar, or press <kbd>&#8984;</kbd>+<kbd>S</kbd> / <kbd>Ctrl</kbd>+<kbd>S</kbd>.</li>
+        <li>If it asks for a project name, type something like <strong>SLAM Signups</strong> and confirm.</li>
+      </ol>
+
+      <div class="callout">
+        <strong>What does this script do?</strong>
+        When the landing-page form is submitted, the form POSTs the email to this script. The script appends a row to your sheet with: timestamp, email, source, and browser. That's it. No data leaves your Google account.
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="step">
+    <div class="step-n">3</div>
+    <div class="step-body">
+      <h2>Deploy the script as a web app</h2>
+      <p>Still in the Apps Script editor, click the blue <strong>Deploy</strong> button in the upper-right, then choose <strong>New deployment</strong>.</p>
+
+      <ol class="sub">
+        <li>A dialog opens. Next to "Select type," click the gear icon <span class="menu">⚙️</span> and choose <strong>Web app</strong>.</li>
+        <li>Fill in the form exactly like this:</li>
+      </ol>
+
+      <div class="mock">
+        <div class="mock-top">
+          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+          <span class="ttl">Apps Script &mdash; New deployment</span>
+        </div>
+        <div class="mock-body">
+          <div class="dlg">
+            <h3>New deployment</h3>
+
+            <label>Description</label>
+            <div class="field">SLAM signup v1</div>
+
+            <label>Execute as</label>
+            <div class="field">Me (you@gmail.com) <span class="arrow">▾</span></div>
+
+            <label>Who has access</label>
+            <div class="field highlight">Anyone <span class="arrow">▾</span></div>
+
+            <div class="btns">
+              <button class="btn btn-g">Cancel</button>
+              <button class="btn btn-p">Deploy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <strong>"Anyone" sounds scary &mdash; it's fine.</strong>
+        This makes the <em>endpoint URL</em> reachable by your landing page (which is a website &mdash; it needs to POST to it). It does <em>not</em> make your spreadsheet public. Only people with this exact URL can submit an email. Nobody can read your data.
+      </div>
+
+      <ol class="sub" style="margin-top: 18px;">
+        <li>Click <strong>Deploy</strong>.</li>
+        <li>Google asks for permission. Click <strong>Authorize access</strong>, pick your Google account, and approve.</li>
+      </ol>
+
+      <div class="callout warn">
+        <strong>"Google hasn't verified this app"</strong>
+        This warning appears for any personal Apps Script. It's normal &mdash; you wrote (well, copied) the script yourself. Click <strong>Advanced</strong>, then <strong>"Go to SLAM Signups (unsafe)"</strong>, then <strong>Allow</strong>.
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="step">
+    <div class="step-n">4</div>
+    <div class="step-body">
+      <h2>Copy the Web app URL</h2>
+      <p>After deploying, a confirmation screen appears with a URL labeled <strong>Web app</strong>. It looks like:</p>
+      <div class="code"><span class="com">// Yours will be longer &mdash; this is the shape</span>
+https://script.google.com/macros/s/AKfycb<span class="kw">…long random string…</span>/exec</div>
+
+      <ol class="sub">
+        <li>Click the <strong>Copy</strong> button next to the URL.</li>
+        <li>Don't close the dialog yet &mdash; if you lose the URL, you'll have to re-deploy.</li>
+      </ol>
+
+      <div class="callout">
+        <strong>Want to double-check it works?</strong>
+        Paste the URL into a new browser tab and hit Enter. You should see: <em>"SLAM! Athletics signup endpoint is live. POST email here."</em> &mdash; that means the script is alive and reachable.
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 5 -->
+  <section class="step">
+    <div class="step-n">5</div>
+    <div class="step-body">
+      <h2>Paste the URL into the landing page</h2>
+      <p>Switch back to this project and open <strong>Landing Page.html</strong>.</p>
+
+      <ol class="sub">
+        <li>In the toolbar at the top of the preview, click <span class="menu">Tweaks</span> to toggle the tweaks panel on. A floating panel appears in the bottom-right of the page.</li>
+        <li>Find the <strong>Email backend</strong> section.</li>
+        <li>Paste the Apps Script URL into the <strong>Apps Script URL</strong> field.</li>
+        <li>Click anywhere outside the field. The URL is saved automatically.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- STEP 6 -->
+  <section class="step">
+    <div class="step-n">6</div>
+    <div class="step-body">
+      <h2>Test it</h2>
+      <p>On the landing page, scroll to the hero. Type a test email (e.g. <code>test@example.com</code>) into the form and hit <strong>Sign me up</strong>.</p>
+      <p>Switch to your Google Sheet. Within a few seconds, a new row appears:</p>
+
+      <div class="mock">
+        <div class="mock-top">
+          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+          <span class="ttl">SLAM! Newsletter Signups &mdash; Google Sheets</span>
+        </div>
+        <div class="mock-body">
+          <div class="sheet-grid">
+            <div class="hdr"></div>
+            <div class="hdr">Timestamp</div>
+            <div class="hdr">Email</div>
+            <div class="hdr">Source</div>
+            <div class="hdr">User agent</div>
+
+            <div class="row-n">1</div>
+            <div>2026-05-23 14:22:18</div>
+            <div>test@example.com</div>
+            <div>landing</div>
+            <div>Chrome / macOS</div>
+
+            <div class="row-n">2</div>
+            <div>2026-05-23 14:24:51</div>
+            <div>parent.j@gmail.com</div>
+            <div>landing</div>
+            <div>Safari / iOS</div>
+          </div>
+        </div>
+      </div>
+
+      <p class="note" style="margin-top: 18px;">If the row appears &mdash; you're done. The form is live.</p>
+
+      <div class="callout">
+        <strong>Duplicates are skipped automatically.</strong>
+        If the same email tries to subscribe twice, the script silently ignores it. You won't see duplicate rows in the sheet.
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 7 -->
+  <section class="step">
+    <div class="step-n">7</div>
+    <div class="step-body">
+      <h2>Send the newsletter</h2>
+      <p>Once emails are landing in the sheet, you have three good options for actually sending mail:</p>
+
+      <ol class="sub">
+        <li>
+          <strong>Mailchimp / Buttondown / Beehiiv / Substack</strong>
+          <span class="why">Export the Email column from your sheet as CSV, then import into any of these services. They handle the actual sending, unsubscribe links, and templates.</span>
+        </li>
+        <li>
+          <strong>Gmail mail merge</strong> (Google Workspace add-on: <em>Yet Another Mail Merge</em>)
+          <span class="why">Sends directly from your Gmail using the sheet as the source. Free for up to 50/day. Best for small lists where the email comes from "you" personally.</span>
+        </li>
+        <li>
+          <strong>Direct from Apps Script</strong>
+          <span class="why">Add a second function to the script that sends a templated email to every row. Ask me and I'll write it &mdash; takes about 5 lines.</span>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- TROUBLESHOOTING -->
+  <section class="step">
+    <div class="step-n" style="color: var(--slam-red);">!</div>
+    <div class="step-body">
+      <h2>If something's off</h2>
+
+      <ol class="sub">
+        <li>
+          <strong>The form says "Saved locally" instead of "You're in"</strong>
+          <span class="why">The endpoint URL isn't set. Re-paste it into the Tweaks panel.</span>
+        </li>
+        <li>
+          <strong>No row is appearing in the sheet</strong>
+          <span class="why">Apps Script caches old versions. Go back to the Apps Script editor &rarr; <span class="menu">Deploy</span> &rarr; <span class="menu">Manage deployments</span> &rarr; click the pencil ✏️ on your deployment &rarr; under "Version," pick <strong>New version</strong> &rarr; <span class="menu">Deploy</span>. The URL stays the same but the latest script code is now live.</span>
+        </li>
+        <li>
+          <strong>Console shows a CORS error</strong>
+          <span class="why">Expected and harmless. The request goes through anyway (we use <code>no-cors</code> mode). The page assumes success after the POST completes.</span>
+        </li>
+        <li>
+          <strong>I lost the URL</strong>
+          <span class="why">Apps Script editor &rarr; <span class="menu">Deploy</span> &rarr; <span class="menu">Manage deployments</span> &rarr; the URL is shown under your active deployment.</span>
+        </li>
+        <li>
+          <strong>I want to start fresh</strong>
+          <span class="why">In the Tweaks panel, clear the URL field. The form falls back to localStorage and you can re-deploy with a new URL anytime.</span>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <div class="end">
+    <h2>That's it.<br>Go send something.</h2>
+    <p>You now own the pipeline. Emails come in &rarr; sheet fills up &rarr; you send the newsletter on your own schedule, your own way.</p>
+  </div>
+
+</div>
+</body>
+</html>

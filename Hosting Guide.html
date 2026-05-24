@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SLAM! — Hosting & Update Guide</title>
+<link rel="stylesheet" href="colors_and_type.css" />
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg); }
+  body { font-family: var(--font-sans); line-height: 1.55; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 56px 32px 120px; }
+
+  .top { display: flex; align-items: center; gap: 16px; margin-bottom: 48px; }
+  .mark {
+    font-family: var(--font-display);
+    font-size: 28px; line-height: 1; letter-spacing: -0.01em;
+    text-transform: uppercase; color: var(--slam-white);
+    display: inline-flex; align-items: baseline;
+  }
+  .mark .bang { color: var(--slam-lime); }
+  .tag {
+    margin-left: 12px; padding: 5px 12px;
+    background: var(--slam-coal); border-radius: 999px;
+    font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+    letter-spacing: 0.12em; color: var(--fg-muted);
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(48px, 7vw, 96px);
+    line-height: 0.9; letter-spacing: -0.018em;
+    text-transform: uppercase; color: var(--slam-white);
+    margin: 0 0 16px;
+  }
+  h1 .red { color: var(--slam-red); }
+  h1 .lime { color: var(--slam-lime); }
+
+  .lede { font-size: 18px; color: var(--fg-muted); max-width: 640px; margin: 0 0 40px; }
+
+  .meta {
+    display: flex; gap: 24px; padding: 16px 0;
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    margin-bottom: 64px;
+    font-family: var(--font-mono); font-size: 11px;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--fg-dim);
+  }
+  .meta strong { color: var(--fg); font-weight: 700; margin-right: 8px; }
+
+  /* Routes — the two paths */
+  .routes {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    margin-bottom: 64px;
+  }
+  .route {
+    padding: 28px 28px 32px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--bg-surface);
+    position: relative;
+    overflow: hidden;
+  }
+  .route.featured { border-color: var(--slam-lime); }
+  .route.featured::before {
+    content: "";
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 4px; background: var(--slam-lime);
+  }
+  .route-tag {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--fg-dim);
+  }
+  .route.featured .route-tag { color: var(--slam-lime); }
+  .route h3 {
+    font-family: var(--font-display);
+    font-size: 32px; line-height: 0.95; letter-spacing: -0.01em;
+    text-transform: uppercase; color: var(--slam-white);
+    margin: 8px 0 12px;
+  }
+  .route p {
+    font-size: 14px; color: var(--fg-muted); margin: 0 0 14px;
+    line-height: 1.5;
+  }
+  .route .when {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--fg-dim);
+    padding-top: 14px; border-top: 1px solid var(--border);
+  }
+
+  /* Steps (same pattern as Setup Guide) */
+  .stage {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+  .stage-h {
+    font-family: var(--font-display);
+    font-size: 40px; line-height: 0.95; letter-spacing: -0.01em;
+    text-transform: uppercase; color: var(--slam-white);
+    margin: 0 0 8px;
+  }
+  .stage-h .lime { color: var(--slam-lime); }
+  .stage-l { color: var(--fg-muted); font-size: 15.5px; margin: 0 0 24px; }
+
+  .step {
+    display: grid; grid-template-columns: 56px 1fr;
+    gap: 24px; padding: 36px 0;
+    border-top: 1px solid var(--border);
+  }
+  .step:first-of-type { border-top: none; padding-top: 8px; }
+  .step-n {
+    font-family: var(--font-display);
+    font-size: 56px; line-height: 0.85; letter-spacing: -0.02em;
+    color: var(--slam-lime);
+  }
+  .step-body h2 {
+    font-family: var(--font-display);
+    font-size: 28px; line-height: 0.95; letter-spacing: -0.01em;
+    text-transform: uppercase; color: var(--slam-white);
+    margin: 4px 0 12px;
+  }
+  .step-body p { margin: 0 0 12px; color: var(--fg); font-size: 15.5px; }
+  .step-body p.note { color: var(--fg-muted); font-size: 14px; }
+
+  ol.sub { counter-reset: sub; list-style: none; padding: 0; margin: 12px 0 0; }
+  ol.sub > li {
+    counter-increment: sub;
+    position: relative; padding: 12px 0 12px 40px;
+    border-top: 1px solid var(--border);
+    font-size: 15px; color: var(--fg);
+  }
+  ol.sub > li::before {
+    content: counter(sub);
+    position: absolute; left: 0; top: 12px;
+    width: 26px; height: 26px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 999px;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+    color: var(--fg-muted);
+    display: flex; align-items: center; justify-content: center;
+  }
+  ol.sub > li:first-child { border-top: none; }
+  ol.sub > li .why {
+    display: block; font-size: 13px; color: var(--fg-muted); margin-top: 4px;
+  }
+
+  kbd {
+    font-family: var(--font-mono); font-size: 12.5px;
+    background: var(--slam-coal);
+    border: 1px solid var(--border-strong); border-bottom-width: 2px;
+    border-radius: 6px; padding: 2px 8px; color: var(--fg);
+    white-space: nowrap;
+  }
+  .menu {
+    font-family: var(--font-mono); font-size: 13px;
+    background: var(--slam-ink); border: 1px solid var(--border);
+    padding: 3px 10px; border-radius: 6px; color: var(--slam-lime);
+    white-space: nowrap;
+  }
+  .url {
+    font-family: var(--font-mono); font-size: 13px;
+    background: var(--slam-ink); border: 1px solid var(--border);
+    padding: 3px 10px; border-radius: 6px; color: var(--fg);
+  }
+  a.link {
+    color: var(--slam-lime); text-decoration: none;
+    border-bottom: 1px solid var(--slam-lime);
+  }
+  a.link:hover { opacity: 0.75; }
+
+  .callout {
+    margin-top: 16px; padding: 14px 18px;
+    border-radius: 12px;
+    border-left: 4px solid var(--slam-lime);
+    background: rgba(128, 255, 0, 0.04);
+    font-size: 14px; color: var(--fg);
+  }
+  .callout.warn { border-left-color: var(--slam-red); background: rgba(218,0,22,0.05); }
+  .callout strong {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--slam-lime); display: block; margin-bottom: 4px;
+  }
+  .callout.warn strong { color: var(--slam-red); }
+
+  /* Mock browser */
+  .mock {
+    margin-top: 16px; background: #1e1e1e;
+    border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+  }
+  .mock-top {
+    background: #2a2a2a; padding: 9px 12px;
+    display: flex; align-items: center; gap: 8px;
+    border-bottom: 1px solid #111;
+  }
+  .mock-top .dot { width: 11px; height: 11px; border-radius: 999px; }
+  .mock-top .dot.r { background: #ff5f56; }
+  .mock-top .dot.y { background: #ffbd2e; }
+  .mock-top .dot.g { background: #27c93f; }
+  .mock-top .url-bar {
+    flex: 1; margin-left: 14px; background: #3a3a3a;
+    border-radius: 6px; padding: 4px 10px;
+    font-family: var(--font-mono); font-size: 11px; color: #ccc;
+  }
+
+  /* Netlify Drop mock */
+  .drop {
+    background: #fff; color: #1f1f1f;
+    padding: 0;
+    font-family: -apple-system, system-ui, sans-serif;
+  }
+  .drop-bar {
+    background: #14213d; color: #fff;
+    padding: 16px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 13px;
+  }
+  .drop-bar b { color: #00ad9f; }
+  .drop-body {
+    padding: 60px 28px;
+    text-align: center;
+  }
+  .drop-zone {
+    border: 3px dashed #00ad9f;
+    border-radius: 16px;
+    padding: 64px 32px;
+    background: #f6fffd;
+    color: #2a2a2a;
+  }
+  .drop-zone h4 {
+    font-size: 26px; margin: 0 0 8px; color: #14213d;
+  }
+  .drop-zone p { font-size: 14px; color: #6b6b6b; margin: 0; }
+
+  /* Folder mock */
+  .folder {
+    background: #1c1c1c; padding: 16px;
+    font-family: var(--font-mono); font-size: 12.5px;
+    color: var(--fg);
+  }
+  .folder .row { padding: 5px 0; }
+  .folder .row .ic { color: var(--slam-lime); margin-right: 6px; }
+  .folder .row.dim { color: var(--fg-dim); }
+
+  /* CTA */
+  .end {
+    margin-top: 80px; padding: 40px 36px;
+    background: var(--slam-red); color: var(--slam-white);
+    border-radius: 20px; position: relative; overflow: hidden;
+  }
+  .end::after {
+    content: "!";
+    position: absolute; right: -40px; bottom: -160px;
+    font-family: var(--font-display);
+    font-size: 480px; color: rgba(255,255,255,0.10); line-height: 1;
+  }
+  .end h2 {
+    font-family: var(--font-display);
+    font-size: 48px; line-height: 0.9; letter-spacing: -0.015em;
+    text-transform: uppercase; margin: 0 0 10px; position: relative;
+  }
+  .end p { font-size: 15px; max-width: 560px; margin: 0; position: relative; opacity: 0.92; }
+
+  @media (max-width: 720px) {
+    .wrap { padding: 32px 20px 80px; }
+    .routes { grid-template-columns: 1fr; }
+    .step { grid-template-columns: 1fr; gap: 8px; }
+    .step-n { font-size: 40px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <span class="mark">SLAM<span class="bang">!</span></span>
+    <span class="tag">HOSTING &amp; UPDATE GUIDE</span>
+  </header>
+
+  <h1>Get it <span class="lime">live</span>.<br/>Keep it <span class="red">fresh</span>.</h1>
+  <p class="lede">
+    Two things this guide covers: (1) putting the landing page on a real URL parents can visit,
+    and (2) the workflow for changing it later &mdash; copy edits, new sections, content updates.
+  </p>
+
+  <div class="meta">
+    <div><strong>Time</strong> ~15 min to go live</div>
+    <div><strong>Cost</strong> Free (Netlify free tier)</div>
+    <div><strong>You'll need</strong> An email address</div>
+  </div>
+
+  <!-- ROUTES -->
+  <div class="routes">
+    <div class="route featured">
+      <div class="route-tag">Recommended &middot; Easiest</div>
+      <h3>Netlify Drop</h3>
+      <p>Drag the project folder onto Netlify's website. Get a live URL in ~30 seconds. No account required to test it; sign up later if you want to keep it.</p>
+      <div class="when">Best if: this is your first deploy, you want it live today, you don't know what GitHub is.</div>
+    </div>
+    <div class="route">
+      <div class="route-tag">Power user</div>
+      <h3>GitHub + Netlify</h3>
+      <p>Push code to GitHub; Netlify auto-deploys every change. More setup, but every update goes live by itself.</p>
+      <div class="when">Best if: you (or a dev) plan to edit code regularly. Skip until you outgrow Drop.</div>
+    </div>
+  </div>
+
+  <!-- STAGE 1: GET IT LIVE -->
+  <div class="stage">
+    <h2 class="stage-h">Stage 1 &mdash; <span class="lime">Go live</span></h2>
+    <p class="stage-l">Take the files in this project and put them on a public URL.</p>
+
+    <!-- STEP 1 -->
+    <section class="step">
+      <div class="step-n">1</div>
+      <div class="step-body">
+        <h2>Download the project</h2>
+        <p>In this environment (the chat with me), look for the <strong>Download</strong> or <strong>Export</strong> option for the project. You'll get a <code>.zip</code> file containing every file we built.</p>
+
+        <ol class="sub">
+          <li>If you don't see a download button, just ask me &mdash; I'll generate one for you.</li>
+          <li>Unzip it on your computer. You should see a folder with files like these:</li>
+        </ol>
+
+        <div class="mock">
+          <div class="mock-top">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <span class="url-bar">~/Downloads/slam-es-athletics/</span>
+          </div>
+          <div class="folder">
+            <div class="row"><span class="ic">▸</span>Landing Page.html</div>
+            <div class="row"><span class="ic">▸</span>app.jsx</div>
+            <div class="row"><span class="ic">▸</span>slam.css</div>
+            <div class="row"><span class="ic">▸</span>colors_and_type.css</div>
+            <div class="row"><span class="ic">▸</span>tweaks-panel.jsx</div>
+            <div class="row dim">▸ assets/ &nbsp; (logo, patterns)</div>
+            <div class="row dim">▸ fonts/ &nbsp; (display font files)</div>
+            <div class="row dim">▸ apps-script.gs &nbsp; (backend, lives in Google)</div>
+            <div class="row dim">▸ Setup Guide.html &nbsp; (this stuff)</div>
+            <div class="row dim">▸ Hosting Guide.html &nbsp; (you are here)</div>
+          </div>
+        </div>
+
+        <div class="callout">
+          <strong>Don't worry about .jsx files</strong>
+          They look like programmer files, but the landing page actually runs them in the browser &mdash; nothing to compile, build, or install. Netlify will serve them as-is.
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section class="step">
+      <div class="step-n">2</div>
+      <div class="step-body">
+        <h2>Open Netlify Drop</h2>
+        <p>In your browser, go to:</p>
+        <p><a class="link" href="https://app.netlify.com/drop" target="_blank" rel="noopener">https://app.netlify.com/drop</a></p>
+        <p class="note">You'll see a big dashed box that says "Drag and drop your site folder here." That's exactly what it is.</p>
+
+        <div class="mock">
+          <div class="mock-top">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <span class="url-bar">app.netlify.com/drop</span>
+          </div>
+          <div class="drop">
+            <div class="drop-bar">
+              <span><b>Netlify</b> &nbsp; Drop</span>
+              <span style="opacity: 0.7;">Need a hand? Read the docs</span>
+            </div>
+            <div class="drop-body">
+              <div class="drop-zone">
+                <h4>Drag and drop your site folder here</h4>
+                <p>Or click to browse</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 3 -->
+    <section class="step">
+      <div class="step-n">3</div>
+      <div class="step-body">
+        <h2>Drag the folder in</h2>
+        <p>Drag the <strong>unzipped folder</strong> (the whole thing &mdash; <code>slam-es-athletics</code>) onto the dashed box.</p>
+
+        <div class="callout warn">
+          <strong>Drag the FOLDER, not the zip</strong>
+          Netlify needs the actual folder, not the zip file. Unzip first.
+        </div>
+
+        <ol class="sub" style="margin-top: 14px;">
+          <li>Wait ~20-40 seconds. Netlify uploads the files and gives you a URL like <span class="url">https://chipper-otter-1a2b3c.netlify.app</span></li>
+          <li>Click the URL. You should see your landing page, live, on the internet.</li>
+        </ol>
+
+        <div class="callout">
+          <strong>That's it &mdash; you're live.</strong>
+          The form still ships to your sheet (the Apps Script URL is baked into the code). Share that <code>.netlify.app</code> URL with parents to start collecting signups.
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 4 -->
+    <section class="step">
+      <div class="step-n">4</div>
+      <div class="step-body">
+        <h2>Claim the site (so you can update it)</h2>
+        <p>The temporary URL works for 24 hours without an account. To keep it permanently &mdash; and to update it later &mdash; claim it:</p>
+
+        <ol class="sub">
+          <li>On the deploy success page, click <span class="menu">Claim this site</span>.</li>
+          <li>Sign up with your email (or Google).</li>
+          <li>Done. The site now belongs to your Netlify account.</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- STEP 5 -->
+    <section class="step">
+      <div class="step-n">5</div>
+      <div class="step-body">
+        <h2>(Optional) Custom domain</h2>
+        <p>If you own a domain like <code>slamesathletics.com</code>:</p>
+        <ol class="sub">
+          <li>In Netlify, go to your site &rarr; <span class="menu">Domain settings</span> &rarr; <span class="menu">Add custom domain</span>.</li>
+          <li>Type your domain. Netlify shows you the DNS records to add at your registrar (GoDaddy, Namecheap, etc).</li>
+          <li>Add those records in your registrar's DNS panel. Wait 5-60 minutes for DNS to propagate.</li>
+          <li>Netlify auto-issues a free HTTPS certificate. Your site is live at your real domain.</li>
+        </ol>
+
+        <div class="callout">
+          <strong>Don't own a domain yet?</strong>
+          The free <code>.netlify.app</code> URL works great for testing and even for sharing with parents. Get a real domain when you're ready to print it on flyers.
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- STAGE 2: UPDATE -->
+  <div class="stage">
+    <h2 class="stage-h">Stage 2 &mdash; <span class="lime">Update it</span></h2>
+    <p class="stage-l">Two flavors of update: <strong>content</strong> (events, posts, copy) and <strong>code</strong> (design, layout, new sections). Each has a workflow.</p>
+
+    <!-- STEP A -->
+    <section class="step">
+      <div class="step-n">A</div>
+      <div class="step-body">
+        <h2>Content updates (text changes)</h2>
+        <p>For small text changes &mdash; updating an event date, fixing a typo, swapping the description &mdash; you have two options:</p>
+
+        <ol class="sub">
+          <li>
+            <strong>Come back here, describe the change.</strong>
+            <span class="why">Easiest: tell me "change the Q&amp;A about pricing to say $260 instead of $240" and I'll do it. Then redownload + redeploy.</span>
+          </li>
+          <li>
+            <strong>Edit the file yourself, redeploy.</strong>
+            <span class="why">Open the downloaded folder, find the relevant file (mostly <code>app.jsx</code>), edit the text, drag the folder back to Netlify (under your site &rarr; <span class="menu">Deploys</span> &rarr; drag to the deploy area). Live in 30s.</span>
+          </li>
+        </ol>
+
+        <div class="callout">
+          <strong>Pro move &mdash; sheet-as-CMS</strong>
+          When you're ready, ask me to build the "Posts &amp; Events tabs in your sheet" version. Then editing content means editing a Google Sheet &mdash; no redeploys, no code, no asking me. The site auto-pulls every page load.
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP B -->
+    <section class="step">
+      <div class="step-n">B</div>
+      <div class="step-body">
+        <h2>Design or layout changes</h2>
+        <p>Adding a new section, changing colors, restructuring the page: those need code edits.</p>
+
+        <ol class="sub">
+          <li>
+            <strong>Tell me what you want.</strong>
+            <span class="why">"Add a coach bios section between hero and What's happening." I build it, you preview here, then redownload and redeploy when happy.</span>
+          </li>
+          <li>
+            <strong>Hire a developer (later).</strong>
+            <span class="why">When the site is making real money, a freelance front-end dev can take over. The code is plain HTML + React + CSS &mdash; standard stuff. They can pick it up in an hour.</span>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- STEP C -->
+    <section class="step">
+      <div class="step-n">C</div>
+      <div class="step-body">
+        <h2>Backend updates (the Google Sheet pipeline)</h2>
+        <p>If you ever change which Google Sheet collects emails, or want to add more fields (name, kid's age, etc):</p>
+        <ol class="sub">
+          <li>Re-open the Apps Script editor (Extensions &rarr; Apps Script from your sheet).</li>
+          <li>Edit <code>apps-script.gs</code> in there.</li>
+          <li>Click <span class="menu">Deploy</span> &rarr; <span class="menu">Manage deployments</span> &rarr; pencil &rarr; <span class="menu">New version</span> &rarr; <span class="menu">Deploy</span>. The URL stays the same.</li>
+        </ol>
+        <p class="note">No need to redeploy the website &mdash; only the Apps Script changes.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- TROUBLESHOOTING -->
+  <div class="stage">
+    <h2 class="stage-h" style="color: var(--slam-red);">!</h2>
+    <p class="stage-l">Things that might trip you up.</p>
+
+    <section class="step">
+      <div class="step-n" style="color: var(--slam-red);">?</div>
+      <div class="step-body">
+        <h2>Common gotchas</h2>
+        <ol class="sub">
+          <li>
+            <strong>I deployed, the page loads, but the email form doesn't work.</strong>
+            <span class="why">Check the browser console (right-click &rarr; Inspect &rarr; Console). If you see a CORS error, that's expected and harmless &mdash; the request goes through. If you see "no endpoint configured," the URL got lost during redownload &mdash; re-add it in <code>app.jsx</code> under <code>signupEndpoint</code>.</span>
+          </li>
+          <li>
+            <strong>The logo is broken or missing on the live site.</strong>
+            <span class="why">You probably uploaded only some files. Re-upload the entire folder &mdash; especially the <code>assets/</code> and <code>fonts/</code> subfolders.</span>
+          </li>
+          <li>
+            <strong>The Tweaks panel won't open on the live site.</strong>
+            <span class="why">Expected. Tweaks is only for the design environment here; once deployed, it's hidden by default. To change the hero background or endpoint URL on the live site, edit <code>app.jsx</code> directly in the <code>TWEAK_DEFAULTS</code> block.</span>
+          </li>
+          <li>
+            <strong>I want to roll back to a previous version.</strong>
+            <span class="why">Netlify keeps every deploy. In your site &rarr; <span class="menu">Deploys</span> &rarr; click any older deploy &rarr; <span class="menu">Publish deploy</span>. Reverts instantly.</span>
+          </li>
+        </ol>
+      </div>
+    </section>
+  </div>
+
+  <div class="end">
+    <h2>Ready when<br/>you are.</h2>
+    <p>Start with Netlify Drop. Get the URL today. Update the content however suits you. Loop me in when you want a new section.</p>
+  </div>
+
+</div>
+</body>
+</html>

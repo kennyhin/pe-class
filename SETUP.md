@@ -1,0 +1,58 @@
+# SLAM! Landing — Email Signup Setup
+
+The landing page collects emails and ships them to a Google Sheet you control,
+via a tiny Google Apps Script "middleman." 10-minute setup, no ongoing cost.
+
+## 1. Create the sheet
+
+1. Go to <https://sheets.new> (creates a fresh Google Sheet).
+2. Rename it (e.g. **SLAM! Newsletter Signups**).
+
+## 2. Add the Apps Script
+
+1. In that sheet, click **Extensions → Apps Script**.
+2. Delete the default `function myFunction()` placeholder.
+3. Open `apps-script.gs` from this project, copy the **entire contents**, paste into the Apps Script editor.
+4. Click the 💾 **Save** icon (or ⌘S / Ctrl+S). Name the project anything (e.g. "SLAM Signups").
+
+## 3. Deploy as a Web App
+
+1. In the Apps Script editor, click **Deploy → New deployment**.
+2. Click the ⚙️ gear next to "Select type" → choose **Web app**.
+3. Fill in:
+   - **Description:** `SLAM signup v1`
+   - **Execute as:** `Me`
+   - **Who has access:** `Anyone` *(this is required — it lets the form post to it; it does not make your sheet public)*
+4. Click **Deploy**.
+5. Google will ask you to **authorize** the script. Approve.
+   *(If it warns "Google hasn't verified this app" → click Advanced → Go to … (unsafe) — this is normal for your own scripts.)*
+6. Copy the **Web app URL** that appears. It ends in `…/exec`.
+
+## 4. Paste the URL into the landing page
+
+1. Open `Landing Page.html` in the preview.
+2. Click the **Tweaks** toggle in the toolbar.
+3. Paste your Apps Script URL into the **Signup endpoint** field.
+4. Submit a test email through the form. Check the sheet — a new row appears.
+
+## What you'll see in the sheet
+
+| Timestamp | Email | Source | User Agent |
+|---|---|---|---|
+| 2026-05-23 14:22 | parent@example.com | landing | Chrome / macOS |
+
+Duplicates are skipped automatically.
+
+## Sending the newsletter
+
+Once you have a list, you have options:
+- **Mailchimp / Buttondown / Beehiiv** — paste the email column in as a CSV import.
+- **Gmail mail merge** (extension: *Yet Another Mail Merge*) — works directly off the sheet.
+- **Direct from Apps Script** — let me know if you want a "send newsletter" script too.
+
+## Troubleshooting
+
+- **Form says "Saved locally"?** The endpoint URL is missing or wrong — paste it in Tweaks.
+- **No row appearing in the sheet?** Re-deploy: in Apps Script → Deploy → Manage deployments → ✏️ edit → New version → Deploy. Apps Script caches old versions.
+- **CORS errors in console?** Expected and harmless — the request still goes through (`mode: 'no-cors'`). The page assumes success after a successful POST.
+- **Want to test the endpoint by hand?** Open the `…/exec` URL in a browser. You should see: *"SLAM! Athletics signup endpoint is live. POST email here."*
