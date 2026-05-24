@@ -257,11 +257,6 @@ function SignupForm({ endpoint, accent }) {
         {status.kind === "sending" && <span>{status.msg}</span>}
         {status.kind === "idle" && <span>&nbsp;</span>}
       </div>
-
-      <div className="signup-footnote">
-        <Icon name="shield-check" size={13} />
-        No spam, ever · Unsubscribe any time
-      </div>
     </div>
   );
 }
@@ -463,6 +458,57 @@ function eventDateKey(event) {
   return String(event?.date || "").slice(0, 10);
 }
 
+function addDaysToKey(dateKey, days) {
+  const date = new Date(`${dateKey}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return dateKey;
+  date.setDate(date.getDate() + days);
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0"),
+  ].join("-");
+}
+
+function eventType(event) {
+  const type = String(event?.type || "event").toLowerCase().trim();
+  return type === "games" ? "game" : type;
+}
+
+function getEventSport(event) {
+  const text = `${event?.sport || ""} ${event?.title || ""}`.toLowerCase();
+  if (text.includes("basketball") || text.includes("hoops")) return "basketball";
+  if (text.includes("soccer") || text.includes("futsal")) return "soccer";
+  if (text.includes("t-ball") || text.includes("tball") || text.includes("baseball")) return "baseball";
+  if (text.includes("softball")) return "softball";
+  if (text.includes("football") || text.includes("flag")) return "football";
+  if (text.includes("volleyball")) return "volleyball";
+  if (text.includes("tennis")) return "tennis";
+  if (text.includes("track") || text.includes("running")) return "track";
+  if (text.includes("swim")) return "swim";
+  return "other";
+}
+
+function sportLabel(sport) {
+  return {
+    basketball: "Basketball",
+    soccer: "Soccer",
+    baseball: "Baseball",
+    softball: "Softball",
+    football: "Football",
+    volleyball: "Volleyball",
+    tennis: "Tennis",
+    track: "Track",
+    swim: "Swim",
+    other: "Other",
+  }[sport] || sport;
+}
+
+function sortEventsByDate(a, b) {
+  return eventDateKey(a).localeCompare(eventDateKey(b))
+    || String(a.time || "").localeCompare(String(b.time || ""))
+    || String(a.title || "").localeCompare(String(b.title || ""));
+}
+
 function formatEventDate(dateKey) {
   const date = new Date(`${dateKey}T00:00:00`);
   if (Number.isNaN(date.getTime())) return "Selected day";
@@ -530,7 +576,10 @@ function Calendar({ events, loading }) {
   const today = now.getDate();
   const todayStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(today).padStart(2, "0")}`;
   const [selectedDate, setSelectedDate] = useState(todayStr);
+  const [upcomingType, setUpcomingType] = useState("all");
+  const [gameSport, setGameSport] = useState("all");
   const monthLabel = now.toLocaleString("default", { month: "long", year: "numeric" });
+  const nextWeekStr = addDaysToKey(todayStr, 7);
 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const firstDayOfWeek = new Date(year, month, 1).getDay();
@@ -546,13 +595,75 @@ function Calendar({ events, loading }) {
     .map((e) => parseInt(eventDateKey(e).slice(8, 10), 10))
     .filter((n) => !isNaN(n));
 
-  const monthEvents = events
-    .filter((e) => eventDateKey(e).startsWith(monthPrefix))
-    .sort((a, b) => eventDateKey(a).localeCompare(eventDateKey(b)));
-
   const selectedEvents = events
     .filter((e) => eventDateKey(e) === selectedDate)
     .sort((a, b) => String(a.time || "").localeCompare(String(b.time || "")));
+
+  const upcomingEvents = events
+    .filter((e) => {
+      const dateKey = eventDateKey(e);
+      return dateKey >= todayStr && dateKey <= nextWeekStr;
+    })
+    .sort(sortEventsByDate);
+
+  const visibleUpcoming = upcomingType === "all"
+    ? upcomingEvents
+    : upcomingEvents.filter((e) => eventType(e) === upcomingType);
+
+  const futureGames = events
+    .filter((e) => eventType(e) === "game" && eventDateKey(e) >= todayStr)
+    .sort(sortEventsByDate);
+
+  const gameSports = Array.from(new Set(futureGames.map(getEventSport)))
+    .filter(Boolean)
+    .sort((a, b) => sportLabel(a).localeCompare(sportLabel(b)));
+
+  const visibleGames = gameSport === "all"
+    ? futureGames
+    : futureGames.filter((e) => getEventSport(e) === gameSport);
+
+  const gamesNextWeek = futureGames.filter((e) => eventDateKey(e) <= nextWeekStr).length;
+
+  function renderFilterButton(group, value, label, active, onClick) {
+    return (
+      <button
+        key={`${group}-${value}`}
+        type="button"
+        className={`cal-filter-btn${active ? " active" : ""}`}
+        onClick={onClick}
+        aria-pressed={active}
+      >
+        {label}
+      </button>
+    );
+  }
+
+  function renderEventRow(e, i, mode = "date") {
+    const dateKey = eventDateKey(e);
+    const type = eventType(e);
+    const date = new Date(`${dateKey}T00:00:00`);
+    const dayNum = parseInt(dateKey.slice(8, 10), 10);
+    const dow = Number.isNaN(date.getTime())
+      ? "TBD"
+      : date.toLocaleDateString("default", { weekday: "short" }).toUpperCase();
+    return (
+      <button
+        key={`${mode}-${dateKey}-${i}`}
+        type="button"
+        className={`cal-month-event${selectedDate === dateKey ? " selected" : ""}`}
+        onClick={() => setSelectedDate(dateKey)}
+      >
+        <span className="cal-month-day">
+          <span className="cal-month-dow">{dow}</span>
+          <span>{Number.isNaN(dayNum) ? "?" : dayNum}</span>
+        </span>
+        <span className="cal-month-copy">
+          <span className="cal-month-title">{getEventIcon(e)} {e.title}</span>
+          <span className="cal-month-meta">{type} · {e.time || "Time TBA"}</span>
+        </span>
+      </button>
+    );
+  }
 
   return (
     <div className="card cal">
@@ -596,7 +707,7 @@ function Calendar({ events, loading }) {
         ) : selectedEvents.length === 0 ? (
           <div className="cal-empty">No events scheduled for this day.</div>
         ) : selectedEvents.map((e, i) => {
-          const type = String(e.type || "event").toLowerCase();
+          const type = eventType(e);
           const icon = getEventIcon(e);
           return (
             <div key={i} className="cal-event">
@@ -614,26 +725,57 @@ function Calendar({ events, loading }) {
       </div>
 
       <div className="cal-month-list">
-        <div className="cal-upcoming-label">This month</div>
+        <div className="cal-section-head">
+          <div>
+            <div className="cal-upcoming-label">Upcoming events</div>
+            <div className="cal-section-sub">Next 7 days</div>
+          </div>
+          <div className="cal-filter" aria-label="Filter upcoming events">
+            {[
+              ["all", "All"],
+              ["event", "Events"],
+              ["practice", "Practice"],
+              ["game", "Games"],
+            ].map(([value, label]) => renderFilterButton(
+              "upcoming",
+              value,
+              label,
+              upcomingType === value,
+              () => setUpcomingType(value)
+            ))}
+          </div>
+        </div>
         {loading ? (
-          <div className="cal-empty">Loading monthly schedule...</div>
-        ) : monthEvents.length === 0 ? (
-          <div className="cal-empty">No events listed for {monthLabel}.</div>
-        ) : monthEvents.map((e, i) => {
-          const dateKey = eventDateKey(e);
-          const dayNum = parseInt(dateKey.slice(8, 10), 10);
-          return (
-            <button
-              key={`${dateKey}-${i}`}
-              type="button"
-              className={`cal-month-event${selectedDate === dateKey ? " selected" : ""}`}
-              onClick={() => setSelectedDate(dateKey)}
-            >
-              <span className="cal-month-day">{Number.isNaN(dayNum) ? "?" : dayNum}</span>
-              <span className="cal-month-title">{getEventIcon(e)} {e.title}</span>
-            </button>
-          );
-        })}
+          <div className="cal-empty">Loading upcoming events...</div>
+        ) : visibleUpcoming.length === 0 ? (
+          <div className="cal-empty">No matching events in the next 7 days.</div>
+        ) : visibleUpcoming.map((e, i) => renderEventRow(e, i, "upcoming"))}
+      </div>
+
+      <div className="cal-games-list">
+        <div className="cal-section-head">
+          <div>
+            <div className="cal-upcoming-label">Games</div>
+            <div className="cal-section-sub">
+              {gamesNextWeek} game{gamesNextWeek === 1 ? "" : "s"} in the next 7 days
+            </div>
+          </div>
+          <div className="cal-filter" aria-label="Filter games by sport">
+            {renderFilterButton("games", "all", "All sports", gameSport === "all", () => setGameSport("all"))}
+            {gameSports.map((sport) => renderFilterButton(
+              "games",
+              sport,
+              sportLabel(sport),
+              gameSport === sport,
+              () => setGameSport(sport)
+            ))}
+          </div>
+        </div>
+        {loading ? (
+          <div className="cal-empty">Loading games...</div>
+        ) : visibleGames.length === 0 ? (
+          <div className="cal-empty">No games match this sport yet.</div>
+        ) : visibleGames.map((e, i) => renderEventRow(e, i, "game"))}
       </div>
     </div>
   );
@@ -697,6 +839,7 @@ function faqTokens(text) {
 function findFaqMatches(question, faq) {
   const queryTokens = Array.from(new Set(faqTokens(question)));
   if (queryTokens.length < 1) return [];
+  const maxMatches = 6;
 
   function scoreBy(text) {
     const tokens = new Set(faqTokens(text));
@@ -706,17 +849,17 @@ function findFaqMatches(question, faq) {
   }
 
   const keywordMatches = faq
-    .map((item) => ({ ...item, score: scoreBy(item.keywords || "") }))
+    .map((item, index) => ({ ...item, index, score: scoreBy(item.keywords || "") }))
     .filter((item) => item.score > 0)
-    .sort((a, b) => b.score - a.score);
+    .sort((a, b) => (b.score - a.score) || (a.index - b.index));
 
-  if (keywordMatches.length) return keywordMatches.slice(0, 3);
+  if (keywordMatches.length) return keywordMatches.slice(0, maxMatches);
 
   return faq
-    .map((item) => ({ ...item, score: scoreBy(`${item.q} ${item.a}`) }))
+    .map((item, index) => ({ ...item, index, score: scoreBy(`${item.q} ${item.a}`) }))
     .filter((item) => item.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 3);
+    .sort((a, b) => (b.score - a.score) || (a.index - b.index))
+    .slice(0, maxMatches);
 }
 
 function AskQuestionForm({ endpoint, faq }) {
@@ -879,8 +1022,8 @@ function WhatsHappening({ endpoint }) {
         <p className="happening-sub">Schedules · Updates · Answers</p>
       </div>
       <div className="happening-grid">
-        <Calendar events={events} loading={loading} />
         <Feed posts={posts} loading={loading} />
+        <Calendar events={events} loading={loading} />
         <QA faq={faq} endpoint={endpoint} loading={loading} />
       </div>
     </section>
