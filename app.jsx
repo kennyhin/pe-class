@@ -474,34 +474,47 @@ function formatEventDate(dateKey) {
 }
 
 // Pulls all three content arrays from the Apps Script endpoint on mount.
-// Returns the fallback arrays until the fetch resolves, so the page is never
-// blank. If the fetch fails (CORS, network, sheet empty, etc.), the fallbacks
-// remain — no error UI for content, just defaults.
+// Keep the sheet-backed sections empty while loading so old fallback content
+// does not flash before the live sheet response arrives.
 function useContent(endpoint) {
   const [content, setContent] = useState({
-    posts: DEFAULT_POSTS,
-    events: DEFAULT_EVENTS,
-    faq: DEFAULT_FAQ,
+    posts: [],
+    events: [],
+    faq: [],
     loaded: false,
+    error: false,
   });
 
   useEffect(() => {
-    if (!endpoint) return;
+    if (!endpoint) {
+      setContent({
+        posts: DEFAULT_POSTS,
+        events: DEFAULT_EVENTS,
+        faq: DEFAULT_FAQ,
+        loaded: true,
+        error: false,
+      });
+      return;
+    }
+
     let cancelled = false;
+    setContent({ posts: [], events: [], faq: [], loaded: false, error: false });
     fetch(`${endpoint}?action=all&t=${Date.now()}`)
       .then((r) => r.json())
       .then((data) => {
         if (cancelled) return;
-        setContent((prev) => ({
-          posts:  Array.isArray(data.posts)  && data.posts.length  ? data.posts  : prev.posts,
-          events: Array.isArray(data.events) && data.events.length ? data.events : prev.events,
-          faq:    Array.isArray(data.faq)    && data.faq.length    ? data.faq    : prev.faq,
+        setContent({
+          posts: Array.isArray(data.posts) ? data.posts : [],
+          events: Array.isArray(data.events) ? data.events : [],
+          faq: Array.isArray(data.faq) ? data.faq : [],
           loaded: true,
-        }));
+          error: data.ok === false,
+        });
       })
       .catch(() => {
-        // Silent fail — keep fallback content.
-        if (!cancelled) setContent((prev) => ({ ...prev, loaded: true }));
+        if (!cancelled) {
+          setContent({ posts: [], events: [], faq: [], loaded: true, error: true });
+        }
       });
     return () => { cancelled = true; };
   }, [endpoint]);
@@ -509,7 +522,7 @@ function useContent(endpoint) {
   return content;
 }
 
-function Calendar({ events }) {
+function Calendar({ events, loading }) {
   // Show the current month, dynamically. Today is highlighted.
   const now = new Date();
   const year = now.getFullYear();
@@ -578,7 +591,9 @@ function Calendar({ events }) {
 
       <div className="cal-upcoming">
         <div className="cal-upcoming-label">{formatEventDate(selectedDate)}</div>
-        {selectedEvents.length === 0 ? (
+        {loading ? (
+          <div className="cal-empty">Loading schedule...</div>
+        ) : selectedEvents.length === 0 ? (
           <div className="cal-empty">No events scheduled for this day.</div>
         ) : selectedEvents.map((e, i) => {
           const type = String(e.type || "event").toLowerCase();
@@ -600,7 +615,9 @@ function Calendar({ events }) {
 
       <div className="cal-month-list">
         <div className="cal-upcoming-label">This month</div>
-        {monthEvents.length === 0 ? (
+        {loading ? (
+          <div className="cal-empty">Loading monthly schedule...</div>
+        ) : monthEvents.length === 0 ? (
           <div className="cal-empty">No events listed for {monthLabel}.</div>
         ) : monthEvents.map((e, i) => {
           const dateKey = eventDateKey(e);
@@ -623,7 +640,7 @@ function Calendar({ events }) {
 }
 
 // --- Updates feed (Twitter/X style) ---
-function Feed({ posts }) {
+function Feed({ posts, loading }) {
   return (
     <div className="card feed">
       <div className="card-head">
@@ -631,7 +648,9 @@ function Feed({ posts }) {
         <span className="card-meta">@slamES</span>
       </div>
       <div className="feed-list">
-        {posts.length === 0 ? (
+        {loading ? (
+          <div className="cal-empty">Loading updates...</div>
+        ) : posts.length === 0 ? (
           <div className="cal-empty">No updates yet.</div>
         ) : posts.map((p, i) => {
           const accent = (p.accent || "").toLowerCase() === "lime" ? "lime"
@@ -812,17 +831,19 @@ function AskQuestionForm({ endpoint, faq }) {
   );
 }
 
-function QA({ faq, endpoint }) {
+function QA({ faq, endpoint, loading }) {
   const [open, setOpen] = useState(0);
   const visibleFaq = faq.slice(0, 3);
   return (
     <div className="card qa">
       <div className="card-head">
         <span className="card-eyebrow">Q&amp;A</span>
-        <span className="card-meta">{visibleFaq.length} shown</span>
+        <span className="card-meta">{loading ? "loading" : `${visibleFaq.length} shown`}</span>
       </div>
       <div className="qa-list">
-        {visibleFaq.map((item, i) => {
+        {loading ? (
+          <div className="cal-empty">Loading answers...</div>
+        ) : visibleFaq.map((item, i) => {
           const isOpen = open === i;
           return (
             <div key={i} className={`qa-item ${isOpen ? "open" : ""}`}>
@@ -849,7 +870,8 @@ function QA({ faq, endpoint }) {
 }
 
 function WhatsHappening({ endpoint }) {
-  const { posts, events, faq } = useContent(endpoint);
+  const { posts, events, faq, loaded } = useContent(endpoint);
+  const loading = !loaded;
   return (
     <section className="happening" data-screen-label="02 Happening">
       <div className="happening-head">
@@ -857,9 +879,9 @@ function WhatsHappening({ endpoint }) {
         <p className="happening-sub">Schedules · Updates · Answers</p>
       </div>
       <div className="happening-grid">
-        <Calendar events={events} />
-        <Feed posts={posts} />
-        <QA faq={faq} endpoint={endpoint} />
+        <Calendar events={events} loading={loading} />
+        <Feed posts={posts} loading={loading} />
+        <QA faq={faq} endpoint={endpoint} loading={loading} />
       </div>
     </section>
   );
