@@ -383,12 +383,12 @@ function Footer() {
 // ---------------------------------------------------------------------------
 
 const DEFAULT_EVENTS = [
-  { date: "2026-05-27", type: "practice", title: "Basketball · Grades 3-5", time: "5:30 PM · Gym B" },
-  { date: "2026-05-29", type: "game",     title: "Soccer Friday Night Lights", time: "6:00 PM · East Field" },
-  { date: "2026-06-02", type: "practice", title: "T-Ball · Grades K-2", time: "4:30 PM · Field 1" },
-  { date: "2026-06-05", type: "event",    title: "Family BBQ + Skills Day", time: "11:00 AM · Park Pavilion" },
-  { date: "2026-06-10", type: "game",     title: "Championship — Spring League", time: "7:00 PM · Center Court" },
-  { date: "2026-06-14", type: "event",    title: "Summer Camp Kickoff", time: "9:00 AM · Main Gym" },
+  { date: "2026-05-27", type: "practice", sport: "Basketball", title: "Basketball · Grades 3-5", time: "5:30 PM · Gym B" },
+  { date: "2026-05-29", type: "game", sport: "Soccer", title: "Soccer Friday Night Lights", time: "6:00 PM · East Field" },
+  { date: "2026-06-02", type: "practice", sport: "Baseball", title: "T-Ball · Grades K-2", time: "4:30 PM · Field 1" },
+  { date: "2026-06-05", type: "event", sport: "Other", title: "Family BBQ + Skills Day", time: "11:00 AM · Park Pavilion" },
+  { date: "2026-06-10", type: "game", sport: "Basketball", title: "Championship — Spring League", time: "7:00 PM · Center Court" },
+  { date: "2026-06-14", type: "event", sport: "Other", title: "Summer Camp Kickoff", time: "9:00 AM · Main Gym" },
 ];
 
 const DEFAULT_POSTS = [
@@ -431,7 +431,7 @@ const DEFAULT_FAQ = [
 ];
 
 function getEventIcon(event) {
-  const title = String(event?.title || "").toLowerCase();
+  const title = `${event?.sport || ""} ${event?.title || ""}`.toLowerCase();
   const type = String(event?.type || "event").toLowerCase();
 
   if (title.includes("basketball")) return "🏀";
@@ -441,6 +441,8 @@ function getEventIcon(event) {
   if (title.includes("football")) return "🏈";
   if (title.includes("volleyball")) return "🏐";
   if (title.includes("tennis")) return "🎾";
+  if (title.includes("cross country")) return "👟";
+  if (title.includes("cheer")) return "📣";
   if (title.includes("swim")) return "🏊";
   if (title.includes("track") || title.includes("running")) return "🏃";
   if (title.includes("camp")) return "⛺";
@@ -478,12 +480,14 @@ function getEventSport(event) {
   const text = `${event?.sport || ""} ${event?.title || ""}`.toLowerCase();
   if (text.includes("basketball") || text.includes("hoops")) return "basketball";
   if (text.includes("soccer") || text.includes("futsal")) return "soccer";
+  if (text.includes("track")) return "track";
+  if (text.includes("cross country") || text.includes("xc")) return "cross-country";
+  if (text.includes("cheer")) return "cheer";
+  if (text.includes("volleyball")) return "volleyball";
   if (text.includes("t-ball") || text.includes("tball") || text.includes("baseball")) return "baseball";
   if (text.includes("softball")) return "softball";
   if (text.includes("football") || text.includes("flag")) return "football";
-  if (text.includes("volleyball")) return "volleyball";
   if (text.includes("tennis")) return "tennis";
-  if (text.includes("track") || text.includes("running")) return "track";
   if (text.includes("swim")) return "swim";
   return "other";
 }
@@ -492,12 +496,14 @@ function sportLabel(sport) {
   return {
     basketball: "Basketball",
     soccer: "Soccer",
+    track: "Track and Field",
+    "cross-country": "Cross Country",
+    cheer: "Cheer",
     baseball: "Baseball",
     softball: "Softball",
     football: "Football",
     volleyball: "Volleyball",
     tennis: "Tennis",
-    track: "Track",
     swim: "Swim",
     other: "Other",
   }[sport] || sport;

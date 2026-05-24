@@ -50,9 +50,38 @@ endpoint. Add these tabs to the Google Sheet:
 
 **Events**
 
-| Date | Type | Title | Time |
-|---|---|---|---|
-| 2026-05-27 | practice | Basketball · Grades 3-5 | 5:30 PM · Gym B |
+| Date | Type | Sport | Title | Time | Location | Opponent | Notes |
+|---|---|---|---|---|---|---|---|
+| 2026-05-27 | practice | Basketball | Basketball · Grades 3-5 | 5:30 PM | Gym B |  | Bring water |
+| 2026-05-30 | game | Soccer | SLAM vs. Pinecrest Cadence | 9:00 AM | East Field | Pinecrest Cadence |  |
+
+Use `Type` for what kind of schedule item it is:
+
+| Type |
+|---|
+| event |
+| practice |
+| game |
+
+Use `Sport` for the sport category. The Apps Script adds a dropdown for:
+
+| Sport |
+|---|
+| Basketball |
+| Soccer |
+| Track and Field |
+| Cross Country |
+| Cheer |
+| Volleyball |
+| Flag Football |
+| Baseball |
+| Softball |
+| Tennis |
+| Other |
+
+The website reads `Sport` directly for the Games filter. If `Sport` is blank,
+it will still try to infer the sport from the title, but the cleanest setup is
+to fill in both `Type` and `Sport` on every Events row.
 
 **Posts**
 

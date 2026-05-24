@@ -10,7 +10,7 @@
  *   Timestamp | Email | Source | User Agent
  *
  * Optional content tabs:
- *   Events: Date | Type | Title | Time
+ *   Events: Date | Type | Sport | Title | Time | Location | Opponent | Notes
  *   Posts:  Name | Handle | Time | Body | Accent
  *   FAQ:    Question | Answer | Keywords
  *
@@ -28,6 +28,20 @@ var EVENTS_SHEET_NAME = 'Events';
 var POSTS_SHEET_NAME = 'Posts';
 var FAQ_SHEET_NAME = 'FAQ';
 var QUESTIONS_SHEET_NAME = 'Questions';
+var EVENT_TYPES = ['event', 'practice', 'game'];
+var SPORTS = [
+  'Basketball',
+  'Soccer',
+  'Track and Field',
+  'Cross Country',
+  'Cheer',
+  'Volleyball',
+  'Flag Football',
+  'Baseball',
+  'Softball',
+  'Tennis',
+  'Other'
+];
 // ---------------------------------------------------------------------------
 
 function doPost(e) {
@@ -135,16 +149,60 @@ function _spreadsheet() {
 }
 
 function _events(ss) {
+  _ensureEventsSheet(ss);
   return _rows(ss, EVENTS_SHEET_NAME).map(function (row) {
+    var time = String(row.time || '').trim();
+    var location = String(row.location || '').trim();
     return {
       date: _dateKey(row.date),
       type: String(row.type || 'event').trim(),
+      sport: String(row.sport || '').trim(),
       title: String(row.title || '').trim(),
-      time: String(row.time || '').trim()
+      time: location && time.indexOf(location) === -1 ? time + ' · ' + location : time,
+      location: location,
+      opponent: String(row.opponent || '').trim(),
+      notes: String(row.notes || '').trim()
     };
   }).filter(function (event) {
     return event.date && event.title;
   });
+}
+
+function _ensureEventsSheet(ss) {
+  var headers = ['Date', 'Type', 'Sport', 'Title', 'Time', 'Location', 'Opponent', 'Notes'];
+  var sheet = ss.getSheetByName(EVENTS_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(EVENTS_SHEET_NAME);
+    sheet.appendRow(headers);
+    sheet.appendRow([
+      new Date(),
+      'practice',
+      'Basketball',
+      'Basketball Skills Practice',
+      '5:30 PM',
+      'Gym B',
+      '',
+      'Example row - edit or delete'
+    ]);
+  }
+
+  _ensureHeaders(sheet, headers);
+  sheet.getRange(1, 1, 1, sheet.getLastColumn()).setFontWeight('bold');
+  sheet.setFrozenRows(1);
+
+  var typeRule = SpreadsheetApp.newDataValidation()
+    .requireValueInList(EVENT_TYPES, true)
+    .setAllowInvalid(false)
+    .build();
+  var sportRule = SpreadsheetApp.newDataValidation()
+    .requireValueInList(SPORTS, true)
+    .setAllowInvalid(false)
+    .build();
+
+  var typeColumn = _headerColumn(sheet, 'Type');
+  var sportColumn = _headerColumn(sheet, 'Sport');
+  if (typeColumn) sheet.getRange(2, typeColumn, Math.max(200, sheet.getMaxRows() - 1), 1).setDataValidation(typeRule);
+  if (sportColumn) sheet.getRange(2, sportColumn, Math.max(200, sheet.getMaxRows() - 1), 1).setDataValidation(sportRule);
 }
 
 function _posts(ss) {
@@ -194,6 +252,29 @@ function _ensureFaqSheet(ss) {
     sheet.getRange(1, 1, 1, lastColumn + 1).setFontWeight('bold');
     sheet.setFrozenRows(1);
   }
+}
+
+function _ensureHeaders(sheet, headers) {
+  var lastColumn = Math.max(1, sheet.getLastColumn());
+  var existing = sheet.getRange(1, 1, 1, lastColumn).getValues()[0].map(function (header) {
+    return String(header).trim().toLowerCase();
+  });
+
+  headers.forEach(function (header) {
+    if (existing.indexOf(header.toLowerCase()) === -1) {
+      sheet.getRange(1, sheet.getLastColumn() + 1).setValue(header);
+      existing.push(header.toLowerCase());
+    }
+  });
+}
+
+function _headerColumn(sheet, headerName) {
+  var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  var needle = String(headerName).trim().toLowerCase();
+  for (var i = 0; i < headers.length; i++) {
+    if (String(headers[i]).trim().toLowerCase() === needle) return i + 1;
+  }
+  return 0;
 }
 
 function _rows(ss, sheetName) {
