@@ -659,7 +659,107 @@ function Feed({ posts }) {
 }
 
 // --- Q&A ---
-function QA({ faq }) {
+function AskQuestionForm({ endpoint }) {
+  const [form, setForm] = useState({ name: "", email: "", question: "" });
+  const [status, setStatus] = useState({ kind: "idle", msg: "" });
+
+  function update(field, value) {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  }
+
+  async function submit(e) {
+    e.preventDefault();
+    const question = form.question.trim();
+    const email = form.email.trim().toLowerCase();
+
+    if (question.length < 8) {
+      setStatus({ kind: "error", msg: "Add a little more detail first." });
+      return;
+    }
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setStatus({ kind: "error", msg: "That email does not look right." });
+      return;
+    }
+
+    setStatus({ kind: "sending", msg: "Sending..." });
+
+    try {
+      const key = "slam_parent_questions";
+      const prev = JSON.parse(localStorage.getItem(key) || "[]");
+      prev.push({
+        name: form.name.trim(),
+        email,
+        question,
+        at: new Date().toISOString(),
+      });
+      localStorage.setItem(key, JSON.stringify(prev.slice(-50)));
+    } catch (_) {}
+
+    if (!endpoint) {
+      setStatus({ kind: "success", msg: "Saved locally for now." });
+      setForm({ name: "", email: "", question: "" });
+      return;
+    }
+
+    try {
+      const fd = new FormData();
+      fd.append("action", "question");
+      fd.append("name", form.name.trim());
+      fd.append("email", email);
+      fd.append("question", question);
+      fd.append("ua", navigator.userAgent);
+      await fetch(endpoint, { method: "POST", body: fd, mode: "no-cors" });
+      setStatus({ kind: "success", msg: "Question sent. We will follow up soon." });
+      setForm({ name: "", email: "", question: "" });
+    } catch (_) {
+      setStatus({ kind: "error", msg: "Could not reach the sheet. Saved locally." });
+    }
+  }
+
+  return (
+    <form className="ask-form" onSubmit={submit}>
+      <div className="ask-head">
+        <div className="ask-title">Ask a question</div>
+        <div className="ask-sub">We will use new questions to keep this FAQ fresh.</div>
+      </div>
+      <div className="ask-row">
+        <input
+          className="ask-input"
+          value={form.name}
+          onChange={(e) => update("name", e.target.value)}
+          placeholder="Your name"
+          autoComplete="name"
+        />
+        <input
+          className="ask-input"
+          type="email"
+          value={form.email}
+          onChange={(e) => update("email", e.target.value)}
+          placeholder="Email (optional)"
+          autoComplete="email"
+        />
+      </div>
+      <textarea
+        className="ask-textarea"
+        value={form.question}
+        onChange={(e) => update("question", e.target.value)}
+        placeholder="What would you like to know?"
+        rows={3}
+        required
+      />
+      <div className="ask-actions">
+        <button className="ask-submit" type="submit" disabled={status.kind === "sending"}>
+          {status.kind === "sending" ? "Sending..." : "Send question"}
+        </button>
+        <span className={`ask-status ${status.kind}`} role="status" aria-live="polite">
+          {status.msg}
+        </span>
+      </div>
+    </form>
+  );
+}
+
+function QA({ faq, endpoint }) {
   const [open, setOpen] = useState(0);
   return (
     <div className="card qa">
@@ -689,6 +789,7 @@ function QA({ faq }) {
           );
         })}
       </div>
+      <AskQuestionForm endpoint={endpoint} />
     </div>
   );
 }
@@ -704,7 +805,7 @@ function WhatsHappening({ endpoint }) {
       <div className="happening-grid">
         <Calendar events={events} />
         <Feed posts={posts} />
-        <QA faq={faq} />
+        <QA faq={faq} endpoint={endpoint} />
       </div>
     </section>
   );

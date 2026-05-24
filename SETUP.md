@@ -66,6 +66,12 @@ endpoint. Add these tabs to the Google Sheet:
 |---|---|
 | What ages do you serve? | Kindergarten through 5th grade. |
 
+Parent questions submitted from the website are saved automatically in a
+**Questions** tab:
+
+| Timestamp | Name | Email | Question | User Agent |
+|---|---|---|---|---|
+
 After editing `apps-script.gs`, deploy a new Apps Script version so the website
 uses the updated content endpoint.
 

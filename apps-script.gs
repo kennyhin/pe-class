@@ -13,6 +13,9 @@
  *   Events: Date | Type | Title | Time
  *   Posts:  Name | Handle | Time | Body | Accent
  *   FAQ:    Question | Answer
+ *
+ * Questions columns (created automatically on first parent question):
+ *   Timestamp | Name | Email | Question | User Agent
  */
 
 // ---- CONFIG ---------------------------------------------------------------
@@ -24,16 +27,17 @@ var SHEET_NAME = 'Signups';
 var EVENTS_SHEET_NAME = 'Events';
 var POSTS_SHEET_NAME = 'Posts';
 var FAQ_SHEET_NAME = 'FAQ';
+var QUESTIONS_SHEET_NAME = 'Questions';
 // ---------------------------------------------------------------------------
 
 function doPost(e) {
   try {
-    var ss = SHEET_ID
-      ? SpreadsheetApp.openById(SHEET_ID)
-      : SpreadsheetApp.getActiveSpreadsheet();
+    var ss = _spreadsheet();
+    var params = (e && e.parameter) || {};
+    var action = String(params.action || '').trim().toLowerCase();
 
-    if (!ss) {
-      return _json({ ok: false, error: 'No spreadsheet bound. Open the sheet first, then Extensions → Apps Script.' });
+    if (action === 'question') {
+      return _saveQuestion(ss, params);
     }
 
     var sheet = ss.getSheetByName(SHEET_NAME);
@@ -44,7 +48,6 @@ function doPost(e) {
       sheet.setFrozenRows(1);
     }
 
-    var params = (e && e.parameter) || {};
     var email = String(params.email || '').trim().toLowerCase();
     var source = String(params.source || 'landing').trim();
     var ua = String(params.ua || '').trim();
@@ -68,6 +71,28 @@ function doPost(e) {
   } catch (err) {
     return _json({ ok: false, error: String(err) });
   }
+}
+
+function _saveQuestion(ss, params) {
+  var question = String(params.question || '').trim();
+  var name = String(params.name || '').trim();
+  var email = String(params.email || '').trim().toLowerCase();
+  var ua = String(params.ua || '').trim();
+
+  if (question.length < 8) {
+    return _json({ ok: false, error: 'Question is too short' });
+  }
+
+  var sheet = ss.getSheetByName(QUESTIONS_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(QUESTIONS_SHEET_NAME);
+    sheet.appendRow(['Timestamp', 'Name', 'Email', 'Question', 'User Agent']);
+    sheet.getRange('A1:E1').setFontWeight('bold');
+    sheet.setFrozenRows(1);
+  }
+
+  sheet.appendRow([new Date(), name, email, question, ua]);
+  return _json({ ok: true });
 }
 
 function doGet(e) {
