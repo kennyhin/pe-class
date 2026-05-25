@@ -1067,6 +1067,8 @@ textarea {
   font-size: 14px;
   font-weight: 800;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 .pin-pad button {
   font-family: var(--font-display);
@@ -1191,12 +1193,17 @@ textarea {
   text-transform: uppercase;
 }
 .staff-status.error { color: var(--slam-red); }
+.photo-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 4px;
+}
 .photo-picker {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 44px;
-  margin-top: 4px;
   border: 1px dashed rgba(128,255,0,0.38);
   border-radius: 13px;
   background: rgba(128,255,0,0.07);
@@ -1207,6 +1214,8 @@ textarea {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 .photo-picker input {
   position: absolute;
@@ -1608,6 +1617,7 @@ textarea {
   .staff-lock, .staff-form { padding: 22px 16px 16px; }
   .staff-lock h3, .staff-form h3 { font-size: 28px; }
   .staff-choice-grid { grid-template-columns: 1fr; }
+  .photo-actions { grid-template-columns: 1fr; }
   .staff-actions { align-items: stretch; flex-direction: column; }
   .staff-primary, .staff-secondary { width: 100%; }
   .qa-q { gap: 10px; font-size: 13.5px; }

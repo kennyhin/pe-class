@@ -135,12 +135,9 @@ function _savePost(ss, params) {
   }
   if (!date) date = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
   if (!handle) handle = '@slamES';
-  if (imageData) {
-    image = _savePostImage(imageData, imageName, imageType);
-  }
 
   var sheet = _ensurePostLikeSheet(ss, POSTS_SHEET_NAME, false);
-  _appendByHeaders(sheet, {
+  var rowNumber = _appendByHeaders(sheet, {
     Name: name,
     Handle: handle,
     Body: body,
@@ -149,6 +146,14 @@ function _savePost(ss, params) {
     Link: link,
     Image: image
   });
+  if (imageData) {
+    try {
+      image = _savePostImage(imageData, imageName, imageType);
+      _setByHeader(sheet, rowNumber, 'Image', image);
+    } catch (imageErr) {
+      _setByHeader(sheet, rowNumber, 'Image', '');
+    }
+  }
   return _json({ ok: true });
 }
 
@@ -389,6 +394,12 @@ function _appendByHeaders(sheet, valuesByHeader) {
     return match ? valuesByHeader[match] : '';
   });
   sheet.appendRow(row);
+  return sheet.getLastRow();
+}
+
+function _setByHeader(sheet, rowNumber, headerName, value) {
+  var column = _headerColumn(sheet, headerName);
+  if (column) sheet.getRange(rowNumber, column).setValue(value);
 }
 
 function _rows(ss, sheetName) {

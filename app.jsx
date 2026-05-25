@@ -1080,6 +1080,21 @@ function StaffPostModal({ endpoint, onClose }) {
       .finally(() => setPhotoBusy(false));
   }
 
+  function pinButton(label, action) {
+    return (
+      <button
+        key={label}
+        type="button"
+        onPointerDown={(e) => {
+          e.preventDefault();
+          action();
+        }}
+      >
+        {label}
+      </button>
+    );
+  }
+
   function submit(e) {
     if (e) e.preventDefault();
     if (!endpoint || submitting) return;
@@ -1125,12 +1140,10 @@ function StaffPostModal({ endpoint, onClose }) {
               {[0, 1, 2, 3].map((i) => <span key={i} className={i < pin.length ? "on" : ""} />)}
             </div>
             <div className="pin-pad">
-              {[1,2,3,4,5,6,7,8,9].map((digit) => (
-                <button key={digit} type="button" onClick={() => pressDigit(String(digit))}>{digit}</button>
-              ))}
-              <button type="button" onClick={() => setPin("")}>Clear</button>
-              <button type="button" onClick={() => pressDigit("0")}>0</button>
-              <button type="button" onClick={onClose}>Cancel</button>
+              {[1,2,3,4,5,6,7,8,9].map((digit) => pinButton(digit, () => pressDigit(String(digit))))}
+              {pinButton("Clear", () => setPin(""))}
+              {pinButton("0", () => pressDigit("0"))}
+              {pinButton("Cancel", onClose)}
             </div>
             {status && <div className="staff-status error">{status}</div>}
           </div>
@@ -1188,10 +1201,16 @@ function StaffPostModal({ endpoint, onClose }) {
                 <label className="staff-label">Photo link (optional)
                   <input className="staff-input" value={form.image} onChange={(e) => update("image", e.target.value)} placeholder="Shared photo URL" />
                 </label>
-                <label className="photo-picker">
-                  <input type="file" accept="image/*" onChange={choosePhoto} />
-                  <span>{form.imageData ? "Change photo" : "Add photo"}</span>
-                </label>
+                <div className="photo-actions">
+                  <label className="photo-picker">
+                    <input type="file" accept="image/*" onChange={choosePhoto} />
+                    <span>{form.imageData ? "Change photo" : "Choose photo"}</span>
+                  </label>
+                  <label className="photo-picker">
+                    <input type="file" accept="image/*" capture="environment" onChange={choosePhoto} />
+                    <span>Take photo</span>
+                  </label>
+                </div>
                 {photoBusy && <div className="staff-status">Preparing photo...</div>}
                 {form.imageData && (
                   <img className="photo-preview" src={form.imageData} alt="Selected update preview" />
