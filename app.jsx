@@ -1024,7 +1024,7 @@ function StaffPostModal({ endpoint, onClose }) {
   }
 
   function submit(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!endpoint || submitting) return;
     setSubmitting(true);
     setStatus("Posting update...");
@@ -1043,8 +1043,8 @@ function StaffPostModal({ endpoint, onClose }) {
     fetch(endpoint, { method: "POST", body, mode: "no-cors" })
       .then(() => {
         try { localStorage.removeItem("slam_content_cache"); } catch (_) {}
-        setStatus("Posted. Refreshing feed...");
-        setTimeout(() => window.location.reload(), 900);
+        setStatus("Post sent. It may take a moment to appear in the feed.");
+        setTimeout(onClose, 1400);
       })
       .catch((err) => {
         setSubmitting(false);
@@ -1075,7 +1075,7 @@ function StaffPostModal({ endpoint, onClose }) {
             {status && <div className="staff-status error">{status}</div>}
           </div>
         ) : (
-          <form className="staff-form" onSubmit={submit}>
+          <form className="staff-form" onSubmit={(e) => e.preventDefault()}>
             <div className="staff-kicker">New update</div>
             {step < 2 && (
               <>
@@ -1136,7 +1136,7 @@ function StaffPostModal({ endpoint, onClose }) {
               {step < 4 ? (
                 <button className="staff-primary" type="button" onClick={nextStep}>Next</button>
               ) : (
-                <button className="staff-primary" type="submit" disabled={submitting}>Post update</button>
+                <button className="staff-primary" type="button" onClick={submit} disabled={submitting}>Post update</button>
               )}
             </div>
           </form>
