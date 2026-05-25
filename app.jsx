@@ -267,7 +267,7 @@ function SignupForm({ endpoint, accent }) {
 function Nav() {
   const [open, setOpen] = useState(false);
   const items = [
-    ["Register for sports", "#register"],
+    ["Register for sports", "slam-register.html"],
     ["Athletic eligibility", "#eligibility"],
     ["Sports physicals/insurance", "#physicals"],
     ["Bulls commitment", "#commitment"],
