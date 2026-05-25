@@ -14,8 +14,8 @@ body { overflow-x: hidden; }
 /* ============== NAV ============== */
 .side-nav {
   position: absolute;
-  top: 24px;
-  left: 24px;
+  top: 0;
+  right: 0;
   z-index: 30;
   width: 232px;
   padding: 16px 16px 18px;
@@ -24,7 +24,7 @@ body { overflow-x: hidden; }
   gap: 0;
   background: linear-gradient(180deg, rgba(218,0,22,0.94), rgba(150,0,16,0.94));
   border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 0 0 18px 0;
+  border-radius: 0 31px 0 18px;
   box-shadow: 0 24px 70px rgba(0,0,0,0.38);
 }
 .side-nav a {
@@ -167,7 +167,7 @@ body { overflow-x: hidden; }
 
 .hero-inner {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   max-width: 980px;
 }
 
@@ -917,110 +917,6 @@ body { overflow-x: hidden; }
 }
 .post-stats span:hover { color: var(--slam-white); }
 
-.shoutout-form {
-  margin-top: 8px;
-  padding: 14px;
-  border: 1px solid rgba(128,255,0,0.18);
-  border-radius: 16px;
-  background: linear-gradient(135deg, rgba(128,255,0,0.095), rgba(255,255,255,0.035));
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.shoutout-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.shoutout-title {
-  color: var(--slam-white);
-  font-family: var(--font-sans);
-  font-size: 13.5px;
-  font-weight: 800;
-}
-.shoutout-sub {
-  margin-top: 2px;
-  color: var(--fg-dim);
-  font-family: var(--font-sans);
-  font-size: 12px;
-}
-.shoutout-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  background: rgba(10,10,10,0.48);
-  border: 1px solid rgba(255,255,255,0.08);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  font-size: 20px;
-}
-.shoutout-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-.shoutout-input,
-.shoutout-textarea {
-  width: 100%;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 10px;
-  background: rgba(0,0,0,0.25);
-  color: var(--fg);
-  font-family: var(--font-sans);
-  font-size: 13px;
-  outline: none;
-  padding: 10px 11px;
-}
-.shoutout-input:focus,
-.shoutout-textarea:focus {
-  border-color: rgba(128,255,0,0.5);
-  box-shadow: 0 0 0 3px rgba(128,255,0,0.12);
-}
-.shoutout-textarea {
-  min-height: 84px;
-  resize: vertical;
-}
-.shoutout-input option {
-  background: var(--slam-black);
-  color: var(--fg);
-}
-.shoutout-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.shoutout-submit {
-  appearance: none;
-  -webkit-appearance: none;
-  border: none;
-  border-radius: 999px;
-  background: var(--slam-lime);
-  color: var(--slam-black);
-  cursor: pointer;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  padding: 10px 13px;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-.shoutout-submit:disabled { opacity: 0.65; cursor: wait; }
-.shoutout-status {
-  min-width: 0;
-  color: var(--fg-dim);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.06em;
-  line-height: 1.35;
-  text-transform: uppercase;
-}
-.shoutout-status.success { color: var(--slam-lime); }
-.shoutout-status.error { color: var(--slam-red); }
-
 /* ---- Q&A ---- */
 .qa-list {
   display: flex;
@@ -1324,9 +1220,6 @@ body { overflow-x: hidden; }
   .post { gap: 10px; }
   .post-avatar { width: 34px; height: 34px; font-size: 20px; border-radius: 10px; }
   .post-date { width: 100%; margin-left: 0; }
-  .shoutout-row { grid-template-columns: 1fr; }
-  .shoutout-actions { align-items: stretch; flex-direction: column; }
-  .shoutout-submit { width: 100%; }
   .qa-q { gap: 10px; font-size: 13.5px; }
   .qa-a { padding-right: 0; }
   .ask-row { grid-template-columns: 1fr; }

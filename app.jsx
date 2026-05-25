@@ -314,6 +314,7 @@ function Hero({ bg, endpoint }) {
   return (
     <section className="hero" id="top" data-screen-label="01 Hero">
       <HeroBackground variant={bg} />
+      <Nav />
       <div className="hero-inner hero-center">
         <div className="welcome-eyebrow">Welcome to</div>
 
@@ -878,106 +879,7 @@ function Calendar({ events, loading }) {
 }
 
 // --- Updates feed (Twitter/X style) ---
-function ShoutoutForm({ endpoint }) {
-  const [form, setForm] = useState({ name: "", sport: "Basketball", body: "" });
-  const [status, setStatus] = useState({ kind: "idle", msg: "" });
-
-  function update(field, value) {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  }
-
-  async function submit(e) {
-    e.preventDefault();
-    const name = form.name.trim();
-    const body = form.body.trim();
-    if (name.length < 2) {
-      setStatus({ kind: "error", msg: "Add a name first." });
-      return;
-    }
-    if (body.length < 8) {
-      setStatus({ kind: "error", msg: "Add a little more to the shoutout." });
-      return;
-    }
-
-    setStatus({ kind: "sending", msg: "Sending..." });
-
-    try {
-      const key = "slam_parent_shoutouts";
-      const prev = JSON.parse(localStorage.getItem(key) || "[]");
-      prev.push({ ...form, name, body, at: new Date().toISOString() });
-      localStorage.setItem(key, JSON.stringify(prev.slice(-50)));
-    } catch (_) {}
-
-    if (!endpoint) {
-      setStatus({ kind: "success", msg: "Saved locally for review." });
-      setForm({ name: "", sport: form.sport, body: "" });
-      return;
-    }
-
-    try {
-      const fd = new FormData();
-      fd.append("action", "shoutout");
-      fd.append("name", name);
-      fd.append("sport", form.sport);
-      fd.append("body", body);
-      await fetch(endpoint, { method: "POST", body: fd, mode: "no-cors" });
-      setStatus({ kind: "success", msg: "Shoutout sent for review." });
-      setForm({ name: "", sport: form.sport, body: "" });
-    } catch (_) {
-      setStatus({ kind: "error", msg: "Could not reach the sheet. Saved locally." });
-    }
-  }
-
-  return (
-    <form className="shoutout-form" onSubmit={submit}>
-      <div className="shoutout-head">
-        <div>
-          <div className="shoutout-title">Parent shoutout</div>
-          <div className="shoutout-sub">Send a quick win for review.</div>
-        </div>
-        <div className="shoutout-icon" aria-hidden="true">📣</div>
-      </div>
-      <div className="shoutout-row">
-        <input
-          className="shoutout-input"
-          value={form.name}
-          onChange={(e) => update("name", e.target.value)}
-          placeholder="Name"
-          autoComplete="name"
-          required
-        />
-        <select
-          className="shoutout-input"
-          value={form.sport}
-          onChange={(e) => update("sport", e.target.value)}
-          aria-label="Sport"
-        >
-          {SPORT_OPTIONS.map((sport) => (
-            <option key={sport} value={sport}>{sport}</option>
-          ))}
-        </select>
-      </div>
-      <textarea
-        className="shoutout-textarea"
-        value={form.body}
-        onChange={(e) => update("body", e.target.value)}
-        placeholder="Shoutout"
-        rows={3}
-        required
-      />
-      <div className="shoutout-actions">
-        <button className="shoutout-submit" type="submit" disabled={status.kind === "sending"}>
-          {status.kind === "sending" ? "Sending..." : "Send shoutout"}
-        </button>
-        <span className={`shoutout-status ${status.kind}`} role="status" aria-live="polite">
-          {status.msg}
-        </span>
-      </div>
-    </form>
-  );
-}
-
-function Feed({ posts, loading, endpoint }) {
+function Feed({ posts, loading }) {
   const sortedPosts = [...posts].sort(sortPostsByDate);
   return (
     <div className="card feed">
@@ -1014,7 +916,6 @@ function Feed({ posts, loading, endpoint }) {
           );
         })}
       </div>
-      <ShoutoutForm endpoint={endpoint} />
     </div>
   );
 }
@@ -1063,7 +964,7 @@ function findFaqMatches(question, faq) {
 }
 
 function AskQuestionForm({ endpoint, faq }) {
-  const [form, setForm] = useState({ name: "", email: "", question: "" });
+  const [form, setForm] = useState({ email: "", question: "" });
   const [status, setStatus] = useState({ kind: "idle", msg: "" });
   const matches = findFaqMatches(form.question, faq);
 
@@ -1080,7 +981,7 @@ function AskQuestionForm({ endpoint, faq }) {
       setStatus({ kind: "error", msg: "Add a little more detail first." });
       return;
     }
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setStatus({ kind: "error", msg: "That email does not look right." });
       return;
     }
@@ -1091,7 +992,7 @@ function AskQuestionForm({ endpoint, faq }) {
       const key = "slam_parent_questions";
       const prev = JSON.parse(localStorage.getItem(key) || "[]");
       prev.push({
-        name: form.name.trim(),
+        name: "",
         email,
         question,
         at: new Date().toISOString(),
@@ -1101,20 +1002,20 @@ function AskQuestionForm({ endpoint, faq }) {
 
     if (!endpoint) {
       setStatus({ kind: "success", msg: "Saved locally for now." });
-      setForm({ name: "", email: "", question: "" });
+      setForm({ email: "", question: "" });
       return;
     }
 
     try {
       const fd = new FormData();
       fd.append("action", "question");
-      fd.append("name", form.name.trim());
+      fd.append("name", "");
       fd.append("email", email);
       fd.append("question", question);
       fd.append("ua", navigator.userAgent);
       await fetch(endpoint, { method: "POST", body: fd, mode: "no-cors" });
       setStatus({ kind: "success", msg: "Question sent. We will follow up soon." });
-      setForm({ name: "", email: "", question: "" });
+      setForm({ email: "", question: "" });
     } catch (_) {
       setStatus({ kind: "error", msg: "Could not reach the sheet. Saved locally." });
     }
@@ -1126,23 +1027,15 @@ function AskQuestionForm({ endpoint, faq }) {
         <div className="ask-title">Ask a question</div>
         <div className="ask-sub">We will use new questions to keep this FAQ fresh.</div>
       </div>
-      <div className="ask-row">
-        <input
-          className="ask-input"
-          value={form.name}
-          onChange={(e) => update("name", e.target.value)}
-          placeholder="Your name"
-          autoComplete="name"
-        />
-        <input
-          className="ask-input"
-          type="email"
-          value={form.email}
-          onChange={(e) => update("email", e.target.value)}
-          placeholder="Email (optional)"
-          autoComplete="email"
-        />
-      </div>
+      <input
+        className="ask-input"
+        type="email"
+        value={form.email}
+        onChange={(e) => update("email", e.target.value)}
+        placeholder="Email"
+        autoComplete="email"
+        required
+      />
       <textarea
         className="ask-textarea"
         value={form.question}
@@ -1227,7 +1120,7 @@ function WhatsHappening({ endpoint }) {
         <p className="happening-sub">Schedules · Updates · Answers</p>
       </div>
       <div className="happening-grid">
-        <Feed posts={posts} loading={loading} endpoint={endpoint} />
+        <Feed posts={posts} loading={loading} />
         <Calendar events={events} loading={loading} />
         <QA faq={faq} endpoint={endpoint} loading={loading} />
       </div>
@@ -1244,7 +1137,6 @@ function App() {
 
   return (
     <div className="page">
-      <Nav />
       <Hero bg={t.heroBg} endpoint={t.signupEndpoint} />
       <WhatsHappening endpoint={t.signupEndpoint} />
 
