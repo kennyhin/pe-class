@@ -801,13 +801,12 @@ function Calendar({ events, loading }) {
         })}
       </div>
 
-      <div className="cal-upcoming">
-        <div className="cal-upcoming-label">{formatEventDate(selectedDate)}</div>
-        {loading ? (
-          <LoadingState label="Loading schedule..." />
-        ) : selectedEvents.length === 0 ? (
-          <div className="cal-empty">No events scheduled for this day.</div>
-        ) : selectedEvents.map((e, i) => {
+      {(loading || selectedEvents.length > 0) && (
+        <div className="cal-upcoming">
+          <div className="cal-upcoming-label">{formatEventDate(selectedDate)}</div>
+          {loading ? (
+            <LoadingState label="Loading schedule..." />
+          ) : selectedEvents.map((e, i) => {
           const type = eventType(e);
           const icon = getEventIcon(e);
           return (
@@ -822,8 +821,9 @@ function Calendar({ events, loading }) {
               </div>
             </div>
           );
-        })}
-      </div>
+          })}
+        </div>
+      )}
 
       <div className="cal-month-list">
         <div className="cal-section-head">
