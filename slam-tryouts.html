@@ -14,16 +14,17 @@
     .brand img { width:72px; height:auto; filter:drop-shadow(0 8px 18px rgba(0,0,0,.35)); }
     h1 { margin:0; font:44px/.9 Impact,"Arial Black",sans-serif; text-transform:uppercase; letter-spacing:.02em; }
     .back { color:#80FF00; font:800 12px monospace; letter-spacing:.1em; text-decoration:none; text-transform:uppercase; white-space:nowrap; }
-    .notice { display:grid; grid-template-columns:1.05fr 1fr; gap:18px; padding:22px 24px; border-bottom:1px solid rgba(255,255,255,.08); background:linear-gradient(135deg,rgba(128,255,0,.09),rgba(218,0,22,.12)); }
-    .notice-card { border:1px solid rgba(255,255,255,.13); border-radius:18px; padding:18px; background:rgba(0,0,0,.28); }
-    .notice-card strong { display:block; color:#fff; font:28px/.95 Impact,"Arial Black",sans-serif; text-transform:uppercase; }
-    .notice-card p, .notice-card li { color:#d5d5d5; line-height:1.45; }
-    .notice-card ul { margin:10px 0 0; padding-left:18px; }
+    .notice { padding:14px 24px; border-bottom:1px solid rgba(255,255,255,.08); background:linear-gradient(135deg,rgba(128,255,0,.07),rgba(218,0,22,.1)); }
+    .notice-card { border:1px solid rgba(255,255,255,.11); border-radius:16px; padding:14px 16px; background:rgba(0,0,0,.24); }
+    .notice-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px 18px; }
+    .notice-card p, .notice-card li { color:#d5d5d5; line-height:1.35; font-size:13px; }
+    .notice-card ul { margin:8px 0 0; padding-left:18px; }
     .notice-card a { color:#80FF00; font-weight:800; text-decoration-thickness:2px; text-underline-offset:3px; }
-    .notice-kicker { color:#80FF00; font:900 12px monospace; letter-spacing:.12em; text-transform:uppercase; margin-bottom:8px; }
+    .notice-kicker { color:#80FF00; font:900 11px monospace; letter-spacing:.12em; text-transform:uppercase; margin-bottom:6px; }
     .main { display:grid; grid-template-columns: minmax(0, 1fr) 300px; gap:0; }
     .stage { padding:34px; min-height:620px; }
     .rail { border-left:1px solid rgba(255,255,255,.1); background:rgba(0,0,0,.2); padding:24px; }
+    .rail-toggle { display:none; }
     .progress { display:grid; grid-template-columns:repeat(9,1fr); gap:6px; margin:0 0 18px; max-width:640px; }
     .progress i { height:7px; border-radius:999px; background:rgba(255,255,255,.1); }
     .progress i.on { background:#80FF00; box-shadow:0 0 18px rgba(128,255,0,.38); }
@@ -59,7 +60,7 @@
     .summary b { display:block; color:#fff; font-size:12px; text-transform:uppercase; margin-bottom:3px; }
     .status { margin-top:14px; color:#80FF00; font:800 12px monospace; text-transform:uppercase; }
     .hidden { display:none; }
-    @media (max-width:850px){ .page{padding:10px}.notice,.main{grid-template-columns:1fr}.rail{border-left:0;border-top:1px solid rgba(255,255,255,.1)}.choices,.fields,.clearance-grid{grid-template-columns:1fr}.stage{padding:22px;min-height:auto}.question{font-size:34px}.top{align-items:flex-start}.brand img{width:58px}h1{font-size:34px}.notice{padding:18px}.notice-card strong{font-size:24px} }
+    @media (max-width:850px){ .page{padding:10px}.main{grid-template-columns:1fr}.notice{padding:8px 10px}.notice-grid{grid-template-columns:1fr;gap:5px}.notice-card{padding:9px 11px}.notice-kicker{font-size:10px;margin-bottom:3px}.notice-card ul{margin:4px 0 0;padding-left:16px}.notice-card li{font-size:11px;line-height:1.22}.rail{border-left:0;border-top:1px solid rgba(255,255,255,.1);padding:0;background:rgba(0,0,0,.18)}.rail-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;border:0;background:rgba(255,255,255,.04);color:#fff;padding:13px 18px;font:900 12px monospace;letter-spacing:.12em;text-transform:uppercase}.rail-toggle:after{content:">";color:#80FF00;transition:transform .18s ease}.rail.open .rail-toggle:after{transform:rotate(90deg)}.rail .step,.rail .summary{display:none}.rail.open .step,.rail.open .summary{display:grid}.rail .step{padding:14px 18px 0;margin:0}.rail .summary{padding:12px 18px 18px;gap:7px}.summary div{font-size:12px;padding-bottom:7px}.choices,.fields,.clearance-grid{grid-template-columns:1fr}.stage{padding:18px;min-height:auto}.question{font-size:34px}.top{align-items:flex-start;padding:14px 16px}.brand img{width:48px}h1{font-size:34px} }
   </style>
 </head>
 <body>
@@ -74,24 +75,23 @@
       </div>
       <div class="notice">
         <div class="notice-card">
-          <div class="notice-kicker">Before you start</div>
-          <strong>One form per sport</strong>
-          <p>A separate form must be completed for each sport in which your student participates.</p>
-        </div>
-        <div class="notice-card">
-          <div class="notice-kicker">Required for tryouts</div>
-          <ul>
-            <li>Sports Physical OR click the waiver option at the end.</li>
-            <li>Form here: <a href="https://www.ncsaasports.com/physicals.html" target="_blank" rel="noopener">NCSAA physicals</a></li>
-            <li>Schedule one here: <a href="https://www.cvs.com/minuteclinic/services/sports-physicals" target="_blank" rel="noopener">CVS MinuteClinic</a></li>
-          </ul>
-          <div class="notice-kicker" style="margin-top:16px;color:#ff6b76">Students are ineligible if</div>
-          <ul>
-            <li>Unpaid fees</li>
-            <li>Chronically absent</li>
-            <li>RPC / suspension</li>
-            <li>Expired sports physical / unsigned waiver</li>
-          </ul>
+          <div class="notice-grid">
+            <div>
+              <div class="notice-kicker">Required for tryouts</div>
+              <ul>
+                <li>One form per sport.</li>
+                <li>Sports physical OR waiver option at the end.</li>
+                <li><a href="https://www.ncsaasports.com/physicals.html" target="_blank" rel="noopener">Physical form</a> · <a href="https://www.cvs.com/minuteclinic/services/sports-physicals" target="_blank" rel="noopener">Schedule physical</a></li>
+              </ul>
+            </div>
+            <div>
+              <div class="notice-kicker" style="color:#ff6b76">Students are ineligible if</div>
+              <ul>
+                <li>Unpaid fees, chronic absence, RPC / suspension.</li>
+                <li>Expired physical or unsigned waiver.</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
       <div class="main">
@@ -106,7 +106,8 @@
           </div>
           <div class="status" id="status"></div>
         </div>
-        <aside class="rail">
+        <aside class="rail" id="rail">
+          <button class="rail-toggle" id="railToggle" type="button" aria-expanded="false">Current form</button>
           <div class="step">Current form</div>
           <div class="summary" id="summary"></div>
         </aside>
@@ -292,6 +293,11 @@
     }
     $('nextBtn').addEventListener('click', next);
     $('backBtn').addEventListener('click', back);
+    $('railToggle').addEventListener('click', function(){
+      var rail = $('rail');
+      var open = rail.classList.toggle('open');
+      this.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
     render();
   </script>
 </body>

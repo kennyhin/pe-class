@@ -1170,32 +1170,40 @@ body { overflow-x: hidden; }
 }
 @media (max-width: 520px) {
   .side-nav {
-    margin: 10px 10px 0;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: min(172px, calc(100% - 20px));
+    margin: 0;
     grid-template-columns: 1fr;
-    padding: 10px 12px;
+    padding: 6px 8px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(218,0,22,0.86), rgba(140,0,15,0.86));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
   }
   .side-nav-toggle {
     appearance: none;
     -webkit-appearance: none;
     width: 100%;
-    min-height: 46px;
+    min-height: 34px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     border: 0;
-    border-bottom: 1.5px dashed rgba(255,255,255,0.42);
+    border-bottom: 1px dashed rgba(255,255,255,0.35);
     background: transparent;
     color: var(--slam-white);
     cursor: pointer;
     font-family: var(--font-display);
-    font-size: 22px;
+    font-size: 14px;
     font-weight: 800;
     line-height: 1;
     text-transform: uppercase;
   }
   .side-nav-toggle i {
-    width: 26px;
-    height: 26px;
+    width: 22px;
+    height: 22px;
     border-radius: 999px;
     background: rgba(10,10,10,0.72);
     position: relative;
@@ -1208,7 +1216,7 @@ body { overflow-x: hidden; }
     align-items: center;
     justify-content: center;
     font-family: var(--font-mono);
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 900;
     transition: transform var(--dur-fast) var(--ease-snap);
   }
@@ -1216,14 +1224,15 @@ body { overflow-x: hidden; }
     transform: rotate(90deg);
   }
   .side-nav-logo { justify-content: center !important; padding: 10px 0 !important; }
-  .side-nav-logo img { width: 58px; margin: 0 auto; }
+  .side-nav-logo img { width: 42px; margin: 0 auto; }
   .side-nav:not(.open) .side-nav-logo,
   .side-nav:not(.open) a:not(.side-nav-logo) {
     display: none;
   }
   .side-nav a:not(.side-nav-logo) {
-    font-size: 16px;
-    min-height: 34px;
+    font-size: 12px;
+    min-height: 28px;
+    padding: 6px 0;
   }
   .hero { margin: 12px 10px 0; padding: 42px 16px 48px; min-height: 68vh; border-radius: 18px; }
   .welcome-eyebrow { margin-bottom: 20px; }
