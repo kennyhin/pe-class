@@ -11,7 +11,7 @@
  *
  * Optional content tabs:
  *   Events: Date | Type | Sport | Title | Time | Location | Opponent | Notes
- *   Posts:  Date | Sport | Name | Handle | Body | Link | Image
+ *   Posts:  Name | Handle | Body | Time | Accent | Date | Sport | Link | Image
  *   FAQ:    Question | Answer | Keywords | Link
  *
  * Questions columns (created automatically on first parent question):
@@ -126,16 +126,39 @@ function _savePost(ss, params) {
   var sport = String(params.sport || '').trim();
   var link = String(params.link || '').trim();
   var image = String(params.image || '').trim();
+  var imageData = String(params.imageData || '').trim();
+  var imageName = String(params.imageName || 'slam-update.jpg').trim();
+  var imageType = String(params.imageType || 'image/jpeg').trim();
 
   if (!name || !body || body.length < 3) {
     return _json({ ok: false, error: 'Name and message are required' });
   }
   if (!date) date = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
   if (!handle) handle = '@slamES';
+  if (imageData) {
+    image = _savePostImage(imageData, imageName, imageType);
+  }
 
   var sheet = _ensurePostLikeSheet(ss, POSTS_SHEET_NAME, false);
-  sheet.appendRow([date, sport, name, handle, body, link, image]);
+  _appendByHeaders(sheet, {
+    Name: name,
+    Handle: handle,
+    Body: body,
+    Date: date,
+    Sport: sport,
+    Link: link,
+    Image: image
+  });
   return _json({ ok: true });
+}
+
+function _savePostImage(imageData, imageName, imageType) {
+  var base64 = imageData.indexOf(',') === -1 ? imageData : imageData.split(',').pop();
+  var bytes = Utilities.base64Decode(base64);
+  var safeName = String(imageName || 'slam-update.jpg').replace(/[^\w.\-]+/g, '-');
+  var file = DriveApp.createFile(Utilities.newBlob(bytes, imageType || 'image/jpeg', 'slam-update-' + Date.now() + '-' + safeName));
+  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  return 'https://drive.google.com/uc?export=view&id=' + file.getId();
 }
 
 function doGet(e) {
@@ -259,18 +282,21 @@ function _ensurePostsSheet(ss) {
 }
 
 function _ensurePostLikeSheet(ss, sheetName, addExample) {
-  var headers = ['Date', 'Sport', 'Name', 'Handle', 'Body', 'Link', 'Image'];
+  var headers = ['Name', 'Handle', 'Body', 'Time', 'Accent', 'Date', 'Sport', 'Link', 'Image'];
   var sheet = ss.getSheetByName(sheetName);
   if (!sheet) {
     sheet = ss.insertSheet(sheetName);
     sheet.appendRow(headers);
     if (addExample) {
       sheet.appendRow([
-        new Date(),
-        'Basketball',
         'SLAM! Athletics',
         '@slamES',
         'Summer camp registration opens Monday.',
+        '',
+        '',
+        new Date(),
+        'Basketball',
+        '',
         ''
       ]);
     }
@@ -351,6 +377,18 @@ function _headerColumn(sheet, headerName) {
     if (String(headers[i]).trim().toLowerCase() === needle) return i + 1;
   }
   return 0;
+}
+
+function _appendByHeaders(sheet, valuesByHeader) {
+  var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  var row = headers.map(function (header) {
+    var key = String(header).trim().toLowerCase();
+    var match = Object.keys(valuesByHeader).filter(function (name) {
+      return name.toLowerCase() === key;
+    })[0];
+    return match ? valuesByHeader[match] : '';
+  });
+  sheet.appendRow(row);
 }
 
 function _rows(ss, sheetName) {

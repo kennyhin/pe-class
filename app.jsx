@@ -930,6 +930,11 @@ function Feed({ posts, loading, endpoint }) {
                   {dateLabel && <span className="post-date">{dateLabel}</span>}
                 </div>
                 <p className="post-text">{linkifyText(p.body)}</p>
+                {p.image && (
+                  <a className="post-image-link" href={p.image} target="_blank" rel="noopener noreferrer" aria-label="Open update photo">
+                    <img className="post-image" src={p.image} alt="" loading="lazy" />
+                  </a>
+                )}
                 {link && (
                   <a className="post-cta" href={link} target="_blank" rel="noopener noreferrer">
                     Open link <Icon name="arrow-right" size={13} />
@@ -968,6 +973,7 @@ function StaffPostModal({ endpoint, onClose }) {
   const [step, setStep] = useState(0);
   const [status, setStatus] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [photoBusy, setPhotoBusy] = useState(false);
   const [form, setForm] = useState({
     name: "",
     handle: "",
@@ -976,6 +982,9 @@ function StaffPostModal({ endpoint, onClose }) {
     sport: "",
     link: "",
     image: "",
+    imageData: "",
+    imageName: "",
+    imageType: "",
   });
 
   const steps = [
@@ -1023,6 +1032,54 @@ function StaffPostModal({ endpoint, onClose }) {
     setStep((current) => Math.min(current + 1, 4));
   }
 
+  function compressPhoto(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          const size = Math.min(img.width, img.height);
+          const sx = Math.round((img.width - size) / 2);
+          const sy = Math.round((img.height - size) / 2);
+          const canvas = document.createElement("canvas");
+          canvas.width = 640;
+          canvas.height = 640;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, sx, sy, size, size, 0, 0, 640, 640);
+          resolve(canvas.toDataURL("image/jpeg", 0.72));
+        };
+        img.onerror = reject;
+        img.src = reader.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function choosePhoto(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    if (!file.type || !file.type.startsWith("image/")) {
+      setStatus("Choose an image file.");
+      return;
+    }
+    setPhotoBusy(true);
+    setStatus("Compressing photo...");
+    compressPhoto(file)
+      .then((dataUrl) => {
+        setForm((current) => ({
+          ...current,
+          image: "",
+          imageData: dataUrl,
+          imageName: file.name || "slam-update.jpg",
+          imageType: "image/jpeg",
+        }));
+        setStatus("Photo ready.");
+      })
+      .catch(() => setStatus("Could not prepare that photo. Try a different image."))
+      .finally(() => setPhotoBusy(false));
+  }
+
   function submit(e) {
     if (e) e.preventDefault();
     if (!endpoint || submitting) return;
@@ -1038,6 +1095,9 @@ function StaffPostModal({ endpoint, onClose }) {
     body.append("sport", form.sport);
     body.append("link", form.link.trim());
     body.append("image", form.image.trim());
+    body.append("imageData", form.imageData);
+    body.append("imageName", form.imageName);
+    body.append("imageType", form.imageType);
     body.append("ua", navigator.userAgent);
 
     fetch(endpoint, { method: "POST", body, mode: "no-cors" })
@@ -1128,6 +1188,14 @@ function StaffPostModal({ endpoint, onClose }) {
                 <label className="staff-label">Photo link (optional)
                   <input className="staff-input" value={form.image} onChange={(e) => update("image", e.target.value)} placeholder="Shared photo URL" />
                 </label>
+                <label className="photo-picker">
+                  <input type="file" accept="image/*" onChange={choosePhoto} />
+                  <span>{form.imageData ? "Change photo" : "Add photo"}</span>
+                </label>
+                {photoBusy && <div className="staff-status">Preparing photo...</div>}
+                {form.imageData && (
+                  <img className="photo-preview" src={form.imageData} alt="Selected update preview" />
+                )}
               </>
             )}
             {status && <div className={`staff-status ${status.toLowerCase().includes("could") || status.toLowerCase().includes("choose") || status.toLowerCase().includes("add") || status.toLowerCase().includes("write") ? "error" : ""}`}>{status}</div>}
