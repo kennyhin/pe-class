@@ -437,7 +437,7 @@ const SPORT_OPTIONS = [
 ];
 
 const DEFAULT_FAQ = [
-  { q: "What ages do you serve?", a: "Kindergarten through 5th grade (ages 5-11). Programs are split by age band so kids play with peers their own size and skill level." },
+  { q: "What ages do you serve?", a: "Kindergarten through 5th grade (ages 5-11). Programs are split by age band so kids play with peers their own size and skill level.", link: "" },
   { q: "How much does it cost?", a: "Most seasons run $240 for 8 weeks (1 practice + 1 game per week). Scholarships available — just ask." },
   { q: "Are coaches certified?", a: "Every coach is CPR + first-aid certified, background-checked, and trained on our developmental model." },
   { q: "What if my kid has never played before?", a: "Perfect. That's exactly who we built this for. Every program starts with fundamentals — running, throwing, catching, sportsmanship. No experience required." },
@@ -1160,7 +1160,12 @@ function QA({ faq, endpoint, loading }) {
                 </span>
               </button>
               <div className="qa-a-wrap" style={{ maxHeight: isOpen ? 400 : 0 }}>
-                <p className="qa-a">{item.a}</p>
+                <p className="qa-a">{linkifyText(item.a)}</p>
+                {item.link && (
+                  <a className="qa-link" href={item.link} target="_blank" rel="noopener noreferrer">
+                    Open link <Icon name="arrow-right" size={13} />
+                  </a>
+                )}
               </div>
             </div>
           );

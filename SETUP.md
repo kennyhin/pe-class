@@ -105,9 +105,9 @@ can copy an approved row straight into the Posts tab:
 
 **FAQ**
 
-| Question | Answer | Keywords |
-|---|---|---|
-| When does soccer season start? | Soccer season starts in September. | soccer, season, start, fall |
+| Question | Answer | Keywords | Link |
+|---|---|---|---|
+| When does soccer season start? | Soccer season starts in September. | soccer, season, start, fall | https://example.com/soccer |
 
 The page only shows the first 3 FAQ rows in the Q&A accordion, but the
 question form searches every FAQ row for possible answers. It checks the

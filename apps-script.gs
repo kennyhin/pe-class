@@ -12,7 +12,7 @@
  * Optional content tabs:
  *   Events: Date | Type | Sport | Title | Time | Location | Opponent | Notes
  *   Posts:  Date | Sport | Name | Handle | Body | Link
- *   FAQ:    Question | Answer | Keywords
+ *   FAQ:    Question | Answer | Keywords | Link
  *
  * Questions columns (created automatically on first parent question):
  *   Timestamp | Name | Email | Question | User Agent
@@ -289,7 +289,8 @@ function _faq(ss) {
     return {
       q: String(row.question || row.q || '').trim(),
       a: String(row.answer || row.a || '').trim(),
-      keywords: String(row.keywords || '').trim()
+      keywords: String(row.keywords || '').trim(),
+      link: String(row.link || row.url || '').trim()
     };
   }).filter(function (item) {
     return item.q && item.a;
@@ -300,8 +301,8 @@ function _ensureFaqSheet(ss) {
   var sheet = ss.getSheetByName(FAQ_SHEET_NAME);
   if (!sheet) {
     sheet = ss.insertSheet(FAQ_SHEET_NAME);
-    sheet.appendRow(['Question', 'Answer', 'Keywords']);
-    sheet.getRange('A1:C1').setFontWeight('bold');
+    sheet.appendRow(['Question', 'Answer', 'Keywords', 'Link']);
+    sheet.getRange('A1:D1').setFontWeight('bold');
     sheet.setFrozenRows(1);
     return;
   }
@@ -314,6 +315,11 @@ function _ensureFaqSheet(ss) {
   if (headers.indexOf('keywords') === -1) {
     sheet.getRange(1, lastColumn + 1).setValue('Keywords');
     sheet.getRange(1, 1, 1, lastColumn + 1).setFontWeight('bold');
+    sheet.setFrozenRows(1);
+  }
+  if (headers.indexOf('link') === -1) {
+    sheet.getRange(1, sheet.getLastColumn() + 1).setValue('Link');
+    sheet.getRange(1, 1, 1, sheet.getLastColumn()).setFontWeight('bold');
     sheet.setFrozenRows(1);
   }
 }
