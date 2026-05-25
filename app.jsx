@@ -265,6 +265,7 @@ function SignupForm({ endpoint, accent }) {
 // Sections
 // ---------------------------------------------------------------------------
 function Nav() {
+  const [open, setOpen] = useState(false);
   const items = [
     ["Register for sports", "#register"],
     ["Athletic eligibility", "#eligibility"],
@@ -275,7 +276,16 @@ function Nav() {
     ["Coach for SLAM!", "#coach"],
   ];
   return (
-    <nav className="side-nav" aria-label="Athletics navigation">
+    <nav className={`side-nav ${open ? "open" : ""}`} aria-label="Athletics navigation">
+      <button
+        className="side-nav-toggle"
+        type="button"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+      >
+        <span>Menu</span>
+        <i aria-hidden="true" />
+      </button>
       <a className="side-nav-logo" href="slam.html" aria-label="SLAM! Athletics home">
         <img src="assets/bull-only-transparent.png" alt="SLAM! Athletics bull" />
       </a>
