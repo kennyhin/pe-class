@@ -268,7 +268,7 @@ function Nav() {
   const [open, setOpen] = useState(false);
   const items = [
     ["Register for sports", "slam-register.html"],
-    ["Athletic eligibility", "#eligibility"],
+    ["Athletic eligibility", "slam-eligibility.html"],
     ["Sports physicals/insurance", "#physicals"],
     ["Bulls commitment", "#commitment"],
     ["Sports offered", "#sports"],
