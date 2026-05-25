@@ -395,6 +395,12 @@ body { overflow-x: hidden; }
   text-transform: uppercase;
   color: var(--fg-dim);
 }
+.card-link {
+  color: var(--slam-lime);
+  font-weight: 800;
+  text-decoration: none;
+}
+.card-link:hover { text-decoration: underline; }
 
 /* ---- Calendar ---- */
 .cal-dow {
@@ -472,11 +478,30 @@ body { overflow-x: hidden; }
 }
 .cal-upcoming-label {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--fg-dim);
+  color: var(--slam-white);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.cal-upcoming-label::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--slam-lime);
+  box-shadow: 0 0 14px rgba(128,255,0,0.45);
+}
+.cal-games-list .cal-section-head {
+  border-color: rgba(218,0,22,0.22);
+  background: linear-gradient(90deg, rgba(218,0,22,0.12), rgba(255,255,255,0.035));
+}
+.cal-games-list .cal-upcoming-label::before {
+  background: var(--slam-red);
+  box-shadow: 0 0 14px rgba(218,0,22,0.45);
 }
 .cal-event {
   display: flex;
@@ -579,6 +604,10 @@ body { overflow-x: hidden; }
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 2px;
+  padding: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.035);
 }
 .cal-section-sub {
   margin-top: 4px;
@@ -691,6 +720,14 @@ body { overflow-x: hidden; }
   display: flex;
   flex-direction: column;
   gap: 10px;
+  max-height: 340px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.feed-list::-webkit-scrollbar { width: 6px; }
+.feed-list::-webkit-scrollbar-thumb {
+  background: rgba(128,255,0,0.35);
+  border-radius: 999px;
 }
 .post {
   display: flex;

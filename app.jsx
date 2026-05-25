@@ -784,7 +784,6 @@ function Calendar({ events, loading }) {
         <div className="cal-section-head">
           <div>
             <div className="cal-upcoming-label">Upcoming events</div>
-            <div className="cal-section-sub">Next 7 days</div>
           </div>
           <div className="cal-filter" aria-label="Filter upcoming events">
             {[
@@ -812,9 +811,6 @@ function Calendar({ events, loading }) {
         <div className="cal-section-head">
           <div>
             <div className="cal-upcoming-label">Games</div>
-            <div className="cal-section-sub">
-              {gamesNextWeek} game{gamesNextWeek === 1 ? "" : "s"} in the next 7 days
-            </div>
           </div>
           <div className="cal-filter" aria-label="Filter games by sport">
             {renderFilterButton("games", "all", "All sports", gameSport === "all", () => setGameSport("all"))}
@@ -1141,6 +1137,7 @@ function QA({ faq, endpoint, loading }) {
     <div className="card qa">
       <div className="card-head">
         <span className="card-eyebrow">Q and A</span>
+        <a className="card-meta card-link" href="slam-faq.html">View all</a>
       </div>
       <div className="qa-list">
         {loading ? (
