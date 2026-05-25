@@ -271,7 +271,7 @@ function Nav() {
     ["Sports physicals/insurance", "#physicals"],
     ["Bulls commitment", "#commitment"],
     ["Sports offered", "#sports"],
-    ["Tryouts", "#tryouts"],
+    ["Tryouts", "slam-tryouts.html"],
     ["Coach for SLAM!", "#coach"],
   ];
   return (

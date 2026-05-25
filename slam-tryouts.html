@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SLAM! Athletics Tryouts</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin:0; background:#050505; color:#f5f5f5; font-family:Arial,Helvetica,sans-serif; }
+    .page { min-height:100vh; padding:22px; background:radial-gradient(circle at 70% 10%, rgba(128,255,0,.08), transparent 32%), #050505; }
+    .shell { max-width:1180px; margin:0 auto; border:1px solid rgba(255,255,255,.14); border-radius:24px; overflow:hidden; background:linear-gradient(180deg,rgba(24,24,24,.95),rgba(10,10,10,.98)); box-shadow:0 24px 80px rgba(0,0,0,.4); }
+    .top { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:20px 24px; border-bottom:1px solid rgba(218,0,22,.35); background:linear-gradient(90deg,rgba(218,0,22,.2),rgba(255,255,255,.03)); }
+    .brand { display:flex; align-items:center; gap:14px; min-width:0; }
+    .brand img { width:72px; height:auto; filter:drop-shadow(0 8px 18px rgba(0,0,0,.35)); }
+    h1 { margin:0; font:44px/.9 Impact,"Arial Black",sans-serif; text-transform:uppercase; letter-spacing:.02em; }
+    .back { color:#80FF00; font:800 12px monospace; letter-spacing:.1em; text-decoration:none; text-transform:uppercase; white-space:nowrap; }
+    .main { display:grid; grid-template-columns: minmax(0, 1fr) 300px; gap:0; }
+    .stage { padding:34px; min-height:620px; }
+    .rail { border-left:1px solid rgba(255,255,255,.1); background:rgba(0,0,0,.2); padding:24px; }
+    .step { color:#80FF00; font:800 12px monospace; letter-spacing:.14em; text-transform:uppercase; margin-bottom:16px; }
+    .question { max-width:680px; margin:0 0 24px; font:44px/.98 Impact,"Arial Black",sans-serif; text-transform:uppercase; }
+    .choices { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    .choice { min-height:104px; border:1px solid rgba(255,255,255,.12); border-radius:16px; background:rgba(255,255,255,.045); color:#fff; cursor:pointer; padding:18px; text-align:left; transition:.18s ease; }
+    .choice:hover, .choice.active { transform:translateY(-2px); border-color:#80FF00; box-shadow:0 0 0 3px rgba(128,255,0,.12); }
+    .choice b { display:block; font:28px/.95 Impact,"Arial Black",sans-serif; text-transform:uppercase; }
+    .choice span { display:block; color:#aaa; margin-top:8px; line-height:1.35; }
+    .fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; max-width:760px; }
+    label { display:flex; flex-direction:column; gap:7px; color:#aaa; font:800 11px monospace; letter-spacing:.1em; text-transform:uppercase; }
+    input, select, textarea { width:100%; border:1px solid rgba(255,255,255,.14); border-radius:12px; background:rgba(0,0,0,.28); color:#fff; font:16px Arial,Helvetica,sans-serif; padding:13px 14px; outline:none; }
+    input:focus, textarea:focus { border-color:#80FF00; box-shadow:0 0 0 3px rgba(128,255,0,.12); }
+    .waiver { max-height:320px; overflow:auto; border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:18px; color:#ddd; line-height:1.5; background:rgba(0,0,0,.24); }
+    .waiver h3 { color:#80FF00; margin:14px 0 6px; font:800 13px monospace; letter-spacing:.1em; text-transform:uppercase; }
+    .agree { margin:16px 0; display:flex; align-items:center; gap:10px; color:#fff; font-weight:800; }
+    .agree input { width:18px; height:18px; }
+    .actions { display:flex; gap:12px; margin-top:24px; }
+    .btn { border:0; border-radius:999px; padding:13px 18px; font:900 12px monospace; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; }
+    .btn.primary { background:#80FF00; color:#050505; }
+    .btn.secondary { background:rgba(255,255,255,.09); color:#fff; border:1px solid rgba(255,255,255,.14); }
+    .btn:disabled { opacity:.45; cursor:not-allowed; }
+    .summary { display:grid; gap:10px; }
+    .summary div { border-bottom:1px dashed rgba(255,255,255,.14); padding-bottom:9px; color:#bbb; font-size:13px; }
+    .summary b { display:block; color:#fff; font-size:12px; text-transform:uppercase; margin-bottom:3px; }
+    .status { margin-top:14px; color:#80FF00; font:800 12px monospace; text-transform:uppercase; }
+    .hidden { display:none; }
+    @media (max-width:850px){ .page{padding:10px}.main{grid-template-columns:1fr}.rail{border-left:0;border-top:1px solid rgba(255,255,255,.1)}.choices,.fields{grid-template-columns:1fr}.stage{padding:22px;min-height:auto}.question{font-size:34px}.top{align-items:flex-start}.brand img{width:58px}h1{font-size:34px} }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="shell">
+      <div class="top">
+        <div class="brand">
+          <img src="assets/bull-only-transparent.png" alt="SLAM! Athletics bull">
+          <h1>Tryouts</h1>
+        </div>
+        <a class="back" href="slam.html">Back to SLAM!</a>
+      </div>
+      <div class="main">
+        <div class="stage">
+          <div class="step" id="stepLabel">Question 1 / 9</div>
+          <h2 class="question" id="question">Which season are you signing up for?</h2>
+          <div id="content"></div>
+          <div class="actions">
+            <button class="btn secondary" id="backBtn" type="button">Back</button>
+            <button class="btn primary" id="nextBtn" type="button">Next</button>
+          </div>
+          <div class="status" id="status"></div>
+        </div>
+        <aside class="rail">
+          <div class="step">Current form</div>
+          <div class="summary" id="summary"></div>
+        </aside>
+      </div>
+    </section>
+  </main>
+  <script>
+    var ENDPOINT = 'https://script.google.com/macros/s/AKfycbx-a6Rgey0CuqAOTXnQp_puTWihRsclvndOBPrSwdjgbJszTfcwFC2-zXnESPguGwyu7Q/exec';
+    var SIZES = ['YXS','YS','YM','YL','YXL','Adult XS','Adult S','Adult M','Adult L','Adult XL','Adult XXL','Adult XXXL'];
+    var SPORTS = {
+      fall: {
+        label: 'Fall',
+        dates: 'August - October',
+        sports: [
+          { sport:'Flag Football', divisions:[{name:'ES 1-3', grades:['1','2','3']},{name:'ES 4-5', grades:['4','5']}] },
+          { sport:'Girls Volleyball', divisions:[{name:'ES 3-5 Girls Rec', grades:['3','4','5']},{name:'ES 3-5 Girls Competitive', grades:['3','4','5']}] },
+          { sport:'Cross Country', divisions:[{name:'ES 3-4', grades:['3','4']},{name:'ES 5', grades:['5']}] },
+          { sport:'Sideline Cheerleading', divisions:[{name:'ES K-5', grades:['K','1','2','3','4','5']}] },
+          { sport:'Baseball', divisions:[{name:'ES K-1 T-Ball', grades:['K','1']},{name:'ES 2-3 Coach Pitch Baseball', grades:['2','3']}] }
+        ]
+      },
+      winter: {
+        label: 'Winter',
+        dates: 'November - February',
+        sports: [
+          { sport:'Basketball', divisions:[{name:'ES K-5', grades:['K','1','2','3','4','5']}] },
+          { sport:'Bowling', divisions:[{name:'ES 3-5', grades:['3','4','5']}] },
+          { sport:'Sideline Cheerleading', divisions:[{name:'ES K-5', grades:['K','1','2','3','4','5']}] },
+          { sport:'Baseball', divisions:[{name:'ES 4-5 Kid Pitch Baseball', grades:['4','5']}] }
+        ]
+      },
+      spring: {
+        label: 'Spring',
+        dates: 'March - May',
+        sports: [
+          { sport:'Soccer', divisions:[{name:'ES K-5', grades:['K','1','2','3','4','5']}] },
+          { sport:'Boys Volleyball', divisions:[{name:'ES 3-5', grades:['3','4','5']}] },
+          { sport:'Cheerleading Competitions', divisions:[{name:'ES 3-5', grades:['3','4','5']}] },
+          { sport:'Track & Field', divisions:[{name:'ES 4-5', grades:['4','5']}] }
+        ]
+      }
+    };
+    var WAIVER = [
+      ['Liability waiver and release','Participation in SLAM! Athletics tryouts and programs is voluntary and involves physical activity and inherent risks, including injury. I release and hold harmless SLAM Nevada Elementary School, SLAM! Athletics, staff, coaches, volunteers, and affiliated organizations from claims or damages arising out of participation.'],
+      ['Assumption of risk','I understand athletic activities carry inherent risks including sprains, fractures, concussions, illness, and other harm. SLAM! Athletics makes no guarantee regarding placement on any team or roster.'],
+      ['Medical authorization','In an injury or medical emergency, I authorize coaching staff and/or school personnel to administer basic first aid, contact emergency services, and contact me as promptly as possible.'],
+      ['Conduct agreement','My child and I will treat coaches, athletes, officials, and spectators with respect, follow instructions, arrive prepared, and accept coaches decisions regarding team selection and roster placement.'],
+      ['Photo/video release','I grant SLAM! Athletics and SLAM Nevada Elementary School permission to photograph or record my child during tryouts and activities for educational, promotional, and social media purposes.'],
+      ['Electronic signature','By signing below, I confirm I have read and understand this waiver and consent form. I am the parent/legal guardian or authorized signer and this electronic signature is legally binding.']
+    ];
+    var steps = ['season','sport','division','grade','sizes','numbers','student','email','waiver'];
+    var data = { season:'', sport:'', division:'', grade:'', shirtSize:'', shortSize:'', jersey1:'', jersey2:'', jersey3:'', lastName:'', firstName:'', email:'', waiverAgreed:false, signature:'' };
+    var step = 0;
+    var $ = function(id){ return document.getElementById(id); };
+
+    function seasonObj(){ return SPORTS[data.season]; }
+    function sportObj(){ return (seasonObj()?.sports || []).find(function(s){ return s.sport === data.sport; }); }
+    function divisionObj(){ return (sportObj()?.divisions || []).find(function(d){ return d.name === data.division; }); }
+    function choice(label, sub, value, active) {
+      return '<button class="choice'+(active?' active':'')+'" data-value="'+esc(value)+'"><b>'+esc(label)+'</b><span>'+esc(sub||'')+'</span></button>';
+    }
+    function esc(s){ return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+    function field(name,label,type,placeholder){
+      return '<label>'+label+'<input name="'+name+'" type="'+(type||'text')+'" value="'+esc(data[name])+'" placeholder="'+(placeholder||'')+'"></label>';
+    }
+    function sizeSelect(name,label){
+      return '<label>'+label+'<select name="'+name+'">'+SIZES.map(function(s){return '<option '+(data[name]===s?'selected':'')+'>'+s+'</option>';}).join('')+'</select></label>';
+    }
+    function saveInputs(){
+      document.querySelectorAll('input,select').forEach(function(el){
+        if (el.name && el.type !== 'checkbox') data[el.name] = el.value.trim();
+        if (el.name && el.type === 'checkbox') data[el.name] = el.checked;
+      });
+    }
+    function render(){
+      var kind = steps[step], html = '';
+      $('stepLabel').textContent = 'Question ' + (step + 1) + ' / ' + steps.length;
+      $('status').textContent = '';
+      if (kind === 'season') {
+        $('question').textContent = 'Which season are you signing up for?';
+        html = '<div class="choices">' + Object.keys(SPORTS).map(function(k){return choice(SPORTS[k].label, SPORTS[k].dates, k, data.season===k);}).join('') + '</div>';
+      }
+      if (kind === 'sport') {
+        $('question').textContent = 'Which sport?';
+        html = '<div class="choices">' + seasonObj().sports.map(function(s){return choice(s.sport, s.divisions.map(function(d){return d.name;}).join(' / '), s.sport, data.sport===s.sport);}).join('') + '</div>';
+      }
+      if (kind === 'division') {
+        $('question').textContent = 'Which division?';
+        html = '<div class="choices">' + sportObj().divisions.map(function(d){return choice(d.name, 'Grades: ' + d.grades.join(', '), d.name, data.division===d.name);}).join('') + '</div>';
+      }
+      if (kind === 'grade') {
+        $('question').textContent = 'What grade?';
+        html = '<div class="choices">' + divisionObj().grades.map(function(g){return choice(g, 'Grade ' + g, g, data.grade===g);}).join('') + '</div>';
+      }
+      if (kind === 'sizes') {
+        $('question').textContent = 'Jersey sizes';
+        if (!data.shirtSize) data.shirtSize = 'YM';
+        if (!data.shortSize) data.shortSize = 'YM';
+        html = '<div class="fields">' + sizeSelect('shirtSize','Jersey shirt size') + sizeSelect('shortSize','Jersey short size') + '</div>';
+      }
+      if (kind === 'numbers') {
+        $('question').textContent = 'Pick 3 jersey number options';
+        html = '<div class="fields">' + field('jersey1','Jersey #1','number','7') + field('jersey2','Jersey #2','number','12') + field('jersey3','Jersey #3','number','24') + '</div>';
+      }
+      if (kind === 'student') {
+        $('question').textContent = 'Student name';
+        html = '<div class="fields">' + field('lastName','Student last name') + field('firstName','Student first name') + '</div>';
+      }
+      if (kind === 'email') {
+        $('question').textContent = 'Best email to communicate';
+        html = '<div class="fields">' + field('email','Email','email','parent@email.com') + '</div>';
+      }
+      if (kind === 'waiver') {
+        $('question').textContent = 'Review waiver and sign';
+        html = '<div class="waiver">' + WAIVER.map(function(w){return '<h3>'+w[0]+'</h3><p>'+w[1]+'</p>';}).join('') + '</div><label class="agree"><input type="checkbox" name="waiverAgreed" '+(data.waiverAgreed?'checked':'')+'> I have read and agree to the terms.</label><div class="fields">' + field('signature','Typed signature') + '</div>';
+      }
+      $('content').innerHTML = html;
+      document.querySelectorAll('.choice').forEach(function(btn){ btn.addEventListener('click', function(){ selectChoice(btn.dataset.value); }); });
+      $('backBtn').disabled = step === 0;
+      $('nextBtn').textContent = step === steps.length - 1 ? 'Submit' : 'Next';
+      renderSummary();
+    }
+    function selectChoice(value){
+      var kind = steps[step];
+      data[kind] = value;
+      if (kind === 'season') { data.sport=''; data.division=''; data.grade=''; }
+      if (kind === 'sport') { data.division=''; data.grade=''; }
+      if (kind === 'division') data.grade='';
+      render();
+    }
+    function valid(){
+      saveInputs();
+      var kind = steps[step];
+      if (kind === 'season') return !!data.season;
+      if (kind === 'sport') return !!data.sport;
+      if (kind === 'division') return !!data.division;
+      if (kind === 'grade') return !!data.grade;
+      if (kind === 'numbers') return data.jersey1 && data.jersey2 && data.jersey3 && new Set([data.jersey1,data.jersey2,data.jersey3]).size === 3;
+      if (kind === 'student') return data.lastName && data.firstName;
+      if (kind === 'email') return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email);
+      if (kind === 'waiver') return data.waiverAgreed && data.signature.length > 1;
+      return true;
+    }
+    function next(){
+      if (!valid()) { $('status').textContent = 'Please complete this step first.'; return; }
+      if (step < steps.length - 1) { step++; render(); return; }
+      submit();
+    }
+    function back(){ saveInputs(); if (step > 0) { step--; render(); } }
+    function submit(){
+      $('nextBtn').disabled = true; $('status').textContent = 'Submitting...';
+      var fd = new FormData();
+      fd.append('action','tryout');
+      Object.keys(data).forEach(function(k){ fd.append(k, data[k] === true ? 'yes' : data[k]); });
+      fd.append('ua', navigator.userAgent);
+      fetch(ENDPOINT, { method:'POST', body:fd, mode:'no-cors' }).then(function(){
+        $('question').textContent = 'You are signed up';
+        $('content').innerHTML = '<div class="choice active"><b>Tryout form sent</b><span>We will follow up using the email you provided.</span></div>';
+        $('nextBtn').classList.add('hidden'); $('backBtn').classList.add('hidden'); $('status').textContent = '';
+      }).catch(function(){
+        $('status').textContent = 'Could not submit. Please try again.';
+        $('nextBtn').disabled = false;
+      });
+    }
+    function renderSummary(){
+      var rows = [['Season', seasonObj()?.label], ['Sport', data.sport], ['Division', data.division], ['Grade', data.grade], ['Sizes', data.shirtSize && data.shortSize ? data.shirtSize + ' / ' + data.shortSize : ''], ['Numbers', [data.jersey1,data.jersey2,data.jersey3].filter(Boolean).join(', ')], ['Student', [data.firstName,data.lastName].filter(Boolean).join(' ')], ['Email', data.email]];
+      $('summary').innerHTML = rows.map(function(r){ return '<div><b>'+r[0]+'</b>'+esc(r[1] || 'Not selected')+'</div>'; }).join('');
+    }
+    $('nextBtn').addEventListener('click', next);
+    $('backBtn').addEventListener('click', back);
+    render();
+  </script>
+</body>
+</html>
