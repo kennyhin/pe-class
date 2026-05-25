@@ -13,52 +13,79 @@ body { overflow-x: hidden; }
 
 /* ============== NAV ============== */
 .side-nav {
-  position: fixed;
-  top: 50%;
-  right: 18px;
-  transform: translateY(-50%);
+  position: absolute;
+  top: 24px;
+  left: 24px;
   z-index: 30;
-  width: min(290px, 22vw);
+  width: 280px;
+  padding: 22px 20px 24px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0;
+  background: linear-gradient(180deg, rgba(128,255,0,0.9), rgba(91,214,92,0.9));
+  border: 1px solid rgba(10,10,10,0.18);
+  border-radius: 0 0 22px 0;
+  box-shadow: 0 24px 70px rgba(0,0,0,0.38);
 }
 .side-nav a {
-  min-height: 46px;
+  min-height: 58px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  padding: 10px 14px 10px 18px;
-  background: rgba(10,10,10,0.58);
-  border: 1px solid rgba(255,255,255,0.12);
-  color: rgba(255,255,255,0.88);
-  font-family: var(--font-mono);
-  font-size: 11px;
+  padding: 14px 0;
+  background: transparent;
+  border: none;
+  border-bottom: 2px dashed rgba(10,40,32,0.48);
+  color: rgba(10,48,39,0.95);
+  font-family: var(--font-display);
+  font-size: 28px;
   font-weight: 800;
-  letter-spacing: 0.12em;
-  line-height: 1.25;
+  letter-spacing: 0;
+  line-height: 0.9;
   text-decoration: none;
   text-transform: uppercase;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: background var(--dur-fast) var(--ease-out),
-              border-color var(--dur-fast) var(--ease-out),
-              color var(--dur-fast) var(--ease-out);
+  transition: color var(--dur-fast) var(--ease-out),
+              transform var(--dur-fast) var(--ease-snap);
+}
+.side-nav-logo {
+  min-height: 0 !important;
+  justify-content: flex-start !important;
+  border-bottom: none !important;
+  padding: 0 0 22px !important;
+}
+.side-nav-logo img {
+  width: 188px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 8px 18px rgba(0,0,0,0.22));
 }
 .side-nav a:hover {
-  background: rgba(128,255,0,0.12);
-  border-color: rgba(128,255,0,0.32);
-  color: var(--slam-lime);
+  color: var(--slam-black);
+  transform: translateX(4px);
 }
 .side-nav i {
-  width: 8px;
-  height: 8px;
+  width: 34px;
+  height: 34px;
   border-radius: 999px;
-  background: rgba(255,255,255,0.34);
+  background: rgba(10,48,39,0.82);
   flex: 0 0 auto;
+  position: relative;
 }
-.side-nav a:hover i { background: var(--slam-lime); }
+.side-nav i::before {
+  content: ">";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--slam-lime);
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 900;
+}
+.side-nav a:hover i { background: var(--slam-black); }
 
 .nav {
   position: sticky;
@@ -1197,7 +1224,34 @@ body { overflow-x: hidden; }
 
 /* ============== RESPONSIVE ============== */
 @media (max-width: 1100px) {
-  .side-nav { display: none; }
+  .side-nav {
+    position: static;
+    transform: none;
+    width: auto;
+    margin: 12px 16px 0;
+    padding: 12px;
+    border-radius: 18px;
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    align-items: start;
+    gap: 8px 12px;
+  }
+  .side-nav-logo {
+    grid-row: span 4;
+    padding: 0 !important;
+  }
+  .side-nav-logo img { width: 108px; }
+  .side-nav a:not(.side-nav-logo) {
+    min-height: 38px;
+    padding: 8px 0;
+    font-size: 19px;
+    border-bottom-width: 1.5px;
+  }
+  .side-nav i {
+    width: 26px;
+    height: 26px;
+  }
+  .side-nav i::before { font-size: 14px; }
   .happening-grid { grid-template-columns: 1fr 1fr; }
   .happening-grid .qa { grid-column: 1 / -1; }
 }
@@ -1213,6 +1267,16 @@ body { overflow-x: hidden; }
   .happening-head { flex-direction: column; align-items: flex-start; gap: 6px; }
 }
 @media (max-width: 520px) {
+  .side-nav {
+    margin: 10px 10px 0;
+    grid-template-columns: 1fr;
+  }
+  .side-nav-logo { justify-content: center !important; }
+  .side-nav-logo img { width: 128px; margin: 0 auto; }
+  .side-nav a:not(.side-nav-logo) {
+    font-size: 18px;
+    min-height: 36px;
+  }
   .hero { margin: 12px 10px 0; padding: 42px 16px 48px; min-height: 68vh; border-radius: 18px; }
   .welcome-eyebrow { margin-bottom: 20px; }
   .signup-wrap-center { max-width: 100%; margin: 28px auto 12px; }

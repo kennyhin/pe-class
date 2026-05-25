@@ -276,6 +276,9 @@ function Nav() {
   ];
   return (
     <nav className="side-nav" aria-label="Athletics navigation">
+      <a className="side-nav-logo" href="slam.html" aria-label="SLAM! Athletics home">
+        <img src="assets/slam-logo.png" alt="SLAM! Athletics" />
+      </a>
       {items.map(([label, href]) => (
         <a key={label} href={href}>
           <span>{label}</span>
