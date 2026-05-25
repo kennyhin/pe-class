@@ -6,7 +6,8 @@
   <title>SLAM! Athletics Register for Sports</title>
   <style>
     * { box-sizing:border-box; }
-    body { margin:0; background:#050505; color:#f4f4f4; font-family:Arial,Helvetica,sans-serif; }
+    body { margin:0; background:#050505; color:#f4f4f4; font-family:Arial,Helvetica,sans-serif; cursor:url("assets/football-cursor.svg") 3 3, auto; }
+    a, button { cursor:url("assets/football-cursor.svg") 3 3, pointer; }
     a { color:#80FF00; }
     .page { min-height:100vh; padding:18px; background:radial-gradient(circle at 18% 18%,rgba(128,255,0,.08),transparent 28%),radial-gradient(circle at 90% 12%,rgba(218,0,22,.12),transparent 30%),#050505; }
     .shell { max-width:1180px; margin:0 auto; border:1px solid rgba(255,255,255,.13); border-radius:26px; overflow:hidden; background:linear-gradient(180deg,rgba(24,24,24,.96),rgba(8,8,8,.99)); box-shadow:0 24px 80px rgba(0,0,0,.42); }
@@ -14,7 +15,12 @@
     .brand { display:flex; align-items:center; gap:14px; min-width:0; }
     .brand img { width:62px; filter:drop-shadow(0 8px 18px rgba(0,0,0,.35)); }
     h1 { margin:0; font:46px/.9 Impact,"Arial Black",sans-serif; text-transform:uppercase; letter-spacing:.02em; }
-    .back { color:#80FF00; font:800 12px monospace; letter-spacing:.1em; text-decoration:none; text-transform:uppercase; white-space:nowrap; }
+    .top-actions { display:flex; align-items:center; justify-content:flex-end; gap:10px; flex-wrap:wrap; }
+    .page-links { display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+    .page-links a { display:inline-flex; align-items:center; min-height:32px; padding:0 10px; border:1px solid rgba(255,255,255,.1); border-radius:999px; background:rgba(255,255,255,.045); color:#d8d8d8; font:800 10px monospace; letter-spacing:.08em; text-decoration:none; text-transform:uppercase; }
+    .page-links a:hover, .page-links a.active { border-color:rgba(128,255,0,.45); background:rgba(128,255,0,.08); color:#80FF00; }
+    .back { display:inline-flex; align-items:center; justify-content:center; min-height:38px; padding:0 14px; border:1px solid rgba(255,255,255,.14); border-radius:999px; background:rgba(255,255,255,.06); color:#fff; font:800 11px monospace; letter-spacing:.08em; text-decoration:none; text-transform:uppercase; white-space:nowrap; }
+    .back:hover { border-color:rgba(128,255,0,.38); color:#80FF00; }
     .hero { display:grid; grid-template-columns:minmax(0,1fr) 310px; gap:24px; padding:28px; border-bottom:1px solid rgba(255,255,255,.08); }
     .eyebrow { color:#80FF00; font:900 12px monospace; letter-spacing:.14em; text-transform:uppercase; margin-bottom:10px; }
     .headline { max-width:760px; font:64px/.88 Impact,"Arial Black",sans-serif; text-transform:uppercase; }
@@ -26,23 +32,20 @@
     .board:before { content:""; position:absolute; inset:0; pointer-events:none; opacity:.18; background-image:linear-gradient(90deg,transparent 48%,rgba(255,255,255,.22) 49%,transparent 51%),linear-gradient(rgba(255,255,255,.16) 1px,transparent 1px); background-size:180px 100%,100% 72px; transform:skewX(-8deg); }
     .plays { position:relative; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; }
     .play { min-height:330px; display:flex; flex-direction:column; border:1px solid rgba(255,255,255,.12); border-radius:18px; padding:18px; background:rgba(8,8,8,.76); box-shadow:inset 0 0 0 1px rgba(255,255,255,.035); }
-    .play-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
-    .number { width:48px; height:48px; display:grid; place-items:center; border-radius:999px; background:#DA0016; color:#fff; font:900 22px Impact,"Arial Black",sans-serif; box-shadow:0 0 0 4px rgba(218,0,22,.18); }
-    .route { color:#80FF00; font:900 12px monospace; letter-spacing:.12em; text-transform:uppercase; }
+    .play-head { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+    .number { width:48px; height:48px; display:grid; place-items:center; border-radius:999px; background:rgba(218,0,22,.08); border:2px solid rgba(218,0,22,.68); color:#fff; font:900 22px Impact,"Arial Black",sans-serif; box-shadow:0 0 0 4px rgba(218,0,22,.08); }
     h2 { margin:0 0 10px; font:26px/.95 Impact,"Arial Black",sans-serif; text-transform:uppercase; }
     .play p { margin:0; color:#d0d0d0; font-size:14px; line-height:1.45; }
     .play ul { margin:12px 0 0; padding-left:18px; color:#d0d0d0; font-size:13px; line-height:1.45; }
-    .play .flag { margin-top:auto; padding-top:16px; color:#80FF00; font:900 11px monospace; letter-spacing:.08em; text-transform:uppercase; }
-    .play:nth-child(even) .number { background:#80FF00; color:#050505; box-shadow:0 0 0 4px rgba(128,255,0,.18); }
-    .play:nth-child(even) .route { color:#ff5b66; }
+    .play:nth-child(even) .number { background:rgba(128,255,0,.08); border-color:rgba(128,255,0,.62); color:#80FF00; box-shadow:0 0 0 4px rgba(128,255,0,.07); }
+    .card-links { display:flex; flex-wrap:wrap; gap:8px; margin-top:auto; padding-top:16px; }
+    .card-link { display:inline-flex; align-items:center; justify-content:center; min-height:34px; border:1px solid rgba(255,255,255,.14); border-radius:999px; padding:0 12px; background:rgba(255,255,255,.055); color:#e8e8e8; font:900 10px monospace; letter-spacing:.08em; text-decoration:none; text-transform:uppercase; }
+    .card-link:hover { border-color:rgba(128,255,0,.42); color:#80FF00; }
+    .bottom-actions { display:flex; justify-content:flex-end; padding:18px 28px 28px; border-top:1px solid rgba(255,255,255,.08); }
     .arrow { position:absolute; top:188px; width:44px; height:18px; color:#80FF00; font:900 28px monospace; opacity:.86; pointer-events:none; }
     .a1 { left:23.5%; } .a2 { left:49%; transform:rotate(-4deg); } .a3 { left:74.5%; }
-    .cta { display:flex; flex-wrap:wrap; gap:12px; padding:24px 28px 30px; border-top:1px solid rgba(255,255,255,.08); }
-    .btn { display:inline-flex; align-items:center; justify-content:center; min-height:44px; border-radius:999px; padding:0 18px; background:#80FF00; color:#050505; font:900 12px monospace; letter-spacing:.08em; text-decoration:none; text-transform:uppercase; }
-    .btn.red { background:#DA0016; color:#fff; }
-    .btn.dark { background:rgba(255,255,255,.08); color:#fff; border:1px solid rgba(255,255,255,.12); }
     @media (max-width:980px){ .hero{grid-template-columns:1fr}.plays{grid-template-columns:1fr 1fr}.arrow{display:none}.play{min-height:260px}.headline{font-size:52px} }
-    @media (max-width:560px){ .page{padding:10px}.top{padding:14px 16px}.brand img{width:48px}h1{font-size:32px}.hero{padding:20px}.headline{font-size:40px}.lead{font-size:15px}.board{padding:18px}.plays{grid-template-columns:1fr}.play{min-height:0}.cta{padding:18px;flex-direction:column}.btn{width:100%} }
+    @media (max-width:560px){ .page{padding:10px}.top{padding:14px 16px;align-items:flex-start}.top-actions{width:100%;justify-content:flex-start}.page-links{justify-content:flex-start}.brand img{width:48px}h1{font-size:32px}.hero{padding:20px}.headline{font-size:40px}.lead{font-size:15px}.board{padding:18px}.plays{grid-template-columns:1fr}.play{min-height:0}.bottom-actions{padding:16px;justify-content:stretch}.back{width:100%} }
   </style>
 </head>
 <body>
@@ -53,7 +56,13 @@
           <img src="assets/bull-only-transparent.png" alt="SLAM! Athletics bull">
           <h1>Register</h1>
         </div>
-        <a class="back" href="slam.html">Back to SLAM!</a>
+        <div class="top-actions">
+          <nav class="page-links" aria-label="Athletics pages">
+            <a class="active" href="slam-register.html">Register</a>
+            <a href="slam-eligibility.html">Eligibility</a>
+            <a href="slam-tryouts.html">Tryouts</a>
+          </nav>
+        </div>
       </div>
       <section class="hero">
         <div>
@@ -69,13 +78,16 @@
       <section class="board" aria-label="Register for sports four step playbook">
         <div class="plays">
           <article class="play">
-            <div class="play-head"><span class="number">1</span><span class="route">First down</span></div>
+            <div class="play-head"><span class="number">1</span></div>
             <h2>Schedule Physical</h2>
             <p>All K-12 athletes must have a sports physical on file and uploaded to Register My Athlete to participate in tryouts, practices, and games.</p>
-            <div class="flag">Upload to RMA only</div>
+            <div class="card-links">
+              <a class="card-link" href="https://www.ncsaasports.com/physicals.html" target="_blank" rel="noopener">Physical form</a>
+              <a class="card-link" href="https://www.cvs.com/minuteclinic/services/sports-physicals" target="_blank" rel="noopener">Schedule physical</a>
+            </div>
           </article>
           <article class="play">
-            <div class="play-head"><span class="number">2</span><span class="route">Set the roster</span></div>
+            <div class="play-head"><span class="number">2</span></div>
             <h2>Register My Athlete</h2>
             <p>Create or update your Register My Athlete account before tryouts. Families may be prompted to pay a $25 fee for tryouts and participation.</p>
             <ul>
@@ -83,28 +95,31 @@
               <li>6-8: choose Middle School.</li>
               <li>9-12: no label, just the sport.</li>
             </ul>
+            <div class="card-links">
+              <a class="card-link" href="https://www.registermyathlete.com/login/" target="_blank" rel="noopener">RMA website</a>
+              <a class="card-link" href="https://www.slamnv.org/ourpages/auto/2024/11/9/34062080/SLAM%20Athletics%20-%20Parent%20RMA%20Instructions.pdf?rnd=1731195637965" target="_blank" rel="noopener">RMA instructions</a>
+            </div>
           </article>
           <article class="play">
-            <div class="play-head"><span class="number">3</span><span class="route">Verify ID</span></div>
+            <div class="play-head"><span class="number">3</span></div>
             <h2>National Sports ID</h2>
             <p>Elementary and middle school students complete National Sports ID. Families may need a birth certificate or passport, Infinite Campus screenshot, and clear student photo.</p>
-            <div class="flag">K-8 only</div>
+            <div class="card-links">
+              <a class="card-link" href="https://www.nationalsportsid.com/" target="_blank" rel="noopener">National Sports ID</a>
+            </div>
           </article>
           <article class="play">
-            <div class="play-head"><span class="number">4</span><span class="route">Finish strong</span></div>
+            <div class="play-head"><span class="number">4</span></div>
             <h2>Pay Sports Fee</h2>
             <p>Most elementary and middle school athletes have a $150 team fee per athlete per season. Pay through Infinite Campus or at the front office only if the student makes the team.</p>
-            <div class="flag">After team placement</div>
           </article>
           <div class="arrow a1">➜</div>
           <div class="arrow a2">➜</div>
           <div class="arrow a3">➜</div>
         </div>
       </section>
-      <div class="cta">
-        <a class="btn red" href="slam-tryouts.html">Start Tryout Form</a>
-        <a class="btn" href="https://www.ncsaasports.com/physicals.html" target="_blank" rel="noopener">Physical Form</a>
-        <a class="btn dark" href="https://www.cvs.com/minuteclinic/services/sports-physicals" target="_blank" rel="noopener">Schedule Physical</a>
+      <div class="bottom-actions">
+        <a class="back" href="slam.html">← Back to homepage</a>
       </div>
     </section>
   </main>

@@ -5,21 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>SLAM! Athletics FAQ</title>
   <style>
-    body { margin:0; background:#050505; color:#f5f5f5; font-family:Arial,Helvetica,sans-serif; }
+    body { margin:0; background:#050505; color:#f5f5f5; font-family:Arial,Helvetica,sans-serif; cursor:url("assets/football-cursor.svg") 3 3, auto; }
+    a, button, summary { cursor:url("assets/football-cursor.svg") 3 3, pointer; }
     .page { max-width:920px; margin:0 auto; padding:28px 16px 56px; }
     a { color:#80FF00; }
-    .side-nav { position:absolute; top:0; right:0; z-index:30; width:232px; padding:16px 16px 18px; display:flex; flex-direction:column; gap:0; background:linear-gradient(180deg,rgba(218,0,22,.94),rgba(150,0,16,.94)); border:1px solid rgba(255,255,255,.12); border-radius:0 31px 0 18px; box-shadow:0 24px 70px rgba(0,0,0,.38); }
-    .side-nav a { min-height:44px; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 0; background:transparent; border-bottom:1.5px dashed rgba(255,255,255,.42); color:rgba(255,255,255,.94); font:800 19px/.98 Impact,"Arial Black",sans-serif; text-decoration:none; text-transform:uppercase; overflow-wrap:anywhere; }
-    .side-nav a:hover { color:#80FF00; transform:translateX(4px); }
-    .side-nav-logo { min-height:0!important; justify-content:flex-start!important; border-bottom:none!important; padding:0 0 12px!important; }
-    .side-nav-logo img { width:88px; max-width:100%; height:auto; display:block; filter:drop-shadow(0 8px 18px rgba(0,0,0,.22)); }
-    .side-nav i { width:25px; height:25px; border-radius:999px; background:rgba(10,10,10,.72); flex:0 0 auto; position:relative; }
-    .side-nav i:before { content:">"; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#fff; font:900 14px monospace; }
-    .side-nav-toggle { display:none; }
-    .back { color:#80FF00; font:700 12px monospace; letter-spacing:.1em; text-decoration:none; text-transform:uppercase; }
+    .topbar { display:flex; justify-content:flex-end; margin-bottom:22px; }
+    .back { display:inline-flex; align-items:center; justify-content:center; min-height:38px; padding:0 14px; border:1px solid rgba(255,255,255,.14); border-radius:999px; background:rgba(255,255,255,.06); color:#fff; font:800 11px monospace; letter-spacing:.08em; text-decoration:none; text-transform:uppercase; white-space:nowrap; }
+    .back:hover { border-color:rgba(128,255,0,.38); color:#80FF00; }
     h1 { margin:28px 0 8px; font:64px/.9 Impact,"Arial Black",sans-serif; text-transform:uppercase; }
     h1 span { color:#80FF00; }
+    .intro { margin:0 0 24px; color:#aaa; line-height:1.45; }
     .faq { display:grid; gap:12px; }
+    .faq-group { display:grid; gap:12px; padding-top:6px; }
+    .faq-group + .faq-group { margin-top:28px; }
+    .faq-group-title { margin:0 0 2px; color:#fff; font:30px/.95 Impact,"Arial Black",sans-serif; text-transform:uppercase; letter-spacing:.02em; }
+    .faq-group-title:before { content:""; display:inline-block; width:8px; height:8px; margin-right:10px; border-radius:999px; background:#80FF00; box-shadow:0 0 12px rgba(128,255,0,.45); vertical-align:middle; }
     details { background:linear-gradient(180deg,rgba(28,28,28,.94),rgba(14,14,14,.94)); border:1px solid rgba(255,255,255,.12); border-radius:16px; overflow:hidden; }
     summary { cursor:pointer; padding:18px 20px; font-weight:800; list-style:none; }
     summary::-webkit-details-marker { display:none; }
@@ -28,46 +28,62 @@
     .faq-link { display:inline-flex; margin-top:10px; color:#80FF00; font:800 11px monospace; letter-spacing:.08em; text-transform:uppercase; text-decoration:none; }
     .empty { color:#999; padding:20px; border:1px dashed rgba(255,255,255,.18); border-radius:16px; }
     .loading { display:inline-flex; align-items:center; gap:10px; color:#999; padding:20px; border:1px dashed rgba(255,255,255,.18); border-radius:16px; font:800 11px monospace; letter-spacing:.1em; text-transform:uppercase; }
-    .spinner { width:16px; height:16px; border:2px solid rgba(255,255,255,.16); border-top-color:#80FF00; border-radius:999px; animation:spin .8s linear infinite; }
+    .spinner { width:22px; height:22px; background:url("assets/bull-only-transparent.png") center/contain no-repeat; border-radius:999px; filter:drop-shadow(0 0 8px rgba(128,255,0,.45)); animation:spin .9s linear infinite; }
     @keyframes spin { to { transform:rotate(360deg); } }
-    @media (max-width:1100px){ .side-nav{position:static; width:auto; margin:12px 16px 0; padding:10px; border-radius:18px; display:grid; grid-template-columns:82px 1fr; align-items:start; gap:8px 12px;} .side-nav-logo{grid-row:span 4; padding:0!important;} .side-nav-logo img{width:70px;} .side-nav a:not(.side-nav-logo){min-height:32px; padding:7px 0; font-size:15px; border-bottom-width:1.5px;} .side-nav i{width:22px;height:22px;} .side-nav i:before{font-size:12px;} }
-    @media (max-width:520px){ .page{padding-top:62px}.side-nav{position:absolute;top:12px;left:12px;right:auto;width:50px;margin:0;grid-template-columns:1fr;padding:5px;border-radius:16px;background:linear-gradient(180deg,rgba(218,0,22,.9),rgba(118,0,13,.9));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)} .side-nav.open{width:min(250px,calc(100% - 24px));padding:8px 10px 10px;} .side-nav-toggle{width:100%;min-height:40px;display:flex;align-items:center;justify-content:space-between;border:0;border-radius:12px;background:transparent;color:#fff;cursor:pointer;font:800 13px/1 Impact,"Arial Black",sans-serif;text-transform:uppercase;} .side-nav:not(.open) .side-nav-toggle{justify-content:center}.side-nav:not(.open) .side-nav-toggle span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.side-nav.open .side-nav-toggle{border-bottom:1px dashed rgba(255,255,255,.35);border-radius:0}.side-nav-toggle i{width:30px;height:30px;border-radius:999px;background:rgba(10,10,10,.7);position:relative;} .side-nav-toggle i:before{content:"";position:absolute;left:8px;right:8px;top:9px;height:2px;border-radius:999px;background:#fff;box-shadow:0 5px 0 #fff,0 10px 0 #fff;transition:transform .18s ease;} .side-nav.open .side-nav-toggle i:before{transform:rotate(90deg) translateX(5px);} .side-nav-logo{justify-content:center!important;padding:8px 0!important;} .side-nav-logo img{width:42px;margin:0 auto;} .side-nav:not(.open) .side-nav-logo,.side-nav:not(.open) a:not(.side-nav-logo){display:none;} .side-nav a:not(.side-nav-logo){font-size:12px;min-height:28px;padding:6px 0;} }
+    @media (max-width:520px){ .page{padding:18px 12px 42px}.topbar{justify-content:stretch}.back{width:100%}h1{font-size:46px}.faq-group-title{font-size:24px}summary{padding:16px}.answer{padding:0 16px 16px} }
   </style>
 </head>
 <body>
-  <nav class="side-nav" aria-label="Athletics navigation">
-    <button class="side-nav-toggle" type="button" aria-expanded="false"><span>Menu</span><i></i></button>
-    <a class="side-nav-logo" href="slam.html" aria-label="SLAM! Athletics home"><img src="assets/bull-only-transparent.png" alt="SLAM! Athletics bull"></a>
-    <a href="slam-register.html"><span>Register for sports</span><i></i></a>
-    <a href="slam-eligibility.html"><span>Athletic eligibility</span><i></i></a>
-    <a href="slam.html#physicals"><span>Sports physicals/insurance</span><i></i></a>
-    <a href="slam.html#commitment"><span>Bulls commitment</span><i></i></a>
-    <a href="slam.html#sports"><span>Sports offered</span><i></i></a>
-    <a href="slam-tryouts.html"><span>Tryouts</span><i></i></a>
-    <a href="slam.html#coach"><span>Coach for SLAM!</span><i></i></a>
-  </nav>
   <main class="page">
-    <a class="back" href="slam.html">← Back to SLAM!</a>
-    <h1><span>Q</span> and A</h1>
+    <div class="topbar">
+      <a class="back" href="slam.html">← Back to homepage</a>
+    </div>
+    <h1><span>Frequently</span> Asked Questions</h1>
+    <p class="intro">Answers are grouped automatically from the FAQ sheet using keywords, questions, and answer text.</p>
     <div id="faq" class="faq"><div class="loading"><span class="spinner"></span>Loading answers...</div></div>
   </main>
   <script>
-    document.querySelector('.side-nav-toggle').addEventListener('click', function(){
-      var nav = document.querySelector('.side-nav');
-      var open = nav.classList.toggle('open');
-      this.setAttribute('aria-expanded', open ? 'true' : 'false');
-    });
     var endpoint = 'https://script.google.com/macros/s/AKfycbxKWDLcTjDwwXb-rNq9LTpqQwmlGgvLHZf9kJKDG7DHqwNp6vjaXD8S4ccG_41CBMfk/exec';
+    var groups = [
+      { label:'Registration', terms:['register','rma','athlete','form','paperwork'] },
+      { label:'Tryouts', terms:['tryout','roster','team','selection'] },
+      { label:'Physicals', terms:['physical','medical','doctor','cvs'] },
+      { label:'Eligibility', terms:['eligible','absent','attendance','suspension','rpc','grades'] },
+      { label:'Fees', terms:['fee','cost','pay','payment','money'] },
+      { label:'Sports & Seasons', terms:['soccer','basketball','football','cheer','volleyball','track','season','games','practice'] },
+      { label:'General', terms:[] }
+    ];
     function esc(s){ return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
     function linkify(s){
       return esc(s).replace(/(https?:\/\/[^\s<]+)/g,function(url){
         return '<a href="'+url+'" target="_blank" rel="noopener noreferrer">'+url.replace(/^https?:\/\//,'').replace(/\/$/,'')+'</a>';
       });
     }
+    function groupFor(item){
+      var text = [item.keywords, item.q, item.question, item.a, item.answer].join(' ').toLowerCase();
+      for (var i = 0; i < groups.length - 1; i++) {
+        if (groups[i].terms.some(function(term){ return text.indexOf(term) !== -1; })) return groups[i].label;
+      }
+      return 'General';
+    }
+    function renderItem(item){
+      var q = item.q || item.question || '';
+      var a = item.a || item.answer || '';
+      return '<details><summary>'+esc(q)+'</summary><div class="answer">'+linkify(a)+(item.link ? '<br><a class="faq-link" href="'+esc(item.link)+'" target="_blank" rel="noopener noreferrer">Open link</a>' : '')+'</div></details>';
+    }
     function render(faq){
-      document.getElementById('faq').innerHTML = faq.length ? faq.map(function(item){
-        return '<details><summary>'+esc(item.q)+'</summary><div class="answer">'+linkify(item.a)+(item.link ? '<br><a class="faq-link" href="'+esc(item.link)+'" target="_blank" rel="noopener noreferrer">Open link</a>' : '')+'</div></details>';
-      }).join('') : '<div class="empty">No FAQ rows yet.</div>';
+      if (!faq.length) {
+        document.getElementById('faq').innerHTML = '<div class="empty">No FAQ rows yet.</div>';
+        return;
+      }
+      var buckets = {};
+      groups.forEach(function(group){ buckets[group.label] = []; });
+      faq.forEach(function(item){ buckets[groupFor(item)].push(item); });
+      document.getElementById('faq').innerHTML = groups.map(function(group){
+        var items = buckets[group.label];
+        if (!items.length) return '';
+        return '<section class="faq-group"><h2 class="faq-group-title">'+esc(group.label)+'</h2>'+items.map(renderItem).join('')+'</section>';
+      }).join('');
     }
     try {
       var cached = JSON.parse(localStorage.getItem('slam_content_cache') || 'null');

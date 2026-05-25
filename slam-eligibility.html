@@ -6,7 +6,8 @@
   <title>SLAM! Athletics Eligibility</title>
   <style>
     * { box-sizing:border-box; }
-    body { margin:0; background:#050505; color:#f4f4f4; font-family:Arial,Helvetica,sans-serif; }
+    body { margin:0; background:#050505; color:#f4f4f4; font-family:Arial,Helvetica,sans-serif; cursor:url("assets/football-cursor.svg") 3 3, auto; }
+    a, button { cursor:url("assets/football-cursor.svg") 3 3, pointer; }
     a { color:#80FF00; }
     .page { min-height:100vh; padding:18px; background:radial-gradient(circle at 14% 18%,rgba(128,255,0,.08),transparent 30%),radial-gradient(circle at 88% 12%,rgba(218,0,22,.12),transparent 30%),#050505; }
     .shell { max-width:1120px; margin:0 auto; border:1px solid rgba(255,255,255,.13); border-radius:26px; overflow:hidden; background:linear-gradient(180deg,rgba(24,24,24,.96),rgba(8,8,8,.99)); box-shadow:0 24px 80px rgba(0,0,0,.42); }
@@ -14,7 +15,13 @@
     .brand { display:flex; align-items:center; gap:14px; min-width:0; }
     .brand img { width:62px; filter:drop-shadow(0 8px 18px rgba(0,0,0,.35)); }
     h1 { margin:0; font:46px/.9 Impact,"Arial Black",sans-serif; text-transform:uppercase; letter-spacing:.02em; }
-    .back { color:#80FF00; font:800 12px monospace; letter-spacing:.1em; text-decoration:none; text-transform:uppercase; white-space:nowrap; }
+    .top-actions { display:flex; align-items:center; justify-content:flex-end; gap:10px; flex-wrap:wrap; }
+    .page-links { display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+    .page-links a { display:inline-flex; align-items:center; min-height:32px; padding:0 10px; border:1px solid rgba(255,255,255,.1); border-radius:999px; background:rgba(255,255,255,.045); color:#d8d8d8; font:800 10px monospace; letter-spacing:.08em; text-decoration:none; text-transform:uppercase; }
+    .page-links a:hover, .page-links a.active { border-color:rgba(128,255,0,.45); background:rgba(128,255,0,.08); color:#80FF00; }
+    .back { display:inline-flex; align-items:center; justify-content:center; min-height:38px; padding:0 14px; border:1px solid rgba(255,255,255,.14); border-radius:999px; background:rgba(255,255,255,.06); color:#fff; font:800 11px monospace; letter-spacing:.08em; text-decoration:none; text-transform:uppercase; white-space:nowrap; }
+    .back:hover { border-color:rgba(128,255,0,.38); color:#80FF00; }
+    .bottom-actions { display:flex; justify-content:flex-end; padding:18px 28px 28px; border-top:1px solid rgba(255,255,255,.08); }
     .hero { padding:30px 28px 24px; border-bottom:1px solid rgba(255,255,255,.08); background:linear-gradient(135deg,rgba(128,255,0,.06),rgba(218,0,22,.1)); }
     .eyebrow { color:#80FF00; font:900 12px monospace; letter-spacing:.14em; text-transform:uppercase; margin-bottom:10px; }
     .headline { max-width:820px; font:64px/.88 Impact,"Arial Black",sans-serif; text-transform:uppercase; }
@@ -40,7 +47,7 @@
     .btn { display:inline-flex; align-items:center; justify-content:center; min-height:44px; border-radius:999px; padding:0 18px; background:#80FF00; color:#050505; font:900 12px monospace; letter-spacing:.08em; text-decoration:none; text-transform:uppercase; }
     .btn.red { background:#DA0016; color:#fff; }
     .source { margin-left:auto; color:#777; font:800 10px monospace; letter-spacing:.08em; text-transform:uppercase; align-self:center; }
-    @media (max-width:760px){ .page{padding:10px}.top{padding:14px 16px}.brand img{width:48px}h1{font-size:32px}.hero{padding:22px 18px}.headline{font-size:42px}.lead{font-size:15px}.field{padding:18px}.grid{grid-template-columns:1fr}.full{grid-column:auto}.decision{grid-template-columns:1fr}.whistle{width:56px;height:56px;border-radius:16px;font-size:28px}.cta{padding:18px;flex-direction:column}.btn{width:100%}.source{margin-left:0;text-align:center} }
+    @media (max-width:760px){ .page{padding:10px}.top{padding:14px 16px;align-items:flex-start}.top-actions{width:100%;justify-content:flex-start}.page-links{justify-content:flex-start}.brand img{width:48px}h1{font-size:32px}.hero{padding:22px 18px}.headline{font-size:42px}.lead{font-size:15px}.field{padding:18px}.grid{grid-template-columns:1fr}.full{grid-column:auto}.decision{grid-template-columns:1fr}.whistle{width:56px;height:56px;border-radius:16px;font-size:28px}.cta{padding:18px;flex-direction:column}.btn{width:100%}.source{margin-left:0;text-align:center}.bottom-actions{padding:16px;justify-content:stretch}.back{width:100%} }
   </style>
 </head>
 <body>
@@ -51,7 +58,13 @@
           <img src="assets/bull-only-transparent.png" alt="SLAM! Athletics bull">
           <h1>Eligibility</h1>
         </div>
-        <a class="back" href="slam.html">Back to SLAM!</a>
+        <div class="top-actions">
+          <nav class="page-links" aria-label="Athletics pages">
+            <a href="slam-register.html">Register</a>
+            <a class="active" href="slam-eligibility.html">Eligibility</a>
+            <a href="slam-tryouts.html">Tryouts</a>
+          </nav>
+        </div>
       </div>
       <section class="hero">
         <div class="eyebrow">Athlete clearance board</div>
@@ -101,6 +114,9 @@
         <a class="btn red" href="slam-register.html">Register for sports</a>
         <a class="btn" href="slam-tryouts.html">Tryout form</a>
         <span class="source">Based on SLAM! Nevada athletics policy</span>
+      </div>
+      <div class="bottom-actions">
+        <a class="back" href="slam.html">← Back to homepage</a>
       </div>
     </section>
   </main>

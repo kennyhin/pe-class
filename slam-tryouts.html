@@ -6,14 +6,22 @@
   <title>SLAM! Athletics Tryout Form</title>
   <style>
     * { box-sizing: border-box; }
-    body { margin:0; background:#050505; color:#f5f5f5; font-family:Arial,Helvetica,sans-serif; }
+    body { margin:0; background:#050505; color:#f5f5f5; font-family:Arial,Helvetica,sans-serif; cursor:url("assets/football-cursor.svg") 3 3, auto; }
+    a, button { cursor:url("assets/football-cursor.svg") 3 3, pointer; }
+    input, select, textarea { cursor:text; }
     .page { min-height:100vh; padding:22px; background:radial-gradient(circle at 70% 10%, rgba(128,255,0,.08), transparent 32%), #050505; }
     .shell { max-width:1180px; margin:0 auto; border:1px solid rgba(255,255,255,.14); border-radius:24px; overflow:hidden; background:linear-gradient(180deg,rgba(24,24,24,.95),rgba(10,10,10,.98)); box-shadow:0 24px 80px rgba(0,0,0,.4); }
     .top { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:20px 24px; border-bottom:1px solid rgba(218,0,22,.35); background:linear-gradient(90deg,rgba(218,0,22,.2),rgba(255,255,255,.03)); }
     .brand { display:flex; align-items:center; gap:14px; min-width:0; }
     .brand img { width:72px; height:auto; filter:drop-shadow(0 8px 18px rgba(0,0,0,.35)); }
     h1 { margin:0; font:44px/.9 Impact,"Arial Black",sans-serif; text-transform:uppercase; letter-spacing:.02em; }
-    .back { color:#80FF00; font:800 12px monospace; letter-spacing:.1em; text-decoration:none; text-transform:uppercase; white-space:nowrap; }
+    .top-actions { display:flex; align-items:center; justify-content:flex-end; gap:10px; flex-wrap:wrap; }
+    .page-links { display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+    .page-links a { display:inline-flex; align-items:center; min-height:32px; padding:0 10px; border:1px solid rgba(255,255,255,.1); border-radius:999px; background:rgba(255,255,255,.045); color:#d8d8d8; font:800 10px monospace; letter-spacing:.08em; text-decoration:none; text-transform:uppercase; }
+    .page-links a:hover, .page-links a.active { border-color:rgba(128,255,0,.45); background:rgba(128,255,0,.08); color:#80FF00; }
+    .back { display:inline-flex; align-items:center; justify-content:center; min-height:38px; padding:0 14px; border:1px solid rgba(255,255,255,.14); border-radius:999px; background:rgba(255,255,255,.06); color:#fff; font:800 11px monospace; letter-spacing:.08em; text-decoration:none; text-transform:uppercase; white-space:nowrap; }
+    .back:hover { border-color:rgba(128,255,0,.38); color:#80FF00; }
+    .bottom-actions { display:flex; justify-content:flex-end; padding:18px 24px 24px; border-top:1px solid rgba(255,255,255,.08); }
     .notice { padding:14px 24px; border-bottom:1px solid rgba(255,255,255,.08); background:linear-gradient(135deg,rgba(128,255,0,.07),rgba(218,0,22,.1)); }
     .notice-card { border:1px solid rgba(255,255,255,.11); border-radius:16px; padding:14px 16px; background:rgba(0,0,0,.24); }
     .notice-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px 18px; }
@@ -60,7 +68,7 @@
     .summary b { display:block; color:#fff; font-size:12px; text-transform:uppercase; margin-bottom:3px; }
     .status { margin-top:14px; color:#80FF00; font:800 12px monospace; text-transform:uppercase; }
     .hidden { display:none; }
-    @media (max-width:850px){ .page{padding:10px}.main{grid-template-columns:1fr}.notice{padding:8px 10px}.notice-grid{grid-template-columns:1fr;gap:5px}.notice-card{padding:9px 11px}.notice-kicker{font-size:10px;margin-bottom:3px}.notice-card ul{margin:4px 0 0;padding-left:16px}.notice-card li{font-size:11px;line-height:1.22}.rail{border-left:0;border-top:1px solid rgba(255,255,255,.1);padding:0;background:rgba(0,0,0,.18)}.rail-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;border:0;background:rgba(255,255,255,.04);color:#fff;padding:13px 18px;font:900 12px monospace;letter-spacing:.12em;text-transform:uppercase}.rail-toggle:after{content:">";color:#80FF00;transition:transform .18s ease}.rail.open .rail-toggle:after{transform:rotate(90deg)}.rail .step,.rail .summary{display:none}.rail.open .step,.rail.open .summary{display:grid}.rail .step{padding:14px 18px 0;margin:0}.rail .summary{padding:12px 18px 18px;gap:7px}.summary div{font-size:12px;padding-bottom:7px}.choices,.fields,.clearance-grid{grid-template-columns:1fr}.stage{padding:18px;min-height:auto}.question{font-size:34px}.top{align-items:flex-start;padding:14px 16px}.brand img{width:48px}h1{font-size:34px} }
+    @media (max-width:850px){ .page{padding:10px}.main{grid-template-columns:1fr}.notice{padding:8px 10px}.notice-grid{grid-template-columns:1fr;gap:5px}.notice-card{padding:9px 11px}.notice-kicker{font-size:10px;margin-bottom:3px}.notice-card ul{margin:4px 0 0;padding-left:16px}.notice-card li{font-size:11px;line-height:1.22}.rail{border-left:0;border-top:1px solid rgba(255,255,255,.1);padding:0;background:rgba(0,0,0,.18)}.rail-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;border:0;background:rgba(255,255,255,.04);color:#fff;padding:13px 18px;font:900 12px monospace;letter-spacing:.12em;text-transform:uppercase}.rail-toggle:after{content:">";color:#80FF00;transition:transform .18s ease}.rail.open .rail-toggle:after{transform:rotate(90deg)}.rail .step,.rail .summary{display:none}.rail.open .step,.rail.open .summary{display:grid}.rail .step{padding:14px 18px 0;margin:0}.rail .summary{padding:12px 18px 18px;gap:7px}.summary div{font-size:12px;padding-bottom:7px}.choices,.fields,.clearance-grid{grid-template-columns:1fr}.stage{padding:18px;min-height:auto}.question{font-size:34px}.top{align-items:flex-start;padding:14px 16px}.top-actions{width:100%;justify-content:flex-start}.page-links{justify-content:flex-start}.brand img{width:48px}h1{font-size:34px}.bottom-actions{padding:16px;justify-content:stretch}.back{width:100%} }
   </style>
 </head>
 <body>
@@ -71,7 +79,13 @@
           <img src="assets/bull-only-transparent.png" alt="SLAM! Athletics bull">
           <h1>Tryout Form</h1>
         </div>
-        <a class="back" href="slam.html">Back to SLAM!</a>
+        <div class="top-actions">
+          <nav class="page-links" aria-label="Athletics pages">
+            <a href="slam-register.html">Register</a>
+            <a href="slam-eligibility.html">Eligibility</a>
+            <a class="active" href="slam-tryouts.html">Tryouts</a>
+          </nav>
+        </div>
       </div>
       <div class="notice">
         <div class="notice-card">
@@ -111,6 +125,9 @@
           <div class="step">Current form</div>
           <div class="summary" id="summary"></div>
         </aside>
+      </div>
+      <div class="bottom-actions">
+        <a class="back" href="slam.html">← Back to homepage</a>
       </div>
     </section>
   </main>
