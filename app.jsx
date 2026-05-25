@@ -1013,11 +1013,11 @@ function StaffPostModal({ endpoint, onClose }) {
       return;
     }
     if (step === 2 && !form.handle.trim()) {
-      setStatus("Add a handle, like @Mr_Theo.");
+      setStatus("Add a handle, like Mr_Theo.");
       return;
     }
     if (step === 3 && !form.body.trim()) {
-      setStatus("Write the update message.");
+      setStatus("Write the post.");
       return;
     }
     setStep((current) => Math.min(current + 1, 4));
@@ -1032,7 +1032,7 @@ function StaffPostModal({ endpoint, onClose }) {
     body.append("action", "post");
     body.append("pin", "7171");
     body.append("name", form.name);
-    body.append("handle", form.handle.trim());
+    body.append("handle", `@${form.handle.trim().replace(/^@+/, "")}`);
     body.append("body", form.body.trim());
     body.append("date", form.date);
     body.append("sport", form.sport);
@@ -1101,15 +1101,18 @@ function StaffPostModal({ endpoint, onClose }) {
             {step === 2 && (
               <>
                 <h3>Add a handle</h3>
-                <p>This shows next to the name. Examples: @Mr_Theo, @CoachK, Mr_Marc.</p>
-                <input className="staff-input" value={form.handle} onChange={(e) => update("handle", e.target.value)} placeholder="@Mr_Theo" />
+                <p>This shows next to the name. The @ is already included, so just type something like Mr_Theo or CoachK.</p>
+                <div className="handle-field">
+                  <span>@</span>
+                  <input className="staff-input" value={form.handle} onChange={(e) => update("handle", e.target.value.replace(/^@+/, ""))} placeholder="Mr_Theo" />
+                </div>
               </>
             )}
             {step === 3 && (
               <>
-                <h3>Write the update</h3>
-                <p>Keep it short, clear, and parent-friendly.</p>
-                <textarea className="staff-textarea" value={form.body} onChange={(e) => update("body", e.target.value)} placeholder="What should families know?" />
+                <h3>Post</h3>
+                <p>Post encouraging words to your athletes, reminders for families, or quick team updates.</p>
+                <textarea className="staff-textarea" value={form.body} onChange={(e) => update("body", e.target.value)} placeholder="Post..." />
               </>
             )}
             {step === 4 && (

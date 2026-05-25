@@ -1093,6 +1093,37 @@ textarea {
   border-color: rgba(128,255,0,0.55);
   box-shadow: 0 0 0 3px rgba(128,255,0,0.10);
 }
+.handle-field {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  align-items: center;
+  border: 1px solid rgba(255,255,255,0.13);
+  border-radius: 13px;
+  background: rgba(0,0,0,0.34);
+  overflow: hidden;
+}
+.handle-field span {
+  display: grid;
+  place-items: center;
+  height: 46px;
+  color: var(--slam-lime);
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 900;
+  border-right: 1px solid rgba(255,255,255,0.1);
+}
+.handle-field .staff-input {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.handle-field:focus-within {
+  border-color: rgba(128,255,0,0.55);
+  box-shadow: 0 0 0 3px rgba(128,255,0,0.10);
+}
+.handle-field:focus-within .staff-input {
+  box-shadow: none;
+}
 .staff-label {
   display: flex;
   flex-direction: column;
