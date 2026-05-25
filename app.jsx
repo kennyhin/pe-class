@@ -468,6 +468,19 @@ const SPORT_OPTIONS = [
   "Other",
 ];
 
+const POST_NAME_OPTIONS = [
+  "SLAM! ES Football",
+  "SLAM! ES Volleyball",
+  "SLAM! ES Basketball",
+  "SLAM! ES Soccer",
+  "SLAM! ES Track",
+  "SLAM! ES Cross Country",
+  "SLAM! ES Cheer",
+  "SLAM! ES Baseball",
+  "Teacher",
+  "Admin",
+];
+
 const DEFAULT_FAQ = [
   { q: "What ages do you serve?", a: "Kindergarten through 5th grade (ages 5-11). Programs are split by age band so kids play with peers their own size and skill level.", link: "" },
   { q: "How much does it cost?", a: "Most seasons run $240 for 8 weeks (1 practice + 1 game per week). Scholarships available — just ask." },
@@ -889,8 +902,9 @@ function Calendar({ events, loading }) {
 }
 
 // --- Updates feed (Twitter/X style) ---
-function Feed({ posts, loading }) {
+function Feed({ posts, loading, endpoint }) {
   const sortedPosts = [...posts].sort(sortPostsByDate);
+  const [postOpen, setPostOpen] = useState(false);
   return (
     <div className="card feed">
       <div className="card-head">
@@ -921,10 +935,209 @@ function Feed({ posts, loading }) {
                     Open link <Icon name="arrow-right" size={13} />
                   </a>
                 )}
+                {p.image && (
+                  <a className="post-cta" href={p.image} target="_blank" rel="noopener noreferrer">
+                    View photo <Icon name="arrow-right" size={13} />
+                  </a>
+                )}
               </div>
             </article>
           );
         })}
+      </div>
+      <button className="staff-post-open" type="button" onClick={() => setPostOpen(true)}>
+        Post
+      </button>
+      {postOpen && <StaffPostModal endpoint={endpoint} onClose={() => setPostOpen(false)} />}
+    </div>
+  );
+}
+
+function todayKey() {
+  const date = new Date();
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0"),
+  ].join("-");
+}
+
+function StaffPostModal({ endpoint, onClose }) {
+  const [unlocked, setUnlocked] = useState(false);
+  const [pin, setPin] = useState("");
+  const [step, setStep] = useState(0);
+  const [status, setStatus] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({
+    name: "",
+    handle: "",
+    body: "",
+    date: todayKey(),
+    sport: "",
+    link: "",
+    image: "",
+  });
+
+  const steps = [
+    { key: "name", title: "Who is posting?", sub: "Choose the program or staff group.", options: POST_NAME_OPTIONS },
+    { key: "sport", title: "What sport is this for?", sub: "This controls the icon on the feed.", options: SPORT_OPTIONS },
+  ];
+
+  function update(field, value) {
+    setForm((current) => ({ ...current, [field]: value }));
+  }
+
+  function pressDigit(digit) {
+    if (pin.length >= 4) return;
+    const next = `${pin}${digit}`;
+    setPin(next);
+    if (next.length === 4) {
+      if (next === "7171") {
+        setStatus("");
+        setTimeout(() => setUnlocked(true), 120);
+      } else {
+        setStatus("That code did not match. Please try again.");
+        setTimeout(() => setPin(""), 260);
+      }
+    }
+  }
+
+  function nextStep() {
+    setStatus("");
+    if (step === 0 && !form.name) {
+      setStatus("Choose who is posting first.");
+      return;
+    }
+    if (step === 1 && !form.sport) {
+      setStatus("Choose a sport for the icon.");
+      return;
+    }
+    if (step === 2 && !form.handle.trim()) {
+      setStatus("Add a handle, like @Mr_Theo.");
+      return;
+    }
+    if (step === 3 && !form.body.trim()) {
+      setStatus("Write the update message.");
+      return;
+    }
+    setStep((current) => Math.min(current + 1, 4));
+  }
+
+  function submit(e) {
+    e.preventDefault();
+    if (!endpoint || submitting) return;
+    setSubmitting(true);
+    setStatus("Posting update...");
+    const body = new FormData();
+    body.append("action", "post");
+    body.append("pin", "7171");
+    body.append("name", form.name);
+    body.append("handle", form.handle.trim());
+    body.append("body", form.body.trim());
+    body.append("date", form.date);
+    body.append("sport", form.sport);
+    body.append("link", form.link.trim());
+    body.append("image", form.image.trim());
+    body.append("ua", navigator.userAgent);
+
+    fetch(endpoint, { method: "POST", body, mode: "no-cors" })
+      .then(() => {
+        try { localStorage.removeItem("slam_content_cache"); } catch (_) {}
+        setStatus("Posted. Refreshing feed...");
+        setTimeout(() => window.location.reload(), 900);
+      })
+      .catch((err) => {
+        setSubmitting(false);
+        setStatus(err.message || "Could not post update.");
+      });
+  }
+
+  return (
+    <div className="staff-modal" role="dialog" aria-modal="true" aria-label="Staff post update">
+      <div className="staff-modal-panel">
+        <button className="staff-close" type="button" onClick={onClose} aria-label="Close staff post form">×</button>
+        {!unlocked ? (
+          <div className="staff-lock">
+            <div className="staff-kicker">Staff access</div>
+            <h3>Authorized staff only</h3>
+            <p>This posting tool is for SLAM! Athletics staff and coaches who are approved to update the public feed.</p>
+            <div className="pin-dots" aria-label={`${pin.length} of 4 digits entered`}>
+              {[0, 1, 2, 3].map((i) => <span key={i} className={i < pin.length ? "on" : ""} />)}
+            </div>
+            <div className="pin-pad">
+              {[1,2,3,4,5,6,7,8,9].map((digit) => (
+                <button key={digit} type="button" onClick={() => pressDigit(String(digit))}>{digit}</button>
+              ))}
+              <button type="button" onClick={() => setPin("")}>Clear</button>
+              <button type="button" onClick={() => pressDigit("0")}>0</button>
+              <button type="button" onClick={onClose}>Cancel</button>
+            </div>
+            {status && <div className="staff-status error">{status}</div>}
+          </div>
+        ) : (
+          <form className="staff-form" onSubmit={submit}>
+            <div className="staff-kicker">New update</div>
+            {step < 2 && (
+              <>
+                <h3>{steps[step].title}</h3>
+                <p>{steps[step].sub}</p>
+                <div className="staff-choice-grid">
+                  {steps[step].options.map((option) => (
+                    <button
+                      key={option}
+                      className={form[steps[step].key] === option ? "active" : ""}
+                      type="button"
+                      onClick={() => {
+                        update(steps[step].key, option);
+                        setTimeout(() => setStep((current) => Math.min(current + 1, 4)), 120);
+                      }}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+            {step === 2 && (
+              <>
+                <h3>Add a handle</h3>
+                <p>This shows next to the name. Examples: @Mr_Theo, @CoachK, Mr_Marc.</p>
+                <input className="staff-input" value={form.handle} onChange={(e) => update("handle", e.target.value)} placeholder="@Mr_Theo" />
+              </>
+            )}
+            {step === 3 && (
+              <>
+                <h3>Write the update</h3>
+                <p>Keep it short, clear, and parent-friendly.</p>
+                <textarea className="staff-textarea" value={form.body} onChange={(e) => update("body", e.target.value)} placeholder="What should families know?" />
+              </>
+            )}
+            {step === 4 && (
+              <>
+                <h3>Final details</h3>
+                <p>Select a date and add optional links for families.</p>
+                <label className="staff-label">Date
+                  <input className="staff-input" type="date" value={form.date} onChange={(e) => update("date", e.target.value)} />
+                </label>
+                <label className="staff-label">Link (optional)
+                  <input className="staff-input" value={form.link} onChange={(e) => update("link", e.target.value)} placeholder="https://..." />
+                </label>
+                <label className="staff-label">Photo link (optional)
+                  <input className="staff-input" value={form.image} onChange={(e) => update("image", e.target.value)} placeholder="Shared photo URL" />
+                </label>
+              </>
+            )}
+            {status && <div className={`staff-status ${status.toLowerCase().includes("could") || status.toLowerCase().includes("choose") || status.toLowerCase().includes("add") || status.toLowerCase().includes("write") ? "error" : ""}`}>{status}</div>}
+            <div className="staff-actions">
+              {step > 0 && <button className="staff-secondary" type="button" onClick={() => setStep((current) => current - 1)}>Back</button>}
+              {step < 4 ? (
+                <button className="staff-primary" type="button" onClick={nextStep}>Next</button>
+              ) : (
+                <button className="staff-primary" type="submit" disabled={submitting}>Post update</button>
+              )}
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );
@@ -1130,7 +1343,7 @@ function WhatsHappening({ endpoint }) {
         <p className="happening-sub">Schedules · Updates · Answers</p>
       </div>
       <div className="happening-grid">
-        <Feed posts={posts} loading={loading} />
+        <Feed posts={posts} loading={loading} endpoint={endpoint} />
         <Calendar events={events} loading={loading} />
         <QA faq={faq} endpoint={endpoint} loading={loading} />
       </div>

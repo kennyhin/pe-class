@@ -11,7 +11,7 @@
  *
  * Optional content tabs:
  *   Events: Date | Type | Sport | Title | Time | Location | Opponent | Notes
- *   Posts:  Date | Sport | Name | Handle | Body | Link
+ *   Posts:  Date | Sport | Name | Handle | Body | Link | Image
  *   FAQ:    Question | Answer | Keywords | Link
  *
  * Questions columns (created automatically on first parent question):
@@ -28,6 +28,7 @@ var EVENTS_SHEET_NAME = 'Events';
 var POSTS_SHEET_NAME = 'Posts';
 var FAQ_SHEET_NAME = 'FAQ';
 var QUESTIONS_SHEET_NAME = 'Questions';
+var ADMIN_POST_PIN = '7171';
 var EVENT_TYPES = ['event', 'practice', 'game'];
 var SPORTS = [
   'Basketball',
@@ -52,6 +53,9 @@ function doPost(e) {
 
     if (action === 'question') {
       return _saveQuestion(ss, params);
+    }
+    if (action === 'post') {
+      return _savePost(ss, params);
     }
 
     var sheet = ss.getSheetByName(SHEET_NAME);
@@ -106,6 +110,31 @@ function _saveQuestion(ss, params) {
   }
 
   sheet.appendRow([new Date(), name, email, question, ua]);
+  return _json({ ok: true });
+}
+
+function _savePost(ss, params) {
+  var pin = String(params.pin || '').trim();
+  if (pin !== ADMIN_POST_PIN) {
+    return _json({ ok: false, error: 'Staff PIN required' });
+  }
+
+  var name = String(params.name || '').trim();
+  var handle = String(params.handle || '').trim();
+  var body = String(params.body || '').trim();
+  var date = String(params.date || '').trim();
+  var sport = String(params.sport || '').trim();
+  var link = String(params.link || '').trim();
+  var image = String(params.image || '').trim();
+
+  if (!name || !body || body.length < 3) {
+    return _json({ ok: false, error: 'Name and message are required' });
+  }
+  if (!date) date = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+  if (!handle) handle = '@slamES';
+
+  var sheet = _ensurePostLikeSheet(ss, POSTS_SHEET_NAME, false);
+  sheet.appendRow([date, sport, name, handle, body, link, image]);
   return _json({ ok: true });
 }
 
@@ -215,7 +244,8 @@ function _posts(ss) {
       handle: String(row.handle || '').trim(),
       time: String(row.time || '').trim(),
       body: String(row.body || '').trim(),
-      link: String(row.link || row.url || '').trim()
+      link: String(row.link || row.url || '').trim(),
+      image: String(row.image || row.photo || '').trim()
     };
   }).filter(function (post) {
     return post.name && post.body;
@@ -229,7 +259,7 @@ function _ensurePostsSheet(ss) {
 }
 
 function _ensurePostLikeSheet(ss, sheetName, addExample) {
-  var headers = ['Date', 'Sport', 'Name', 'Handle', 'Body', 'Link'];
+  var headers = ['Date', 'Sport', 'Name', 'Handle', 'Body', 'Link', 'Image'];
   var sheet = ss.getSheetByName(sheetName);
   if (!sheet) {
     sheet = ss.insertSheet(sheetName);
