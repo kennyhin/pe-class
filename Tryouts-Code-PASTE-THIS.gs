@@ -19,7 +19,7 @@ var HEADERS = [
   'Student Last Name',
   'Student First Name',
   'Email',
-  'Waiver Agreed',
+  'Physical/Waiver Status',
   'Signature',
   'User Agent'
 ];
@@ -40,7 +40,14 @@ function doPost(e) {
 
     var email = String(params.email || '').trim().toLowerCase();
     var signature = String(params.signature || '').trim();
+    var clearance = String(params.clearance || '').trim();
+    var clearanceLabel = clearance === 'rmaPhysical'
+      ? 'Sports physical uploaded to RMA'
+      : clearance === 'waiver'
+        ? 'Waiver signed instead of sports physical'
+        : '';
     if (!email || email.indexOf('@') === -1) return _json({ ok: false, error: 'Valid email required' });
+    if (!clearanceLabel) return _json({ ok: false, error: 'Physical/waiver choice required' });
     if (signature.length < 2) return _json({ ok: false, error: 'Signature required' });
 
     sheet.appendRow([
@@ -57,7 +64,7 @@ function doPost(e) {
       String(params.lastName || '').trim(),
       String(params.firstName || '').trim(),
       email,
-      String(params.waiverAgreed || '') === 'yes' ? 'Yes' : 'No',
+      clearanceLabel,
       signature,
       String(params.ua || '').trim()
     ]);
@@ -81,9 +88,23 @@ function _ensureSheet(ss, name) {
   if (needsHeaders) {
     sheet.clear();
     sheet.appendRow(HEADERS);
-    sheet.getRange(1, 1, 1, HEADERS.length).setFontWeight('bold');
-    sheet.setFrozenRows(1);
+  } else {
+    var range = sheet.getRange(1, 1, 1, Math.max(sheet.getLastColumn(), HEADERS.length));
+    var existing = range.getValues()[0].map(function(value) { return String(value || '').trim(); });
+    var oldWaiverIndex = existing.indexOf('Waiver Agreed');
+    if (oldWaiverIndex !== -1) {
+      sheet.getRange(1, oldWaiverIndex + 1).setValue('Physical/Waiver Status');
+      existing[oldWaiverIndex] = 'Physical/Waiver Status';
+    }
+    HEADERS.forEach(function(header) {
+      if (existing.indexOf(header) === -1) {
+        sheet.getRange(1, sheet.getLastColumn() + 1).setValue(header);
+        existing.push(header);
+      }
+    });
   }
+  sheet.getRange(1, 1, 1, Math.max(sheet.getLastColumn(), HEADERS.length)).setFontWeight('bold');
+  sheet.setFrozenRows(1);
   return sheet;
 }
 

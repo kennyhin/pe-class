@@ -14,9 +14,19 @@
     .brand img { width:72px; height:auto; filter:drop-shadow(0 8px 18px rgba(0,0,0,.35)); }
     h1 { margin:0; font:44px/.9 Impact,"Arial Black",sans-serif; text-transform:uppercase; letter-spacing:.02em; }
     .back { color:#80FF00; font:800 12px monospace; letter-spacing:.1em; text-decoration:none; text-transform:uppercase; white-space:nowrap; }
+    .notice { display:grid; grid-template-columns:1.05fr 1fr; gap:18px; padding:22px 24px; border-bottom:1px solid rgba(255,255,255,.08); background:linear-gradient(135deg,rgba(128,255,0,.09),rgba(218,0,22,.12)); }
+    .notice-card { border:1px solid rgba(255,255,255,.13); border-radius:18px; padding:18px; background:rgba(0,0,0,.28); }
+    .notice-card strong { display:block; color:#fff; font:28px/.95 Impact,"Arial Black",sans-serif; text-transform:uppercase; }
+    .notice-card p, .notice-card li { color:#d5d5d5; line-height:1.45; }
+    .notice-card ul { margin:10px 0 0; padding-left:18px; }
+    .notice-card a { color:#80FF00; font-weight:800; text-decoration-thickness:2px; text-underline-offset:3px; }
+    .notice-kicker { color:#80FF00; font:900 12px monospace; letter-spacing:.12em; text-transform:uppercase; margin-bottom:8px; }
     .main { display:grid; grid-template-columns: minmax(0, 1fr) 300px; gap:0; }
     .stage { padding:34px; min-height:620px; }
     .rail { border-left:1px solid rgba(255,255,255,.1); background:rgba(0,0,0,.2); padding:24px; }
+    .progress { display:grid; grid-template-columns:repeat(9,1fr); gap:6px; margin:0 0 18px; max-width:640px; }
+    .progress i { height:7px; border-radius:999px; background:rgba(255,255,255,.1); }
+    .progress i.on { background:#80FF00; box-shadow:0 0 18px rgba(128,255,0,.38); }
     .step { color:#80FF00; font:800 12px monospace; letter-spacing:.14em; text-transform:uppercase; margin-bottom:16px; }
     .question { max-width:680px; margin:0 0 24px; font:44px/.98 Impact,"Arial Black",sans-serif; text-transform:uppercase; }
     .choices { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
@@ -24,14 +34,21 @@
     .choice:hover, .choice.active { transform:translateY(-2px); border-color:#80FF00; box-shadow:0 0 0 3px rgba(128,255,0,.12); }
     .choice b { display:block; font:28px/.95 Impact,"Arial Black",sans-serif; text-transform:uppercase; }
     .choice span { display:block; color:#aaa; margin-top:8px; line-height:1.35; }
+    .choice small { display:inline-block; margin-top:14px; color:#80FF00; font:900 11px monospace; letter-spacing:.08em; text-transform:uppercase; }
+    .choice.danger small { color:#ffb0b7; }
     .fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; max-width:760px; }
     label { display:flex; flex-direction:column; gap:7px; color:#aaa; font:800 11px monospace; letter-spacing:.1em; text-transform:uppercase; }
     input, select, textarea { width:100%; border:1px solid rgba(255,255,255,.14); border-radius:12px; background:rgba(0,0,0,.28); color:#fff; font:16px Arial,Helvetica,sans-serif; padding:13px 14px; outline:none; }
     input:focus, textarea:focus { border-color:#80FF00; box-shadow:0 0 0 3px rgba(128,255,0,.12); }
     .waiver { max-height:320px; overflow:auto; border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:18px; color:#ddd; line-height:1.5; background:rgba(0,0,0,.24); }
     .waiver h3 { color:#80FF00; margin:14px 0 6px; font:800 13px monospace; letter-spacing:.1em; text-transform:uppercase; }
-    .agree { margin:16px 0; display:flex; align-items:center; gap:10px; color:#fff; font-weight:800; }
-    .agree input { width:18px; height:18px; }
+    .clearance-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-bottom:16px; }
+    .clearance { min-height:124px; border:1px solid rgba(255,255,255,.13); border-radius:16px; background:rgba(255,255,255,.045); color:#fff; cursor:pointer; padding:18px; text-align:left; transition:.18s ease; }
+    .clearance.active { border-color:#80FF00; box-shadow:0 0 0 3px rgba(128,255,0,.12); }
+    .clearance b { display:block; font:22px/.95 Impact,"Arial Black",sans-serif; text-transform:uppercase; }
+    .clearance span { display:block; margin-top:8px; color:#aaa; line-height:1.35; }
+    .clearance input { position:absolute; opacity:0; pointer-events:none; }
+    .waiver-note { margin:0 0 14px; color:#ffced2; font:800 12px/1.5 monospace; letter-spacing:.06em; text-transform:uppercase; }
     .actions { display:flex; gap:12px; margin-top:24px; }
     .btn { border:0; border-radius:999px; padding:13px 18px; font:900 12px monospace; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; }
     .btn.primary { background:#80FF00; color:#050505; }
@@ -42,7 +59,7 @@
     .summary b { display:block; color:#fff; font-size:12px; text-transform:uppercase; margin-bottom:3px; }
     .status { margin-top:14px; color:#80FF00; font:800 12px monospace; text-transform:uppercase; }
     .hidden { display:none; }
-    @media (max-width:850px){ .page{padding:10px}.main{grid-template-columns:1fr}.rail{border-left:0;border-top:1px solid rgba(255,255,255,.1)}.choices,.fields{grid-template-columns:1fr}.stage{padding:22px;min-height:auto}.question{font-size:34px}.top{align-items:flex-start}.brand img{width:58px}h1{font-size:34px} }
+    @media (max-width:850px){ .page{padding:10px}.notice,.main{grid-template-columns:1fr}.rail{border-left:0;border-top:1px solid rgba(255,255,255,.1)}.choices,.fields,.clearance-grid{grid-template-columns:1fr}.stage{padding:22px;min-height:auto}.question{font-size:34px}.top{align-items:flex-start}.brand img{width:58px}h1{font-size:34px}.notice{padding:18px}.notice-card strong{font-size:24px} }
   </style>
 </head>
 <body>
@@ -55,8 +72,31 @@
         </div>
         <a class="back" href="slam.html">Back to SLAM!</a>
       </div>
+      <div class="notice">
+        <div class="notice-card">
+          <div class="notice-kicker">Before you start</div>
+          <strong>One form per sport</strong>
+          <p>A separate form must be completed for each sport in which your student participates.</p>
+        </div>
+        <div class="notice-card">
+          <div class="notice-kicker">Required for tryouts</div>
+          <ul>
+            <li>Sports Physical OR click the waiver option at the end.</li>
+            <li>Form here: <a href="https://www.ncsaasports.com/physicals.html" target="_blank" rel="noopener">NCSAA physicals</a></li>
+            <li>Schedule one here: <a href="https://www.cvs.com/minuteclinic/services/sports-physicals" target="_blank" rel="noopener">CVS MinuteClinic</a></li>
+          </ul>
+          <div class="notice-kicker" style="margin-top:16px;color:#ff6b76">Students are ineligible if</div>
+          <ul>
+            <li>Unpaid fees</li>
+            <li>Chronically absent</li>
+            <li>RPC / suspension</li>
+            <li>Expired sports physical / unsigned waiver</li>
+          </ul>
+        </div>
+      </div>
       <div class="main">
         <div class="stage">
+          <div class="progress" id="progress"></div>
           <div class="step" id="stepLabel">Question 1 / 9</div>
           <h2 class="question" id="question">Which season are you signing up for?</h2>
           <div id="content"></div>
@@ -118,7 +158,7 @@
       ['Electronic signature','By signing below, I confirm I have read and understand this waiver and consent form. I am the parent/legal guardian or authorized signer and this electronic signature is legally binding.']
     ];
     var steps = ['season','sport','division','grade','sizes','numbers','student','email','waiver'];
-    var data = { season:'', sport:'', division:'', grade:'', shirtSize:'', shortSize:'', jersey1:'', jersey2:'', jersey3:'', lastName:'', firstName:'', email:'', waiverAgreed:false, signature:'' };
+    var data = { season:'', sport:'', division:'', grade:'', shirtSize:'', shortSize:'', jersey1:'', jersey2:'', jersey3:'', lastName:'', firstName:'', email:'', clearance:'', signature:'' };
     var step = 0;
     var $ = function(id){ return document.getElementById(id); };
 
@@ -126,7 +166,7 @@
     function sportObj(){ return (seasonObj()?.sports || []).find(function(s){ return s.sport === data.sport; }); }
     function divisionObj(){ return (sportObj()?.divisions || []).find(function(d){ return d.name === data.division; }); }
     function choice(label, sub, value, active) {
-      return '<button class="choice'+(active?' active':'')+'" data-value="'+esc(value)+'"><b>'+esc(label)+'</b><span>'+esc(sub||'')+'</span></button>';
+      return '<button class="choice'+(active?' active':'')+'" data-value="'+esc(value)+'"><b>'+esc(label)+'</b><span>'+esc(sub||'')+'</span><small>Choose</small></button>';
     }
     function esc(s){ return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
     function field(name,label,type,placeholder){
@@ -137,12 +177,14 @@
     }
     function saveInputs(){
       document.querySelectorAll('input,select').forEach(function(el){
-        if (el.name && el.type !== 'checkbox') data[el.name] = el.value.trim();
+        if (el.name && el.type === 'radio' && el.checked) data[el.name] = el.value.trim();
+        if (el.name && el.type !== 'checkbox' && el.type !== 'radio') data[el.name] = el.value.trim();
         if (el.name && el.type === 'checkbox') data[el.name] = el.checked;
       });
     }
     function render(){
       var kind = steps[step], html = '';
+      $('progress').innerHTML = steps.map(function(_, i){ return '<i class="'+(i <= step ? 'on' : '')+'"></i>'; }).join('');
       $('stepLabel').textContent = 'Question ' + (step + 1) + ' / ' + steps.length;
       $('status').textContent = '';
       if (kind === 'season') {
@@ -180,14 +222,23 @@
         html = '<div class="fields">' + field('email','Email','email','parent@email.com') + '</div>';
       }
       if (kind === 'waiver') {
-        $('question').textContent = 'Review waiver and sign';
-        html = '<div class="waiver">' + WAIVER.map(function(w){return '<h3>'+w[0]+'</h3><p>'+w[1]+'</p>';}).join('') + '</div><label class="agree"><input type="checkbox" name="waiverAgreed" '+(data.waiverAgreed?'checked':'')+'> I have read and agree to the terms.</label><div class="fields">' + field('signature','Typed signature') + '</div>';
+        $('question').textContent = 'Physical or waiver?';
+        html = '<div class="clearance-grid">' +
+          clearanceChoice('rmaPhysical','Physical uploaded to RMA','Choose this if your student already has a valid sports physical uploaded in Register My Athlete.') +
+          clearanceChoice('waiver','Sign waiver instead','Choose this only if your student does not have a sports physical on file. You must read the waiver below.') +
+          '</div>' +
+          (data.clearance === 'waiver' ? '<p class="waiver-note">Read this waiver before signing. This option is only for students without a sports physical on file.</p><div class="waiver">' + WAIVER.map(function(w){return '<h3>'+w[0]+'</h3><p>'+w[1]+'</p>';}).join('') + '</div>' : '') +
+          '<div class="fields" style="margin-top:16px">' + field('signature','Typed parent/guardian signature') + '</div>';
       }
       $('content').innerHTML = html;
       document.querySelectorAll('.choice').forEach(function(btn){ btn.addEventListener('click', function(){ selectChoice(btn.dataset.value); }); });
+      document.querySelectorAll('.clearance').forEach(function(btn){ btn.addEventListener('click', function(){ saveInputs(); data.clearance = btn.dataset.value; render(); }); });
       $('backBtn').disabled = step === 0;
       $('nextBtn').textContent = step === steps.length - 1 ? 'Submit' : 'Next';
       renderSummary();
+    }
+    function clearanceChoice(value, title, body) {
+      return '<button type="button" class="clearance '+(data.clearance===value?'active':'')+'" data-value="'+value+'"><input type="radio" name="clearance" value="'+value+'" '+(data.clearance===value?'checked':'')+'><b>'+esc(title)+'</b><span>'+esc(body)+'</span></button>';
     }
     function selectChoice(value){
       var kind = steps[step];
@@ -196,6 +247,9 @@
       if (kind === 'sport') { data.division=''; data.grade=''; }
       if (kind === 'division') data.grade='';
       render();
+      if (['season','sport','division','grade'].indexOf(kind) !== -1) {
+        window.setTimeout(function(){ if (valid() && step < steps.length - 1) { step++; render(); } }, 120);
+      }
     }
     function valid(){
       saveInputs();
@@ -207,7 +261,7 @@
       if (kind === 'numbers') return data.jersey1 && data.jersey2 && data.jersey3 && new Set([data.jersey1,data.jersey2,data.jersey3]).size === 3;
       if (kind === 'student') return data.lastName && data.firstName;
       if (kind === 'email') return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email);
-      if (kind === 'waiver') return data.waiverAgreed && data.signature.length > 1;
+      if (kind === 'waiver') return !!data.clearance && data.signature.length > 1;
       return true;
     }
     function next(){
@@ -232,7 +286,8 @@
       });
     }
     function renderSummary(){
-      var rows = [['Season', seasonObj()?.label], ['Sport', data.sport], ['Division', data.division], ['Grade', data.grade], ['Sizes', data.shirtSize && data.shortSize ? data.shirtSize + ' / ' + data.shortSize : ''], ['Numbers', [data.jersey1,data.jersey2,data.jersey3].filter(Boolean).join(', ')], ['Student', [data.firstName,data.lastName].filter(Boolean).join(' ')], ['Email', data.email]];
+      var clearance = data.clearance === 'rmaPhysical' ? 'Physical uploaded to RMA' : data.clearance === 'waiver' ? 'Waiver signed' : '';
+      var rows = [['Season', seasonObj()?.label], ['Sport', data.sport], ['Division', data.division], ['Grade', data.grade], ['Sizes', data.shirtSize && data.shortSize ? data.shirtSize + ' / ' + data.shortSize : ''], ['Numbers', [data.jersey1,data.jersey2,data.jersey3].filter(Boolean).join(', ')], ['Student', [data.firstName,data.lastName].filter(Boolean).join(' ')], ['Email', data.email], ['Physical / waiver', clearance]];
       $('summary').innerHTML = rows.map(function(r){ return '<div><b>'+r[0]+'</b>'+esc(r[1] || 'Not selected')+'</div>'; }).join('');
     }
     $('nextBtn').addEventListener('click', next);
