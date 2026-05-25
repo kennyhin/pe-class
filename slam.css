@@ -12,6 +12,54 @@ body { overflow-x: hidden; }
 }
 
 /* ============== NAV ============== */
+.side-nav {
+  position: fixed;
+  top: 50%;
+  right: 18px;
+  transform: translateY(-50%);
+  z-index: 30;
+  width: min(290px, 22vw);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.side-nav a {
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 14px 10px 18px;
+  background: rgba(10,10,10,0.58);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.88);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  line-height: 1.25;
+  text-decoration: none;
+  text-transform: uppercase;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out),
+              color var(--dur-fast) var(--ease-out);
+}
+.side-nav a:hover {
+  background: rgba(128,255,0,0.12);
+  border-color: rgba(128,255,0,0.32);
+  color: var(--slam-lime);
+}
+.side-nav i {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.34);
+  flex: 0 0 auto;
+}
+.side-nav a:hover i { background: var(--slam-lime); }
+
 .nav {
   position: sticky;
   top: 20px;
@@ -582,6 +630,29 @@ body { overflow-x: hidden; }
   padding: 8px 0;
   font-style: italic;
 }
+.loading-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--fg-dim);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 10px 0;
+  text-transform: uppercase;
+}
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.16);
+  border-top-color: var(--slam-lime);
+  border-radius: 999px;
+  animation: loading-spin 0.8s linear infinite;
+}
+@keyframes loading-spin {
+  to { transform: rotate(360deg); }
+}
 .cal-month-list {
   margin-top: 4px;
   padding-top: 16px;
@@ -1126,6 +1197,7 @@ body { overflow-x: hidden; }
 
 /* ============== RESPONSIVE ============== */
 @media (max-width: 1100px) {
+  .side-nav { display: none; }
   .happening-grid { grid-template-columns: 1fr 1fr; }
   .happening-grid .qa { grid-column: 1 / -1; }
 }

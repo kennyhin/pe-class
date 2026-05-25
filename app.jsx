@@ -265,7 +265,25 @@ function SignupForm({ endpoint, accent }) {
 // Sections
 // ---------------------------------------------------------------------------
 function Nav() {
-  return null;
+  const items = [
+    ["Register for sports", "#register"],
+    ["Athletic eligibility", "#eligibility"],
+    ["Sports physicals/insurance", "#physicals"],
+    ["Bulls commitment", "#commitment"],
+    ["Sports offered", "#sports"],
+    ["Tryouts", "#tryouts"],
+    ["Coach for SLAM!", "#coach"],
+  ];
+  return (
+    <nav className="side-nav" aria-label="Athletics navigation">
+      {items.map(([label, href]) => (
+        <a key={label} href={href}>
+          <span>{label}</span>
+          <i aria-hidden="true" />
+        </a>
+      ))}
+    </nav>
+  );
 }
 
 // Word-by-word reveal for the welcome headline.
@@ -575,6 +593,15 @@ function linkifyText(text) {
   });
 }
 
+function LoadingState({ label = "Loading..." }) {
+  return (
+    <div className="loading-state" role="status" aria-live="polite">
+      <span className="loading-spinner" aria-hidden="true" />
+      <span>{label}</span>
+    </div>
+  );
+}
+
 // Pulls all three content arrays from the Apps Script endpoint on mount.
 // Keep the sheet-backed sections empty while loading so old fallback content
 // does not flash before the live sheet response arrives.
@@ -600,15 +627,29 @@ function useContent(endpoint) {
     }
 
     let cancelled = false;
-    setContent({ posts: [], events: [], faq: [], loaded: false, error: false });
+    const cacheKey = "slam_content_cache";
+    try {
+      const cached = JSON.parse(localStorage.getItem(cacheKey) || "null");
+      if (cached && cached.posts && cached.events && cached.faq) {
+        setContent({ ...cached, loaded: true, error: false });
+      } else {
+        setContent({ posts: [], events: [], faq: [], loaded: false, error: false });
+      }
+    } catch (_) {
+      setContent({ posts: [], events: [], faq: [], loaded: false, error: false });
+    }
     fetch(`${endpoint}?action=all&t=${Date.now()}`)
       .then((r) => r.json())
       .then((data) => {
         if (cancelled) return;
-        setContent({
+        const next = {
           posts: Array.isArray(data.posts) ? data.posts : [],
           events: Array.isArray(data.events) ? data.events : [],
           faq: Array.isArray(data.faq) ? data.faq : [],
+        };
+        try { localStorage.setItem(cacheKey, JSON.stringify(next)); } catch (_) {}
+        setContent({
+          ...next,
           loaded: true,
           error: data.ok === false,
         });
@@ -759,7 +800,7 @@ function Calendar({ events, loading }) {
       <div className="cal-upcoming">
         <div className="cal-upcoming-label">{formatEventDate(selectedDate)}</div>
         {loading ? (
-          <div className="cal-empty">Loading schedule...</div>
+          <LoadingState label="Loading schedule..." />
         ) : selectedEvents.length === 0 ? (
           <div className="cal-empty">No events scheduled for this day.</div>
         ) : selectedEvents.map((e, i) => {
@@ -801,7 +842,7 @@ function Calendar({ events, loading }) {
           </div>
         </div>
         {loading ? (
-          <div className="cal-empty">Loading upcoming events...</div>
+          <LoadingState label="Loading events..." />
         ) : visibleUpcoming.length === 0 ? (
           <div className="cal-empty">No matching events in the next 7 days.</div>
         ) : visibleUpcoming.map((e, i) => renderEventRow(e, i, "upcoming"))}
@@ -824,7 +865,7 @@ function Calendar({ events, loading }) {
           </div>
         </div>
         {loading ? (
-          <div className="cal-empty">Loading games...</div>
+          <LoadingState label="Loading games..." />
         ) : visibleGames.length === 0 ? (
           <div className="cal-empty">No games match this sport yet.</div>
         ) : visibleGames.map((e, i) => renderEventRow(e, i, "game"))}
@@ -943,7 +984,7 @@ function Feed({ posts, loading, endpoint }) {
       </div>
       <div className="feed-list">
         {loading ? (
-          <div className="cal-empty">Loading updates...</div>
+          <LoadingState label="Loading updates..." />
         ) : sortedPosts.length === 0 ? (
           <div className="cal-empty">No updates yet.</div>
         ) : sortedPosts.map((p, i) => {
@@ -1141,7 +1182,7 @@ function QA({ faq, endpoint, loading }) {
       </div>
       <div className="qa-list">
         {loading ? (
-          <div className="cal-empty">Loading answers...</div>
+          <LoadingState label="Loading answers..." />
         ) : visibleFaq.map((item, i) => {
           const isOpen = open === i;
           return (

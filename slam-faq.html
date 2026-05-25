@@ -8,10 +8,13 @@
     body { margin:0; background:#050505; color:#f5f5f5; font-family:Arial,Helvetica,sans-serif; }
     .page { max-width:920px; margin:0 auto; padding:28px 16px 56px; }
     a { color:#80FF00; }
+    .side-nav { position:fixed; top:50%; right:18px; transform:translateY(-50%); z-index:30; width:min(290px,22vw); display:flex; flex-direction:column; gap:4px; }
+    .side-nav a { min-height:46px; display:flex; align-items:center; justify-content:space-between; gap:14px; padding:10px 14px 10px 18px; background:rgba(10,10,10,.58); border:1px solid rgba(255,255,255,.12); color:rgba(255,255,255,.88); font:800 11px/1.25 monospace; letter-spacing:.12em; text-decoration:none; text-transform:uppercase; backdrop-filter:blur(12px); }
+    .side-nav a:hover { color:#80FF00; border-color:rgba(128,255,0,.32); background:rgba(128,255,0,.12); }
+    .side-nav i { width:8px; height:8px; border-radius:999px; background:rgba(255,255,255,.34); flex:0 0 auto; }
     .back { color:#80FF00; font:700 12px monospace; letter-spacing:.1em; text-decoration:none; text-transform:uppercase; }
     h1 { margin:28px 0 8px; font:64px/.9 Impact,"Arial Black",sans-serif; text-transform:uppercase; }
     h1 span { color:#80FF00; }
-    .sub { color:#9b9b9b; margin:0 0 24px; }
     .faq { display:grid; gap:12px; }
     details { background:linear-gradient(180deg,rgba(28,28,28,.94),rgba(14,14,14,.94)); border:1px solid rgba(255,255,255,.12); border-radius:16px; overflow:hidden; }
     summary { cursor:pointer; padding:18px 20px; font-weight:800; list-style:none; }
@@ -20,14 +23,26 @@
     .answer { padding:0 20px 18px; color:#c9c9c9; line-height:1.55; }
     .faq-link { display:inline-flex; margin-top:10px; color:#80FF00; font:800 11px monospace; letter-spacing:.08em; text-transform:uppercase; text-decoration:none; }
     .empty { color:#999; padding:20px; border:1px dashed rgba(255,255,255,.18); border-radius:16px; }
+    .loading { display:inline-flex; align-items:center; gap:10px; color:#999; padding:20px; border:1px dashed rgba(255,255,255,.18); border-radius:16px; font:800 11px monospace; letter-spacing:.1em; text-transform:uppercase; }
+    .spinner { width:16px; height:16px; border:2px solid rgba(255,255,255,.16); border-top-color:#80FF00; border-radius:999px; animation:spin .8s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    @media (max-width:1100px){ .side-nav{display:none;} }
   </style>
 </head>
 <body>
+  <nav class="side-nav" aria-label="Athletics navigation">
+    <a href="slam.html#register"><span>Register for sports</span><i></i></a>
+    <a href="slam.html#eligibility"><span>Athletic eligibility</span><i></i></a>
+    <a href="slam.html#physicals"><span>Sports physicals/insurance</span><i></i></a>
+    <a href="slam.html#commitment"><span>Bulls commitment</span><i></i></a>
+    <a href="slam.html#sports"><span>Sports offered</span><i></i></a>
+    <a href="slam.html#tryouts"><span>Tryouts</span><i></i></a>
+    <a href="slam.html#coach"><span>Coach for SLAM!</span><i></i></a>
+  </nav>
   <main class="page">
     <a class="back" href="slam.html">← Back to SLAM!</a>
     <h1><span>Q</span> and A</h1>
-    <p class="sub">All parent questions from the FAQ sheet.</p>
-    <div id="faq" class="faq"><div class="empty">Loading answers...</div></div>
+    <div id="faq" class="faq"><div class="loading"><span class="spinner"></span>Loading answers...</div></div>
   </main>
   <script>
     var endpoint = 'https://script.google.com/macros/s/AKfycbxKWDLcTjDwwXb-rNq9LTpqQwmlGgvLHZf9kJKDG7DHqwNp6vjaXD8S4ccG_41CBMfk/exec';
@@ -37,13 +52,20 @@
         return '<a href="'+url+'" target="_blank" rel="noopener noreferrer">'+url.replace(/^https?:\/\//,'').replace(/\/$/,'')+'</a>';
       });
     }
+    function render(faq){
+      document.getElementById('faq').innerHTML = faq.length ? faq.map(function(item){
+        return '<details><summary>'+esc(item.q)+'</summary><div class="answer">'+linkify(item.a)+(item.link ? '<br><a class="faq-link" href="'+esc(item.link)+'" target="_blank" rel="noopener noreferrer">Open link</a>' : '')+'</div></details>';
+      }).join('') : '<div class="empty">No FAQ rows yet.</div>';
+    }
+    try {
+      var cached = JSON.parse(localStorage.getItem('slam_content_cache') || 'null');
+      if (cached && Array.isArray(cached.faq)) render(cached.faq);
+    } catch(e) {}
     fetch(endpoint + '?action=all&t=' + Date.now())
       .then(function(r){ return r.json(); })
       .then(function(data){
         var faq = Array.isArray(data.faq) ? data.faq : [];
-        document.getElementById('faq').innerHTML = faq.length ? faq.map(function(item){
-          return '<details><summary>'+esc(item.q)+'</summary><div class="answer">'+linkify(item.a)+(item.link ? '<br><a class="faq-link" href="'+esc(item.link)+'" target="_blank" rel="noopener noreferrer">Open link</a>' : '')+'</div></details>';
-        }).join('') : '<div class="empty">No FAQ rows yet.</div>';
+        render(faq);
       })
       .catch(function(){ document.getElementById('faq').innerHTML = '<div class="empty">Could not load FAQ right now.</div>'; });
   </script>
