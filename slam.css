@@ -494,12 +494,13 @@ body { overflow-x: hidden; }
 .cal-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
+  gap: 2px 4px;
 }
 .cal-cell {
   appearance: none;
   -webkit-appearance: none;
-  aspect-ratio: 1;
+  aspect-ratio: auto;
+  min-height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -522,6 +523,7 @@ body { overflow-x: hidden; }
   background: var(--slam-red);
   color: var(--slam-white);
   font-weight: 700;
+  min-height: 50px;
 }
 .cal-cell.selected {
   border-color: var(--slam-lime);
