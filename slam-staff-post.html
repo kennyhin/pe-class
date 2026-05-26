@@ -27,6 +27,8 @@
     .role-btn.active, .choice.active { border-color:rgba(218,0,22,.72); background:rgba(218,0,22,.22); box-shadow:0 0 0 3px rgba(218,0,22,.1); }
     .pin-panel { display:none; margin-top:18px; padding:18px; border:1px solid rgba(255,255,255,.12); border-radius:24px; background:rgba(255,255,255,.04); text-align:center; }
     .pin-panel.show { display:block; }
+    .pin-panel-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+    .back-step { min-height:36px; padding:0 12px; border:1px solid rgba(255,255,255,.16); border-radius:999px; background:rgba(0,0,0,.28); color:#fff; font:900 10px monospace; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; }
     .pin-box { position:relative; width:min(100%,320px); margin:0 auto; padding:20px; border:1px solid rgba(255,255,255,.12); border-radius:24px; background:rgba(0,0,0,.22); }
     .pin-dots { display:flex; justify-content:center; gap:12px; margin:12px 0 4px; }
     .pin-dots span { width:17px; height:17px; border:2px solid rgba(255,255,255,.28); border-radius:50%; background:rgba(255,255,255,.04); }
@@ -38,8 +40,8 @@
     .form { display:grid; gap:14px; }
     input, select, textarea, button { font:inherit; }
     input, select, textarea { width:100%; min-width:0; border:1px solid rgba(255,255,255,.14); border-radius:13px; background:rgba(0,0,0,.34); color:#fff; outline:none; }
-    input, select { height:48px; padding:0 13px; }
-    textarea { min-height:132px; padding:13px; resize:vertical; }
+    input, select { height:48px; padding:0 13px; font-size:16px; }
+    textarea { min-height:132px; padding:13px; resize:vertical; font-size:16px; }
     input:focus, select:focus, textarea:focus { border-color:rgba(128,255,0,.58); box-shadow:0 0 0 3px rgba(128,255,0,.1); }
     label { display:grid; gap:7px; color:#8d8d8d; font:900 10px monospace; letter-spacing:.1em; text-transform:uppercase; }
     .choice-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
@@ -70,6 +72,7 @@
       .role-grid, .builder { grid-template-columns:1fr; }
       .choice-row, .photo-row { grid-template-columns:1fr; }
       .preview-card { position:static; order:-1; }
+      .pin-panel-head { align-items:flex-start; flex-direction:column; }
     }
   </style>
 </head>
@@ -96,7 +99,10 @@
               <button class="role-btn" type="button" data-role="Student">Student</button>
             </div>
             <div id="pinPanel" class="pin-panel">
-              <div class="kicker">Authorized staff only</div>
+              <div class="pin-panel-head">
+                <div class="kicker">Authorized staff only</div>
+                <button id="roleBack" class="back-step" type="button">← Change role</button>
+              </div>
               <div class="pin-box" onclick="document.getElementById('pin').focus()">
                 <div class="pin-dots" aria-label="Staff PIN">
                   <span></span><span></span><span></span><span></span>
@@ -205,6 +211,7 @@
         $('pinPanel').classList.add('show');
         $('pin').value = '';
         updatePinDots();
+        $('pinPanel').scrollIntoView({ behavior: 'smooth', block: 'center' });
         setTimeout(function(){ $('pin').focus(); }, 80);
         return;
       }
@@ -230,9 +237,9 @@
       } else {
         $('titleChoices').parentElement.classList.remove('hidden');
       }
-      $('handle').placeholder = selectedRole === 'Parent' ? 'Bulls_Family' : selectedRole === 'Student' ? '4th_Grade_Bull' : 'Mr_Wong';
+      $('handle').placeholder = selectedRole === 'Parent' ? 'Johnnys_Mom' : selectedRole === 'Student' ? 'Student_Bull' : 'Mr_Wong';
       updatePreview();
-      $('handle').focus();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     function updatePinDots() {
       var length = $('pin').value.length;
@@ -312,6 +319,18 @@
 
     fillSelect('sport', sports);
     fillSelect('grade', grades);
+    $('roleBack').addEventListener('click', function() {
+      selectedRole = '';
+      title = '';
+      enteredPin = '';
+      $('pinPanel').classList.remove('show');
+      $('pin').value = '';
+      $('lockStatus').textContent = '';
+      updatePinDots();
+      document.querySelectorAll('[data-role]').forEach(function(button) {
+        button.classList.remove('active');
+      });
+    });
     document.querySelectorAll('[data-role]').forEach(function(button) {
       button.addEventListener('click', function() { activateRole(button.getAttribute('data-role')); });
     });
