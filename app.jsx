@@ -1036,6 +1036,8 @@ function Feed({ posts, loading, endpoint }) {
     body.append("action", "react");
     body.append("postId", postId);
     body.append("reaction", reaction);
+    body.append("mode", previous === reaction ? "remove" : "add");
+    body.append("previousReaction", previous);
     body.append("voterKey", reactionDeviceKey());
     body.append("ua", navigator.userAgent);
     fetch(endpoint, { method: "POST", body, mode: "no-cors" }).catch(() => {});

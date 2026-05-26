@@ -172,6 +172,8 @@ function _savePost(ss, params) {
 function _saveReaction(ss, params) {
   var postId = String(params.postId || '').trim();
   var reaction = String(params.reaction || '').trim().toLowerCase();
+  var mode = String(params.mode || 'add').trim().toLowerCase();
+  var previousReaction = String(params.previousReaction || '').trim().toLowerCase();
   var voterKey = String(params.voterKey || '').trim();
   var allowed = { like: 'Likes', heart: 'Hearts', celebrate: 'Celebrates' };
   if (!postId || !allowed[reaction] || !voterKey) {
@@ -195,6 +197,16 @@ function _saveReaction(ss, params) {
     }
   });
 
+  if (mode === 'remove') {
+    var reactionToRemove = existingReaction || reaction;
+    if (allowed[reactionToRemove]) {
+      _incrementReaction(sheet, rowNumber, allowed[reactionToRemove], -1);
+    }
+    if (existingIndex !== -1) tokens.splice(existingIndex, 1);
+    sheet.getRange(rowNumber, voterColumn).setValue(tokens.join('|'));
+    return _json({ ok: true, removed: true });
+  }
+
   if (existingIndex !== -1 && existingReaction === reaction) {
     _incrementReaction(sheet, rowNumber, allowed[reaction], -1);
     tokens.splice(existingIndex, 1);
@@ -205,6 +217,8 @@ function _saveReaction(ss, params) {
   if (existingIndex !== -1 && existingReaction && allowed[existingReaction]) {
     _incrementReaction(sheet, rowNumber, allowed[existingReaction], -1);
     tokens.splice(existingIndex, 1);
+  } else if (previousReaction && previousReaction !== reaction && allowed[previousReaction]) {
+    _incrementReaction(sheet, rowNumber, allowed[previousReaction], -1);
   }
 
   _incrementReaction(sheet, rowNumber, allowed[reaction], 1);
