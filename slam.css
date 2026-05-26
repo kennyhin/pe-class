@@ -1217,7 +1217,7 @@ textarea {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
-.photo-picker input {
+.photo-input {
   position: absolute;
   width: 1px;
   height: 1px;

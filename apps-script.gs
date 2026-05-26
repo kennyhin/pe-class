@@ -151,7 +151,7 @@ function _savePost(ss, params) {
       image = _savePostImage(imageData, imageName, imageType);
       _setByHeader(sheet, rowNumber, 'Image', image);
     } catch (imageErr) {
-      _setByHeader(sheet, rowNumber, 'Image', '');
+      _setByHeader(sheet, rowNumber, 'Image', 'Image upload failed: ' + String(imageErr).slice(0, 160));
     }
   }
   return _json({ ok: true });

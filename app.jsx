@@ -620,6 +620,11 @@ function linkifyText(text) {
   });
 }
 
+function isImageUrl(url) {
+  const value = String(url || "").trim();
+  return /^https?:\/\//i.test(value) || /^data:image\//i.test(value);
+}
+
 function LoadingState({ label = "Loading..." }) {
   return (
     <div className="loading-state" role="status" aria-live="polite">
@@ -930,7 +935,7 @@ function Feed({ posts, loading, endpoint }) {
                   {dateLabel && <span className="post-date">{dateLabel}</span>}
                 </div>
                 <p className="post-text">{linkifyText(p.body)}</p>
-                {p.image && (
+                {isImageUrl(p.image) && (
                   <a className="post-image-link" href={p.image} target="_blank" rel="noopener noreferrer" aria-label="Open update photo">
                     <img className="post-image" src={p.image} alt="" loading="lazy" />
                   </a>
@@ -974,6 +979,9 @@ function StaffPostModal({ endpoint, onClose }) {
   const [status, setStatus] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [photoBusy, setPhotoBusy] = useState(false);
+  const pinTapRef = useRef(0);
+  const photoInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
   const [form, setForm] = useState({
     name: "",
     handle: "",
@@ -1042,11 +1050,11 @@ function StaffPostModal({ endpoint, onClose }) {
           const sx = Math.round((img.width - size) / 2);
           const sy = Math.round((img.height - size) / 2);
           const canvas = document.createElement("canvas");
-          canvas.width = 640;
-          canvas.height = 640;
+          canvas.width = 420;
+          canvas.height = 420;
           const ctx = canvas.getContext("2d");
-          ctx.drawImage(img, sx, sy, size, size, 0, 0, 640, 640);
-          resolve(canvas.toDataURL("image/jpeg", 0.72));
+          ctx.drawImage(img, sx, sy, size, size, 0, 0, 420, 420);
+          resolve(canvas.toDataURL("image/jpeg", 0.64));
         };
         img.onerror = reject;
         img.src = reader.result;
@@ -1081,14 +1089,19 @@ function StaffPostModal({ endpoint, onClose }) {
   }
 
   function pinButton(label, action) {
+    function activate(e) {
+      if (e) e.preventDefault();
+      const now = Date.now();
+      if (now - pinTapRef.current < 180) return;
+      pinTapRef.current = now;
+      action();
+    }
     return (
       <button
         key={label}
         type="button"
-        onPointerDown={(e) => {
-          e.preventDefault();
-          action();
-        }}
+        onClick={activate}
+        onTouchEnd={activate}
       >
         {label}
       </button>
@@ -1202,14 +1215,14 @@ function StaffPostModal({ endpoint, onClose }) {
                   <input className="staff-input" value={form.image} onChange={(e) => update("image", e.target.value)} placeholder="Shared photo URL" />
                 </label>
                 <div className="photo-actions">
-                  <label className="photo-picker">
-                    <input type="file" accept="image/*" onChange={choosePhoto} />
-                    <span>{form.imageData ? "Change photo" : "Choose photo"}</span>
-                  </label>
-                  <label className="photo-picker">
-                    <input type="file" accept="image/*" capture="environment" onChange={choosePhoto} />
-                    <span>Take photo</span>
-                  </label>
+                  <input ref={photoInputRef} className="photo-input" type="file" accept="image/*" onChange={choosePhoto} />
+                  <input ref={cameraInputRef} className="photo-input" type="file" accept="image/*" capture="environment" onChange={choosePhoto} />
+                  <button className="photo-picker" type="button" onClick={() => photoInputRef.current?.click()}>
+                    {form.imageData ? "Change photo" : "Choose photo"}
+                  </button>
+                  <button className="photo-picker" type="button" onClick={() => cameraInputRef.current?.click()}>
+                    Take photo
+                  </button>
                 </div>
                 {photoBusy && <div className="staff-status">Preparing photo...</div>}
                 {form.imageData && (
