@@ -134,32 +134,10 @@
     fillSelect('sport', sports);
     $('date').value = todayKey();
 
-    function verifyPin(pin) {
-      return new Promise(function(resolve) {
-        var callbackName = 'slamPinCheck' + Date.now();
-        var script = document.createElement('script');
-        var done = false;
-        window[callbackName] = function(result) {
-          done = true;
-          delete window[callbackName];
-          script.remove();
-          resolve(!!(result && result.ok));
-        };
-        script.onerror = function() {
-          if (done) return;
-          delete window[callbackName];
-          script.remove();
-          resolve(false);
-        };
-        script.src = ENDPOINT + '?action=verifyPin&pin=' + encodeURIComponent(pin) + '&callback=' + encodeURIComponent(callbackName) + '&_=' + Date.now();
-        document.body.appendChild(script);
-        setTimeout(function() {
-          if (done) return;
-          delete window[callbackName];
-          script.remove();
-          resolve(false);
-        }, 7000);
-      });
+    function pinHash(pin) {
+      return String(pin || '').split('').reduce(function(total, char) {
+        return (total * 31) + char.charCodeAt(0);
+      }, 0);
     }
 
     function unlock() {
@@ -169,23 +147,18 @@
         $('pin').focus();
         return;
       }
-      $('unlock').disabled = true;
-      $('lockStatus').classList.remove('error');
-      $('lockStatus').textContent = 'Checking access...';
-      verifyPin(pin).then(function(ok) {
-        $('unlock').disabled = false;
-        if (!ok) {
-          $('lockStatus').classList.add('error');
-          $('lockStatus').textContent = 'That code did not match. Please try again.';
-          $('pin').value = '';
-          $('pin').focus();
-          return;
-        }
-        enteredPin = pin;
-        $('lock').classList.add('hidden');
-        $('form').classList.remove('hidden');
-        $('name').focus();
-      });
+      if (pinHash(pin) !== 1687348) {
+        $('lockStatus').classList.add('error');
+        $('lockStatus').textContent = 'That code did not match. Please try again.';
+        $('pin').value = '';
+        $('pin').focus();
+        return;
+      }
+      enteredPin = pin;
+      $('lockStatus').textContent = '';
+      $('lock').classList.add('hidden');
+      $('form').classList.remove('hidden');
+      $('name').focus();
     }
     $('unlock').addEventListener('click', unlock);
     $('pin').addEventListener('input', function(){
