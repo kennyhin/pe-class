@@ -584,23 +584,37 @@ function formatEventDate(dateKey) {
   });
 }
 
-function formatPostDate(dateKey) {
-  const date = new Date(`${String(dateKey || "").slice(0, 10)}T00:00:00`);
-  if (Number.isNaN(date.getTime())) return "";
-  return date.toLocaleDateString("default", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
 function postDateKey(post) {
   return String(post?.date || post?.time || "").slice(0, 10);
 }
 
+function postSortKey(post) {
+  return String(post?.timestamp || post?.time || post?.date || "");
+}
+
 function sortPostsByDate(a, b) {
-  return postDateKey(b).localeCompare(postDateKey(a))
+  return postSortKey(b).localeCompare(postSortKey(a))
     || String(b.name || "").localeCompare(String(a.name || ""));
+}
+
+function formatRelativePostTime(post) {
+  const raw = post?.timestamp || post?.time || post?.date;
+  if (!raw) return "";
+  let date = raw instanceof Date ? raw : new Date(raw);
+  if (Number.isNaN(date.getTime()) && postDateKey(post)) {
+    date = new Date(`${postDateKey(post)}T00:00:00`);
+  }
+  if (Number.isNaN(date.getTime())) return "";
+  const diffMs = Date.now() - date.getTime();
+  if (diffMs < 0) return "now";
+  const minutes = Math.max(1, Math.floor(diffMs / 60000));
+  if (minutes < 60) return `${minutes}m`;
+  const hours = Math.floor(minutes / 60);
+  if (hours <= 5) return `${hours}h`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${Math.max(1, days)}d`;
+  const weeks = Math.floor(days / 7);
+  return `${Math.max(1, weeks)}w`;
 }
 
 function linkifyText(text) {
@@ -935,7 +949,7 @@ function Feed({ posts, loading, endpoint }) {
           <div className="cal-empty">No updates yet.</div>
         ) : sortedPosts.map((p, i) => {
           const icon = getEventIcon({ sport: p.sport, title: p.sport, type: "event" });
-          const dateLabel = formatPostDate(postDateKey(p));
+          const dateLabel = formatRelativePostTime(p);
           const link = String(p.link || "").trim();
           const imageUrl = String(p.image || "").trim();
           const displayUrl = displayImageUrl(imageUrl);

@@ -11,7 +11,7 @@
  *
  * Optional content tabs:
  *   Events: Date | Type | Sport | Title | Time | Location | Opponent | Notes
- *   Posts:  Name | Handle | Body | Time | Accent | Date | Sport | Link | Image
+ *   Posts:  Timestamp | Approved | Name | Handle | Body | Time | Accent | Date | Sport | Link | Image | Grade | Submitter
  *   FAQ:    Question | Answer | Keywords | Link
  *
  * Questions columns (created automatically on first parent question):
@@ -115,17 +115,21 @@ function _saveQuestion(ss, params) {
 
 function _savePost(ss, params) {
   var pin = String(params.pin || '').trim();
-  if (pin !== ADMIN_POST_PIN) {
+  var submitter = String(params.submitter || params.name || '').trim();
+  var needsPin = ['admin', 'teacher', 'coach'].indexOf(submitter.toLowerCase()) !== -1;
+  if (needsPin && pin !== ADMIN_POST_PIN) {
     return _json({ ok: false, error: 'Staff PIN required' });
   }
 
   var name = String(params.name || '').trim();
   var handle = String(params.handle || '').trim();
   var body = String(params.body || '').trim();
-  var date = String(params.date || '').trim();
+  var timestamp = new Date();
+  var date = Utilities.formatDate(timestamp, Session.getScriptTimeZone(), 'yyyy-MM-dd');
   var sport = String(params.sport || '').trim();
   var link = String(params.link || '').trim();
   var image = String(params.image || '').trim();
+  var grade = String(params.grade || '').trim();
   var imageData = String(params.imageData || '').trim();
   var imageName = String(params.imageName || 'slam-update.jpg').trim();
   var imageType = String(params.imageType || 'image/jpeg').trim();
@@ -133,18 +137,22 @@ function _savePost(ss, params) {
   if (!name || !body || body.length < 3) {
     return _json({ ok: false, error: 'Name and message are required' });
   }
-  if (!date) date = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
   if (!handle) handle = '@slamES';
 
   var sheet = _ensurePostLikeSheet(ss, POSTS_SHEET_NAME, false);
   var rowNumber = _appendByHeaders(sheet, {
+    Timestamp: timestamp,
+    Approved: needsPin,
     Name: name,
     Handle: handle,
     Body: body,
+    Time: timestamp,
     Date: date,
     Sport: sport,
     Link: link,
-    Image: image
+    Image: image,
+    Grade: grade,
+    Submitter: submitter
   });
   if (imageData) {
     try {
@@ -283,9 +291,14 @@ function _ensureEventsSheet(ss) {
 
 function _posts(ss) {
   _ensurePostsSheet(ss);
-  return _rows(ss, POSTS_SHEET_NAME).map(function (row) {
+  return _rows(ss, POSTS_SHEET_NAME).filter(function (row) {
+    if (row.approved === '' || row.approved === null || typeof row.approved === 'undefined') return true;
+    return row.approved === true || String(row.approved).toLowerCase() === 'true' || String(row.approved).toLowerCase() === 'yes';
+  }).map(function (row) {
+    var timestamp = row.timestamp || row.time || row.date;
     return {
       date: _dateKey(row.date || row.time),
+      timestamp: _timestampValue(timestamp),
       sport: String(row.sport || '').trim(),
       name: String(row.name || '').trim(),
       handle: String(row.handle || '').trim(),
@@ -297,7 +310,7 @@ function _posts(ss) {
   }).filter(function (post) {
     return post.name && post.body;
   }).sort(function (a, b) {
-    return String(b.date || '').localeCompare(String(a.date || ''));
+    return String(b.timestamp || b.date || '').localeCompare(String(a.timestamp || a.date || ''));
   });
 }
 
@@ -306,13 +319,15 @@ function _ensurePostsSheet(ss) {
 }
 
 function _ensurePostLikeSheet(ss, sheetName, addExample) {
-  var headers = ['Name', 'Handle', 'Body', 'Time', 'Accent', 'Date', 'Sport', 'Link', 'Image'];
+  var headers = ['Timestamp', 'Approved', 'Name', 'Handle', 'Body', 'Time', 'Accent', 'Date', 'Sport', 'Link', 'Image', 'Grade', 'Submitter'];
   var sheet = ss.getSheetByName(sheetName);
   if (!sheet) {
     sheet = ss.insertSheet(sheetName);
     sheet.appendRow(headers);
     if (addExample) {
       sheet.appendRow([
+        new Date(),
+        true,
         'SLAM! Athletics',
         '@slamES',
         'Summer camp registration opens Monday.',
@@ -320,6 +335,8 @@ function _ensurePostLikeSheet(ss, sheetName, addExample) {
         '',
         new Date(),
         'Basketball',
+        '',
+        '',
         '',
         ''
       ]);
@@ -336,6 +353,8 @@ function _ensurePostLikeSheet(ss, sheetName, addExample) {
     .build();
   var sportColumn = _headerColumn(sheet, 'Sport');
   if (sportColumn) sheet.getRange(2, sportColumn, Math.max(200, sheet.getMaxRows() - 1), 1).setDataValidation(sportRule);
+  var approvedColumn = _headerColumn(sheet, 'Approved');
+  if (approvedColumn) sheet.getRange(2, approvedColumn, Math.max(200, sheet.getMaxRows() - 1), 1).insertCheckboxes();
   return sheet;
 }
 
@@ -444,4 +463,11 @@ function _dateKey(value) {
     return Utilities.formatDate(value, Session.getScriptTimeZone(), 'yyyy-MM-dd');
   }
   return String(value || '').trim().slice(0, 10);
+}
+
+function _timestampValue(value) {
+  if (Object.prototype.toString.call(value) === '[object Date]' && !isNaN(value.getTime())) {
+    return value.toISOString();
+  }
+  return String(value || '').trim();
 }

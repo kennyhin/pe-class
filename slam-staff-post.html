@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SLAM! Staff Post</title>
+  <title>SLAM! Post</title>
   <link rel="icon" type="image/svg+xml" href="assets/mark-square.svg">
   <style>
     * { box-sizing: border-box; }
@@ -19,8 +19,15 @@
     .kicker { color:#80FF00; font:900 11px monospace; letter-spacing:.14em; text-transform:uppercase; margin-bottom:10px; }
     h2 { margin:0 0 10px; font:38px/.92 Impact,"Arial Black",sans-serif; text-transform:uppercase; }
     p { margin:0 0 18px; color:#bcbcbc; line-height:1.45; }
-    .lock { display:grid; justify-items:center; gap:16px; min-height:420px; align-content:center; text-align:center; }
-    .pin-box { position:relative; width:min(100%,320px); padding:20px; border:1px solid rgba(255,255,255,.12); border-radius:24px; background:rgba(255,255,255,.04); }
+    .gate { display:grid; gap:18px; min-height:420px; align-content:center; }
+    .gate-inner { max-width:740px; margin:0 auto; width:100%; }
+    .role-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
+    .role-btn, .choice { min-height:50px; border:1px solid rgba(255,255,255,.14); border-radius:999px; background:rgba(255,255,255,.06); color:#fff; font:900 11px monospace; letter-spacing:.12em; text-transform:uppercase; cursor:pointer; }
+    .role-btn:hover, .choice:hover { border-color:rgba(128,255,0,.45); }
+    .role-btn.active, .choice.active { border-color:rgba(218,0,22,.72); background:rgba(218,0,22,.22); box-shadow:0 0 0 3px rgba(218,0,22,.1); }
+    .pin-panel { display:none; margin-top:18px; padding:18px; border:1px solid rgba(255,255,255,.12); border-radius:24px; background:rgba(255,255,255,.04); text-align:center; }
+    .pin-panel.show { display:block; }
+    .pin-box { position:relative; width:min(100%,320px); margin:0 auto; padding:20px; border:1px solid rgba(255,255,255,.12); border-radius:24px; background:rgba(0,0,0,.22); }
     .pin-dots { display:flex; justify-content:center; gap:12px; margin:12px 0 4px; }
     .pin-dots span { width:17px; height:17px; border:2px solid rgba(255,255,255,.28); border-radius:50%; background:rgba(255,255,255,.04); }
     .pin-dots span.on { border-color:#80FF00; background:#80FF00; box-shadow:0 0 20px rgba(128,255,0,.34); }
@@ -36,8 +43,6 @@
     input:focus, select:focus, textarea:focus { border-color:rgba(128,255,0,.58); box-shadow:0 0 0 3px rgba(128,255,0,.1); }
     label { display:grid; gap:7px; color:#8d8d8d; font:900 10px monospace; letter-spacing:.1em; text-transform:uppercase; }
     .choice-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
-    .choice { min-height:48px; border:1px solid rgba(255,255,255,.14); border-radius:999px; background:rgba(255,255,255,.06); color:#fff; font:900 11px monospace; letter-spacing:.12em; text-transform:uppercase; cursor:pointer; }
-    .choice.active { border-color:rgba(218,0,22,.72); background:rgba(218,0,22,.22); box-shadow:0 0 0 3px rgba(218,0,22,.1); }
     .handle { display:grid; grid-template-columns:44px 1fr; border:1px solid rgba(128,255,0,.24); border-radius:13px; overflow:hidden; background:rgba(128,255,0,.06); }
     .handle span { display:grid; place-items:center; color:#80FF00; font:900 16px monospace; border-right:1px solid rgba(128,255,0,.2); }
     .handle input { border:0; border-radius:0; background:transparent; }
@@ -46,12 +51,14 @@
     .photo-btn input { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
     .btn { min-height:50px; border:0; border-radius:999px; padding:0 18px; background:#80FF00; color:#050505; font:900 12px monospace; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; }
     .btn.secondary { display:grid; place-items:center; background:rgba(255,255,255,.08); color:#fff; border:1px solid rgba(255,255,255,.14); text-decoration:none; }
+    .review-note { border:1px solid rgba(128,255,0,.18); border-radius:14px; padding:12px; color:#bcbcbc; background:rgba(128,255,0,.05); font-size:13px; line-height:1.4; }
     .preview-card { position:sticky; top:18px; border:1px solid rgba(255,255,255,.13); border-radius:20px; padding:18px; background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03)); }
     .post-preview { display:grid; grid-template-columns:54px 1fr; gap:12px; padding:15px; border:1px solid rgba(255,255,255,.13); border-radius:18px; background:#1c1c1c; }
     .avatar { width:54px; height:54px; display:grid; place-items:center; border-radius:14px; background:#101010; font-size:29px; }
     .meta { display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; }
     .title { font-weight:900; color:#fff; }
     .handle-copy { color:#80FF00; font:900 11px monospace; opacity:.9; }
+    .grade-copy { color:#ff5f6b; font:900 11px monospace; opacity:.95; }
     .date { color:#8d8d8d; font:900 10px monospace; margin-left:auto; text-transform:uppercase; }
     .post-text { margin:8px 0 10px; color:#f2f2f2; line-height:1.35; }
     .image-preview { width:104px; height:104px; object-fit:cover; border:1px solid rgba(255,255,255,.18); border-radius:15px; background:#111; }
@@ -60,9 +67,9 @@
       .page { padding:10px; }
       .top { align-items:flex-start; flex-direction:column; }
       .content { padding:18px; }
-      .builder { grid-template-columns:1fr; }
+      .role-grid, .builder { grid-template-columns:1fr; }
+      .choice-row, .photo-row { grid-template-columns:1fr; }
       .preview-card { position:static; order:-1; }
-      .photo-row, .choice-row { grid-template-columns:1fr; }
     }
   </style>
 </head>
@@ -72,36 +79,45 @@
       <div class="top">
         <div class="brand">
           <img src="assets/bull-only-transparent.png" alt="">
-          <h1>Staff Post</h1>
+          <h1>Post Update</h1>
         </div>
         <a class="back" href="slam.html">← Back to homepage</a>
       </div>
       <div class="content">
-        <section id="lock" class="lock">
-          <div>
-            <div class="kicker">Authorized staff only</div>
-            <h2>Enter Staff PIN</h2>
-            <p>This tool is for approved SLAM! Athletics staff and coaches to update the public feed.</p>
-          </div>
-          <div class="pin-box" onclick="document.getElementById('pin').focus()">
-            <div class="pin-dots" aria-label="Staff PIN">
-              <span></span><span></span><span></span><span></span>
+        <section id="gate" class="gate">
+          <div class="gate-inner">
+            <div class="kicker">Choose access</div>
+            <h2>Who is posting?</h2>
+            <div class="role-grid">
+              <button class="role-btn" type="button" data-role="Admin">Admin</button>
+              <button class="role-btn" type="button" data-role="Teacher">Teacher</button>
+              <button class="role-btn" type="button" data-role="Coach">Coach</button>
+              <button class="role-btn" type="button" data-role="Parent">Parent</button>
+              <button class="role-btn" type="button" data-role="Student">Student</button>
             </div>
-            <input id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="one-time-code" aria-label="Staff PIN">
+            <div id="pinPanel" class="pin-panel">
+              <div class="kicker">Authorized staff only</div>
+              <div class="pin-box" onclick="document.getElementById('pin').focus()">
+                <div class="pin-dots" aria-label="Staff PIN">
+                  <span></span><span></span><span></span><span></span>
+                </div>
+                <input id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="one-time-code" aria-label="Staff PIN">
+              </div>
+              <div id="lockStatus" class="status error"></div>
+            </div>
           </div>
-          <div id="lockStatus" class="status error"></div>
         </section>
 
         <section id="builder" class="builder hidden">
           <form id="form" class="form">
             <div>
-              <div class="kicker">New update</div>
-              <h2>Build Post</h2>
-              <p>Post encouraging words to athletes, reminders for families, or quick team updates.</p>
+              <div class="kicker">Build post</div>
+              <h2 id="builderTitle">New Post</h2>
+              <p id="builderCopy">Post encouraging words to athletes, reminders for families, or quick team updates.</p>
             </div>
             <label>Title
               <div class="choice-row" id="titleChoices">
-                <button class="choice active" type="button" data-title="Admin">Admin</button>
+                <button class="choice" type="button" data-title="Admin">Admin</button>
                 <button class="choice" type="button" data-title="Teacher">Teacher</button>
                 <button class="choice" type="button" data-title="Coach">Coach</button>
               </div>
@@ -109,14 +125,14 @@
             <label>Handle
               <div class="handle"><span>@</span><input id="handle" required placeholder="Mr_Wong"></div>
             </label>
+            <label id="gradeWrap" class="hidden">Grade level
+              <select id="grade"></select>
+            </label>
             <label>Sport supporting
               <select id="sport" required></select>
             </label>
             <label>Post
               <textarea id="body" required placeholder="Post..."></textarea>
-            </label>
-            <label>Date
-              <input id="date" type="date" required>
             </label>
             <label>Link (optional)
               <input id="link" type="url" placeholder="https://...">
@@ -128,7 +144,8 @@
               <label class="photo-btn">Choose photo<input id="photo" type="file" accept="image/*"></label>
               <label class="photo-btn">Take photo<input id="camera" type="file" accept="image/*" capture="environment"></label>
             </div>
-            <button id="submit" class="btn" type="submit">Post update</button>
+            <div id="reviewNote" class="review-note hidden">Parent and student posts are sent for review first. They will appear on the feed after SLAM! Athletics approves them.</div>
+            <button id="submit" class="btn" type="submit">Submit post</button>
             <a class="btn secondary" href="slam.html">Cancel</a>
             <div id="status" class="status"></div>
           </form>
@@ -141,8 +158,9 @@
                 <div class="meta">
                   <span id="previewTitle" class="title">Admin</span>
                   <span id="previewHandle" class="handle-copy">@Mr_Wong</span>
-                  <span id="previewDate" class="date"></span>
+                  <span class="date">now</span>
                 </div>
+                <div id="previewGrade" class="grade-copy hidden"></div>
                 <div id="previewBody" class="post-text">Your update will preview here as you type.</div>
                 <img id="previewImage" class="image-preview hidden" alt="Selected photo preview">
               </div>
@@ -155,18 +173,17 @@
   <script>
     var ENDPOINT = 'https://script.google.com/macros/s/AKfycbxKWDLcTjDwwXb-rNq9LTpqQwmlGgvLHZf9kJKDG7DHqwNp6vjaXD8S4ccG_41CBMfk/exec';
     var sports = ['Basketball','Soccer','Track and Field','Cross Country','Cheer','Volleyball','Flag Football','Baseball','Softball','Tennis','Other'];
+    var grades = ['Kindergarten','1st Grade','2nd Grade','3rd Grade','4th Grade','5th Grade'];
     var sportIcons = { Basketball:'🏀', Soccer:'⚽', 'Track and Field':'🏃', 'Cross Country':'🏃', Cheer:'📣', Volleyball:'🏐', 'Flag Football':'🏈', Baseball:'⚾', Softball:'🥎', Tennis:'🎾', Other:'⭐' };
+    var staffRoles = ['Admin','Teacher','Coach'];
+    var selectedRole = '';
+    var title = '';
     var enteredPin = '';
-    var title = 'Admin';
     var imageData = '';
     var imageName = '';
     var imageType = '';
 
     function $(id){ return document.getElementById(id); }
-    function todayKey() {
-      var d = new Date();
-      return [d.getFullYear(), String(d.getMonth()+1).padStart(2,'0'), String(d.getDate()).padStart(2,'0')].join('-');
-    }
     function fillSelect(id, values) {
       $(id).innerHTML = values.map(function(v){ return '<option value="'+v.replace(/"/g,'&quot;')+'">'+v+'</option>'; }).join('');
     }
@@ -175,11 +192,47 @@
         return (total * 31) + char.charCodeAt(0);
       }, 0);
     }
-    function formatDate(value) {
-      if (!value) return '';
-      var parts = value.split('-');
-      if (parts.length !== 3) return value;
-      return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2])).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+    function isStaff(role) {
+      return staffRoles.indexOf(role) !== -1;
+    }
+    function activateRole(role) {
+      selectedRole = role;
+      title = role;
+      document.querySelectorAll('[data-role]').forEach(function(button) {
+        button.classList.toggle('active', button.getAttribute('data-role') === role);
+      });
+      if (isStaff(role)) {
+        $('pinPanel').classList.add('show');
+        $('pin').value = '';
+        updatePinDots();
+        setTimeout(function(){ $('pin').focus(); }, 80);
+        return;
+      }
+      enteredPin = '';
+      openBuilder();
+    }
+    function openBuilder() {
+      $('gate').classList.add('hidden');
+      $('builder').classList.remove('hidden');
+      $('reviewNote').classList.toggle('hidden', isStaff(selectedRole));
+      $('gradeWrap').classList.toggle('hidden', selectedRole !== 'Student');
+      $('builderTitle').textContent = isStaff(selectedRole) ? 'Staff Post' : selectedRole + ' Post';
+      $('builderCopy').textContent = isStaff(selectedRole)
+        ? 'Build a quick update for families.'
+        : 'Build a post for SLAM! Athletics to review.';
+      document.querySelectorAll('[data-title]').forEach(function(button) {
+        var buttonTitle = button.getAttribute('data-title');
+        button.classList.toggle('hidden', !isStaff(selectedRole));
+        button.classList.toggle('active', buttonTitle === title);
+      });
+      if (!isStaff(selectedRole)) {
+        $('titleChoices').parentElement.classList.add('hidden');
+      } else {
+        $('titleChoices').parentElement.classList.remove('hidden');
+      }
+      $('handle').placeholder = selectedRole === 'Parent' ? 'Bulls_Family' : selectedRole === 'Student' ? '4th_Grade_Bull' : 'Mr_Wong';
+      updatePreview();
+      $('handle').focus();
     }
     function updatePinDots() {
       var length = $('pin').value.length;
@@ -199,19 +252,18 @@
         return;
       }
       enteredPin = pin;
-      $('lock').classList.add('hidden');
-      $('builder').classList.remove('hidden');
-      $('handle').focus();
+      openBuilder();
     }
     function updatePreview() {
       var sport = $('sport').value || 'Basketball';
-      var handle = $('handle').value.trim().replace(/^@+/, '') || 'Mr_Wong';
+      var handle = $('handle').value.trim().replace(/^@+/, '') || $('handle').placeholder || 'Mr_Wong';
       var body = $('body').value.trim() || 'Your update will preview here as you type.';
-      $('previewTitle').textContent = title;
+      $('previewTitle').textContent = title || selectedRole || 'Post';
       $('previewHandle').textContent = '@' + handle;
       $('previewBody').textContent = body;
-      $('previewDate').textContent = formatDate($('date').value);
       $('previewAvatar').textContent = sportIcons[sport] || sportIcons.Other;
+      $('previewGrade').textContent = selectedRole === 'Student' ? $('grade').value : '';
+      $('previewGrade').classList.toggle('hidden', selectedRole !== 'Student');
       if ($('image').value.trim() && !imageData) {
         $('previewImage').src = $('image').value.trim();
         $('previewImage').classList.remove('hidden');
@@ -259,11 +311,9 @@
     }
 
     fillSelect('sport', sports);
-    $('date').value = todayKey();
-    $('pin').focus();
-    $('pin').addEventListener('input', function(){
-      this.value = this.value.replace(/\D/g,'').slice(0,4);
-      unlock();
+    fillSelect('grade', grades);
+    document.querySelectorAll('[data-role]').forEach(function(button) {
+      button.addEventListener('click', function() { activateRole(button.getAttribute('data-role')); });
     });
     document.querySelectorAll('[data-title]').forEach(function(button) {
       button.addEventListener('click', function() {
@@ -272,7 +322,11 @@
         updatePreview();
       });
     });
-    ['handle','sport','body','date','image'].forEach(function(id) {
+    $('pin').addEventListener('input', function(){
+      this.value = this.value.replace(/\D/g,'').slice(0,4);
+      unlock();
+    });
+    ['handle','sport','grade','body','image'].forEach(function(id) {
       $(id).addEventListener('input', updatePreview);
       $(id).addEventListener('change', updatePreview);
     });
@@ -284,15 +338,16 @@
       e.preventDefault();
       $('submit').disabled = true;
       $('status').classList.remove('error');
-      $('status').textContent = 'Posting update...';
+      $('status').textContent = isStaff(selectedRole) ? 'Posting update...' : 'Sending for review...';
       var fd = new FormData();
       fd.append('action', 'post');
       fd.append('pin', enteredPin);
-      fd.append('name', title);
+      fd.append('submitter', selectedRole);
+      fd.append('name', title || selectedRole);
+      fd.append('grade', selectedRole === 'Student' ? $('grade').value : '');
       fd.append('sport', $('sport').value);
       fd.append('handle', '@' + $('handle').value.trim().replace(/^@+/, ''));
       fd.append('body', $('body').value.trim());
-      fd.append('date', $('date').value);
       fd.append('link', $('link').value.trim());
       fd.append('image', $('image').value.trim());
       fd.append('imageData', imageData);
@@ -300,12 +355,14 @@
       fd.append('imageType', imageType);
       fd.append('ua', navigator.userAgent);
       fetch(ENDPOINT, { method:'POST', body:fd, mode:'no-cors' }).then(function() {
-        $('status').textContent = 'Post sent. It may take a moment to appear in the feed.';
-        setTimeout(function(){ location.href = 'slam.html'; }, 1200);
+        $('status').textContent = isStaff(selectedRole)
+          ? 'Post sent. It may take a moment to appear in the feed.'
+          : 'Post sent for review. Thank you for sharing!';
+        setTimeout(function(){ location.href = 'slam.html'; }, 1400);
       }).catch(function() {
         $('submit').disabled = false;
         $('status').classList.add('error');
-        $('status').textContent = 'Could not post. Check connection and try again.';
+        $('status').textContent = 'Could not submit. Check connection and try again.';
       });
     });
   </script>
