@@ -1051,6 +1051,45 @@ textarea {
   background: var(--slam-lime);
   box-shadow: 0 0 16px rgba(128,255,0,0.42);
 }
+.pin-entry {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  margin: 0 0 14px;
+}
+.pin-entry input {
+  width: 100%;
+  height: 46px;
+  border: 1px solid rgba(255,255,255,0.13);
+  border-radius: 13px;
+  background: rgba(0,0,0,0.34);
+  color: var(--slam-white);
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0.3em;
+  text-align: center;
+  outline: none;
+}
+.pin-entry input:focus {
+  border-color: rgba(128,255,0,0.55);
+  box-shadow: 0 0 0 3px rgba(128,255,0,0.10);
+}
+.pin-entry button {
+  min-height: 46px;
+  border: 0;
+  border-radius: 13px;
+  padding: 0 14px;
+  background: var(--slam-lime);
+  color: var(--slam-black);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  touch-action: manipulation;
+}
 .pin-pad {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1616,6 +1655,7 @@ textarea {
   .staff-modal-panel { max-height: calc(100vh - 20px); border-radius: 18px; }
   .staff-lock, .staff-form { padding: 22px 16px 16px; }
   .staff-lock h3, .staff-form h3 { font-size: 28px; }
+  .pin-entry { grid-template-columns: 1fr; }
   .staff-choice-grid { grid-template-columns: 1fr; }
   .photo-actions { grid-template-columns: 1fr; }
   .staff-actions { align-items: stretch; flex-direction: column; }

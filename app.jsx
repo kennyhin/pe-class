@@ -1019,6 +1019,16 @@ function StaffPostModal({ endpoint, onClose }) {
     }
   }
 
+  function unlockWithPin(value = pin) {
+    if (String(value).trim() === "7171") {
+      setStatus("");
+      setUnlocked(true);
+      return;
+    }
+    setStatus("That code did not match. Please try again.");
+    setPin("");
+  }
+
   function nextStep() {
     setStatus("");
     if (step === 0 && !form.name) {
@@ -1151,6 +1161,26 @@ function StaffPostModal({ endpoint, onClose }) {
             <p>This posting tool is for SLAM! Athletics staff and coaches who are approved to update the public feed.</p>
             <div className="pin-dots" aria-label={`${pin.length} of 4 digits entered`}>
               {[0, 1, 2, 3].map((i) => <span key={i} className={i < pin.length ? "on" : ""} />)}
+            </div>
+            <div className="pin-entry">
+              <input
+                value={pin}
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength="4"
+                autoComplete="one-time-code"
+                aria-label="Staff PIN"
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "").slice(0, 4);
+                  setPin(value);
+                  if (value.length === 4) unlockWithPin(value);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") unlockWithPin();
+                }}
+                placeholder="7171"
+              />
+              <button type="button" onClick={() => unlockWithPin()}>Unlock</button>
             </div>
             <div className="pin-pad">
               {[1,2,3,4,5,6,7,8,9].map((digit) => pinButton(digit, () => pressDigit(String(digit))))}
