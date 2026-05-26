@@ -325,7 +325,8 @@ function _posts(ss) {
       body: String(row.body || '').trim(),
       link: String(row.link || row.url || '').trim(),
       image: String(row.image || row.photo || '').trim(),
-      grade: String(row.grade || '').trim()
+      grade: String(row.grade || '').trim(),
+      submitter: String(row.submitter || '').trim()
     };
   }).filter(function (post) {
     return post.name && post.body;

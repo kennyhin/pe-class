@@ -878,6 +878,28 @@ textarea {
   font-size: 13.5px;
   color: var(--fg);
 }
+.post-badge {
+  width: 15px;
+  height: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #050505;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+.post-badge.staff { background: #ffd166; box-shadow: 0 0 14px rgba(255,209,102,0.34); }
+.post-badge.parent { background: #9a9a9a; color: #101010; }
+.post-badge.student.grade-kinder { background: #ff3b30; color: #fff; }
+.post-badge.student.grade-first { background: #ff9500; }
+.post-badge.student.grade-second { background: #ffd60a; }
+.post-badge.student.grade-third { background: #80ff00; }
+.post-badge.student.grade-fourth { background: #36a3ff; color: #fff; }
+.post-badge.student.grade-fifth { background: #af52de; color: #fff; }
+.post-badge.student.grade-student { background: #ff5f6b; color: #fff; }
 .post-handle {
   font-family: var(--font-mono);
   font-size: 11px;

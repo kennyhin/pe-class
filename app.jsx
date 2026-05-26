@@ -656,6 +656,28 @@ function displayImageUrl(url) {
   return driveId ? `https://drive.google.com/thumbnail?id=${driveId}&sz=w500` : value;
 }
 
+function postBadge(post) {
+  const submitter = String(post?.submitter || post?.name || "").trim().toLowerCase();
+  const grade = String(post?.grade || "").trim().toLowerCase();
+  if (["admin", "teacher", "coach"].includes(submitter)) {
+    return { label: "✓", className: "staff", title: "Verified staff" };
+  }
+  if (submitter === "parent") {
+    return { label: "✓", className: "parent", title: "Approved parent" };
+  }
+  if (submitter === "student" || grade) {
+    const gradeKey = grade.includes("kindergarten") ? "kinder"
+      : grade.includes("1st") ? "first"
+      : grade.includes("2nd") ? "second"
+      : grade.includes("3rd") ? "third"
+      : grade.includes("4th") ? "fourth"
+      : grade.includes("5th") ? "fifth"
+      : "student";
+    return { label: "✓", className: `student grade-${gradeKey}`, title: "Approved student" };
+  }
+  return { label: "✓", className: "staff", title: "Verified update" };
+}
+
 function LoadingState({ label = "Loading..." }) {
   return (
     <div className="loading-state" role="status" aria-live="polite">
@@ -957,12 +979,14 @@ function Feed({ posts, loading, endpoint }) {
           const link = String(p.link || "").trim();
           const imageUrl = String(p.image || "").trim();
           const displayUrl = displayImageUrl(imageUrl);
+          const badge = postBadge(p);
           return (
             <article key={i} className="post">
               <div className="post-avatar" aria-label={p.sport || "Update"}>{icon}</div>
               <div className="post-body">
                 <div className="post-meta">
                   <span className="post-name">{p.name}</span>
+                  <span className={`post-badge ${badge.className}`} title={badge.title} aria-label={badge.title}>{badge.label}</span>
                   <span className="post-handle">{p.handle}</span>
                   {p.grade && <span className="post-grade">{p.grade}</span>}
                   {dateLabel && <span className="post-date">{dateLabel}</span>}
