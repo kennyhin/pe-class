@@ -184,6 +184,24 @@ function authorizeDrive() {
 
 function doGet(e) {
   var params = (e && e.parameter) || {};
+  if (String(params.action || '').toLowerCase() === 'debug') {
+    try {
+      var debugSs = _spreadsheet();
+      return _json({
+        ok: true,
+        spreadsheetName: debugSs.getName(),
+        spreadsheetId: debugSs.getId(),
+        spreadsheetUrl: debugSs.getUrl(),
+        postsSheetName: POSTS_SHEET_NAME,
+        postsRows: debugSs.getSheetByName(POSTS_SHEET_NAME)
+          ? Math.max(0, debugSs.getSheetByName(POSTS_SHEET_NAME).getLastRow() - 1)
+          : 0
+      });
+    } catch (debugErr) {
+      return _json({ ok: false, error: String(debugErr) });
+    }
+  }
+
   if (String(params.action || '').toLowerCase() === 'verifypin') {
     var callback = String(params.callback || '').replace(/[^\w.$]/g, '');
     var payload = { ok: String(params.pin || '').trim() === ADMIN_POST_PIN };
