@@ -292,8 +292,9 @@ function _ensureEventsSheet(ss) {
 function _posts(ss) {
   _ensurePostsSheet(ss);
   return _rows(ss, POSTS_SHEET_NAME).filter(function (row) {
-    if (row.approved === '' || row.approved === null || typeof row.approved === 'undefined') return true;
-    return row.approved === true || String(row.approved).toLowerCase() === 'true' || String(row.approved).toLowerCase() === 'yes';
+    var submitter = String(row.submitter || '').trim().toLowerCase();
+    if (!submitter) return true;
+    return _truthy(row.approved);
   }).map(function (row) {
     var timestamp = row.timestamp || row.time || row.date;
     return {
@@ -471,4 +472,11 @@ function _timestampValue(value) {
     return value.toISOString();
   }
   return String(value || '').trim();
+}
+
+function _truthy(value) {
+  return value === true
+    || String(value).toLowerCase() === 'true'
+    || String(value).toLowerCase() === 'yes'
+    || String(value).toLowerCase() === 'approved';
 }
