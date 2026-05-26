@@ -166,8 +166,27 @@ function _savePostImage(imageData, imageName, imageType) {
   return 'https://drive.google.com/uc?export=view&id=' + file.getId();
 }
 
+// Run this once from the Apps Script editor after pasting new code if Google
+// has not prompted for Drive permission yet. It forces the Drive authorization
+// screen, then deletes the temporary file.
+function authorizeDrive() {
+  var file = DriveApp.createFile('slam-drive-auth-test.txt', 'SLAM photo upload permission test');
+  file.setTrashed(true);
+}
+
 function doGet(e) {
   var params = (e && e.parameter) || {};
+  if (String(params.action || '').toLowerCase() === 'verifypin') {
+    var callback = String(params.callback || '').replace(/[^\w.$]/g, '');
+    var payload = { ok: String(params.pin || '').trim() === ADMIN_POST_PIN };
+    if (callback) {
+      return ContentService
+        .createTextOutput(callback + '(' + JSON.stringify(payload) + ');')
+        .setMimeType(ContentService.MimeType.JAVASCRIPT);
+    }
+    return _json(payload);
+  }
+
   if (String(params.action || '').toLowerCase() === 'all') {
     try {
       var ss = _spreadsheet();

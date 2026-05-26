@@ -950,6 +950,9 @@ textarea {
 .post-stats span:hover { color: var(--slam-white); }
 
 .staff-post-open {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   min-height: 42px;
   margin-top: 10px;
@@ -962,6 +965,7 @@ textarea {
   font-weight: 900;
   letter-spacing: 0.16em;
   text-transform: uppercase;
+  text-decoration: none;
   cursor: pointer;
 }
 .staff-post-open:hover {

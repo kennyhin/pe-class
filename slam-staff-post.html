@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SLAM! Staff Post</title>
+  <link rel="icon" type="image/svg+xml" href="assets/mark-square.svg">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:#050505; color:#f5f5f5; font-family:Arial,Helvetica,sans-serif; }
+    .page { min-height:100vh; padding:18px; background:radial-gradient(circle at 12% 10%,rgba(128,255,0,.1),transparent 28%),radial-gradient(circle at 90% 0,rgba(218,0,22,.18),transparent 26%),#050505; }
+    .shell { max-width:720px; margin:0 auto; border:1px solid rgba(255,255,255,.13); border-radius:24px; overflow:hidden; background:linear-gradient(180deg,rgba(28,28,28,.98),rgba(8,8,8,.98)); box-shadow:0 24px 80px rgba(0,0,0,.45); }
+    .top { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:18px; border-bottom:1px solid rgba(218,0,22,.35); background:linear-gradient(90deg,rgba(218,0,22,.24),rgba(255,255,255,.03)); }
+    .brand { display:flex; align-items:center; gap:12px; min-width:0; }
+    .brand img { width:48px; filter:drop-shadow(0 8px 18px rgba(0,0,0,.3)); }
+    h1 { margin:0; font:34px/.9 Impact,"Arial Black",sans-serif; text-transform:uppercase; }
+    .back { color:#80FF00; font:900 11px monospace; letter-spacing:.1em; text-transform:uppercase; text-decoration:none; white-space:nowrap; }
+    .content { padding:22px; }
+    .kicker { color:#80FF00; font:900 11px monospace; letter-spacing:.14em; text-transform:uppercase; margin-bottom:10px; }
+    h2 { margin:0 0 10px; font:38px/.92 Impact,"Arial Black",sans-serif; text-transform:uppercase; }
+    p { margin:0 0 18px; color:#bcbcbc; line-height:1.45; }
+    .lock, .form { display:grid; gap:14px; }
+    .pin-row { display:grid; grid-template-columns:1fr auto; gap:10px; }
+    input, select, textarea, button { font:inherit; }
+    input, select, textarea {
+      width:100%; min-width:0; border:1px solid rgba(255,255,255,.14); border-radius:13px;
+      background:rgba(0,0,0,.34); color:#fff; outline:none;
+    }
+    input, select { height:48px; padding:0 13px; }
+    textarea { min-height:132px; padding:13px; resize:vertical; }
+    input:focus, select:focus, textarea:focus { border-color:rgba(128,255,0,.58); box-shadow:0 0 0 3px rgba(128,255,0,.1); }
+    label { display:grid; gap:7px; color:#8d8d8d; font:900 10px monospace; letter-spacing:.1em; text-transform:uppercase; }
+    .handle { display:grid; grid-template-columns:42px 1fr; border:1px solid rgba(255,255,255,.14); border-radius:13px; overflow:hidden; background:rgba(0,0,0,.34); }
+    .handle span { display:grid; place-items:center; color:#80FF00; font:900 16px monospace; border-right:1px solid rgba(255,255,255,.1); }
+    .handle input { border:0; border-radius:0; background:transparent; }
+    .btn {
+      min-height:48px; border:0; border-radius:999px; padding:0 18px; background:#80FF00; color:#050505;
+      font:900 12px monospace; letter-spacing:.1em; text-transform:uppercase; cursor:pointer;
+    }
+    .btn.secondary { background:rgba(255,255,255,.08); color:#fff; border:1px solid rgba(255,255,255,.14); }
+    .photo-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .photo-btn { display:grid; place-items:center; min-height:48px; border:1px dashed rgba(128,255,0,.38); border-radius:13px; background:rgba(128,255,0,.07); color:#80FF00; font:900 11px monospace; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; }
+    .photo-btn input { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
+    .preview { width:112px; height:112px; object-fit:cover; border-radius:16px; border:1px solid rgba(255,255,255,.14); }
+    .status { color:#80FF00; font:900 11px/1.4 monospace; letter-spacing:.08em; text-transform:uppercase; }
+    .status.error { color:#ff5f6b; }
+    .hidden { display:none; }
+    @media (max-width:520px) {
+      .page { padding:10px; }
+      .top { align-items:flex-start; flex-direction:column; }
+      h1 { font-size:30px; }
+      .content { padding:18px; }
+      .pin-row, .photo-row { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="shell">
+      <div class="top">
+        <div class="brand">
+          <img src="assets/bull-only-transparent.png" alt="">
+          <h1>Staff Post</h1>
+        </div>
+        <a class="back" href="slam.html">Back to homepage</a>
+      </div>
+      <div class="content">
+        <section id="lock" class="lock">
+          <div class="kicker">Authorized staff only</div>
+          <h2>Enter Staff PIN</h2>
+          <p>This tool is for approved SLAM! Athletics staff and coaches to update the public feed.</p>
+          <div class="pin-row">
+            <input id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="PIN" autocomplete="one-time-code">
+            <button id="unlock" class="btn" type="button">Unlock</button>
+          </div>
+          <div id="lockStatus" class="status error"></div>
+        </section>
+
+        <form id="form" class="form hidden">
+          <div class="kicker">New update</div>
+          <h2>Post</h2>
+          <p>Post encouraging words to athletes, reminders for families, or quick team updates.</p>
+          <label>Name
+            <select id="name" required></select>
+          </label>
+          <label>Sport
+            <select id="sport" required></select>
+          </label>
+          <label>Handle
+            <div class="handle"><span>@</span><input id="handle" required placeholder="Mr_Theo"></div>
+          </label>
+          <label>Post
+            <textarea id="body" required placeholder="Post..."></textarea>
+          </label>
+          <label>Date
+            <input id="date" type="date" required>
+          </label>
+          <label>Link (optional)
+            <input id="link" type="url" placeholder="https://...">
+          </label>
+          <label>Photo link (optional)
+            <input id="image" type="url" placeholder="Shared photo URL">
+          </label>
+          <div class="photo-row">
+            <label class="photo-btn">Choose photo<input id="photo" type="file" accept="image/*"></label>
+            <label class="photo-btn">Take photo<input id="camera" type="file" accept="image/*" capture="environment"></label>
+          </div>
+          <img id="preview" class="preview hidden" alt="Selected photo preview">
+          <button id="submit" class="btn" type="submit">Post update</button>
+          <a class="btn secondary" href="slam.html" style="display:grid;place-items:center;text-decoration:none;">Cancel</a>
+          <div id="status" class="status"></div>
+        </form>
+      </div>
+    </section>
+  </main>
+  <script>
+    var ENDPOINT = 'https://script.google.com/macros/s/AKfycbxKWDLcTjDwwXb-rNq9LTpqQwmlGgvLHZf9kJKDG7DHqwNp6vjaXD8S4ccG_41CBMfk/exec';
+    var names = ['SLAM! ES Football','SLAM! ES Volleyball','SLAM! ES Basketball','SLAM! ES Soccer','SLAM! ES Track','SLAM! ES Cross Country','SLAM! ES Cheer','SLAM! ES Baseball','Teacher','Admin'];
+    var sports = ['Basketball','Soccer','Track and Field','Cross Country','Cheer','Volleyball','Flag Football','Baseball','Softball','Tennis','Other'];
+    var enteredPin = '';
+    var imageData = '';
+    var imageName = '';
+    var imageType = '';
+
+    function $(id){ return document.getElementById(id); }
+    function fillSelect(id, values) {
+      $(id).innerHTML = values.map(function(v){ return '<option value="'+v.replace(/"/g,'&quot;')+'">'+v+'</option>'; }).join('');
+    }
+    function todayKey() {
+      var d = new Date();
+      return [d.getFullYear(), String(d.getMonth()+1).padStart(2,'0'), String(d.getDate()).padStart(2,'0')].join('-');
+    }
+    fillSelect('name', names);
+    fillSelect('sport', sports);
+    $('date').value = todayKey();
+
+    function verifyPin(pin) {
+      return new Promise(function(resolve) {
+        var callbackName = 'slamPinCheck' + Date.now();
+        var script = document.createElement('script');
+        var done = false;
+        window[callbackName] = function(result) {
+          done = true;
+          delete window[callbackName];
+          script.remove();
+          resolve(!!(result && result.ok));
+        };
+        script.onerror = function() {
+          if (done) return;
+          delete window[callbackName];
+          script.remove();
+          resolve(false);
+        };
+        script.src = ENDPOINT + '?action=verifyPin&pin=' + encodeURIComponent(pin) + '&callback=' + encodeURIComponent(callbackName) + '&_=' + Date.now();
+        document.body.appendChild(script);
+        setTimeout(function() {
+          if (done) return;
+          delete window[callbackName];
+          script.remove();
+          resolve(false);
+        }, 7000);
+      });
+    }
+
+    function unlock() {
+      var pin = $('pin').value.trim();
+      if (pin.length !== 4) {
+        $('lockStatus').textContent = 'Enter the staff PIN to continue.';
+        $('pin').focus();
+        return;
+      }
+      $('unlock').disabled = true;
+      $('lockStatus').classList.remove('error');
+      $('lockStatus').textContent = 'Checking access...';
+      verifyPin(pin).then(function(ok) {
+        $('unlock').disabled = false;
+        if (!ok) {
+          $('lockStatus').classList.add('error');
+          $('lockStatus').textContent = 'That code did not match. Please try again.';
+          $('pin').value = '';
+          $('pin').focus();
+          return;
+        }
+        enteredPin = pin;
+        $('lock').classList.add('hidden');
+        $('form').classList.remove('hidden');
+        $('name').focus();
+      });
+    }
+    $('unlock').addEventListener('click', unlock);
+    $('pin').addEventListener('input', function(){
+      this.value = this.value.replace(/\D/g,'').slice(0,4);
+      if (this.value.length === 4) unlock();
+    });
+    $('pin').addEventListener('keydown', function(e){ if (e.key === 'Enter') unlock(); });
+
+    function compressPhoto(file) {
+      return new Promise(function(resolve, reject) {
+        var reader = new FileReader();
+        reader.onload = function() {
+          var img = new Image();
+          img.onload = function() {
+            var size = Math.min(img.width, img.height);
+            var sx = Math.round((img.width - size) / 2);
+            var sy = Math.round((img.height - size) / 2);
+            var canvas = document.createElement('canvas');
+            canvas.width = 420;
+            canvas.height = 420;
+            canvas.getContext('2d').drawImage(img, sx, sy, size, size, 0, 0, 420, 420);
+            resolve(canvas.toDataURL('image/jpeg', 0.64));
+          };
+          img.onerror = reject;
+          img.src = reader.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+    function choosePhoto(e) {
+      var file = e.target.files && e.target.files[0];
+      if (!file) return;
+      $('status').textContent = 'Preparing photo...';
+      compressPhoto(file).then(function(dataUrl) {
+        imageData = dataUrl;
+        imageName = file.name || 'slam-update.jpg';
+        imageType = 'image/jpeg';
+        $('preview').src = dataUrl;
+        $('preview').classList.remove('hidden');
+        $('status').textContent = 'Photo ready.';
+      }).catch(function() {
+        $('status').textContent = 'Could not prepare that photo. Try another image.';
+        $('status').classList.add('error');
+      });
+    }
+    $('photo').addEventListener('change', choosePhoto);
+    $('camera').addEventListener('change', choosePhoto);
+
+    $('form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      $('submit').disabled = true;
+      $('status').classList.remove('error');
+      $('status').textContent = 'Posting update...';
+      var fd = new FormData();
+      fd.append('action', 'post');
+      fd.append('pin', enteredPin);
+      fd.append('name', $('name').value);
+      fd.append('sport', $('sport').value);
+      fd.append('handle', '@' + $('handle').value.trim().replace(/^@+/, ''));
+      fd.append('body', $('body').value.trim());
+      fd.append('date', $('date').value);
+      fd.append('link', $('link').value.trim());
+      fd.append('image', $('image').value.trim());
+      fd.append('imageData', imageData);
+      fd.append('imageName', imageName);
+      fd.append('imageType', imageType);
+      fd.append('ua', navigator.userAgent);
+      fetch(ENDPOINT, { method:'POST', body:fd, mode:'no-cors' }).then(function() {
+        $('status').textContent = 'Post sent. It may take a moment to appear in the feed.';
+        setTimeout(function(){ location.href = 'slam.html'; }, 1200);
+      }).catch(function() {
+        $('submit').disabled = false;
+        $('status').classList.add('error');
+        $('status').textContent = 'Could not post. Check connection and try again.';
+      });
+    });
+  </script>
+</body>
+</html>
