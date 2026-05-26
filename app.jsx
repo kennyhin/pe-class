@@ -1013,15 +1013,22 @@ function Feed({ posts, loading, endpoint }) {
 
   function reactToPost(post, reaction) {
     const postId = String(post.id || "").trim();
-    if (!postId || reacted[postId]) return;
-    const nextReacted = { ...reacted, [postId]: reaction };
+    if (!postId) return;
+    const previous = reacted[postId] || "";
+    const nextReacted = { ...reacted };
+    if (previous === reaction) {
+      delete nextReacted[postId];
+    } else {
+      nextReacted[postId] = reaction;
+    }
     setReacted(nextReacted);
     saveReactedPostIds(nextReacted);
     setReactionBumps((current) => ({
       ...current,
       [postId]: {
         ...current[postId],
-        [reaction]: (current[postId]?.[reaction] || 0) + 1,
+        ...(previous && { [previous]: (current[postId]?.[previous] || 0) - 1 }),
+        ...(previous !== reaction && { [reaction]: (current[postId]?.[reaction] || 0) + 1 }),
       },
     }));
     if (!endpoint) return;
@@ -1054,11 +1061,10 @@ function Feed({ posts, loading, endpoint }) {
           const badge = postBadge(p);
           const postId = String(p.id || "").trim();
           const bumps = reactionBumps[postId] || {};
-          const alreadyReacted = !!reacted[postId];
           const counts = {
-            like: (Number(p.likes) || 0) + (bumps.like || 0),
-            heart: (Number(p.hearts) || 0) + (bumps.heart || 0),
-            celebrate: (Number(p.celebrates) || 0) + (bumps.celebrate || 0),
+            like: Math.max(0, (Number(p.likes) || 0) + (bumps.like || 0)),
+            heart: Math.max(0, (Number(p.hearts) || 0) + (bumps.heart || 0)),
+            celebrate: Math.max(0, (Number(p.celebrates) || 0) + (bumps.celebrate || 0)),
           };
           return (
             <article key={i} className="post">
@@ -1097,7 +1103,6 @@ function Feed({ posts, loading, endpoint }) {
                       key={key}
                       type="button"
                       className={`reaction-btn${reacted[postId] === key ? " selected" : ""}`}
-                      disabled={alreadyReacted}
                       onClick={() => reactToPost(p, key)}
                       aria-label={`React with ${key}`}
                     >

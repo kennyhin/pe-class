@@ -185,16 +185,38 @@ function _saveReaction(ss, params) {
   var voterColumn = _headerColumn(sheet, 'VoterKeys');
   var currentVoters = String(sheet.getRange(rowNumber, voterColumn).getValue() || '');
   var tokens = currentVoters.split('|').filter(String);
-  if (tokens.indexOf(voterKey) !== -1) {
-    return _json({ ok: true, duplicate: true });
+  var existingIndex = -1;
+  var existingReaction = '';
+  tokens.forEach(function (token, index) {
+    var parts = token.split(':');
+    if (parts[0] === voterKey) {
+      existingIndex = index;
+      existingReaction = parts[1] || '';
+    }
+  });
+
+  if (existingIndex !== -1 && existingReaction === reaction) {
+    _incrementReaction(sheet, rowNumber, allowed[reaction], -1);
+    tokens.splice(existingIndex, 1);
+    sheet.getRange(rowNumber, voterColumn).setValue(tokens.join('|'));
+    return _json({ ok: true, removed: true });
   }
 
-  var reactionColumn = _headerColumn(sheet, allowed[reaction]);
-  var currentCount = Number(sheet.getRange(rowNumber, reactionColumn).getValue()) || 0;
-  sheet.getRange(rowNumber, reactionColumn).setValue(currentCount + 1);
-  tokens.push(voterKey);
+  if (existingIndex !== -1 && existingReaction && allowed[existingReaction]) {
+    _incrementReaction(sheet, rowNumber, allowed[existingReaction], -1);
+    tokens.splice(existingIndex, 1);
+  }
+
+  _incrementReaction(sheet, rowNumber, allowed[reaction], 1);
+  tokens.push(voterKey + ':' + reaction);
   sheet.getRange(rowNumber, voterColumn).setValue(tokens.join('|'));
   return _json({ ok: true });
+}
+
+function _incrementReaction(sheet, rowNumber, headerName, delta) {
+  var column = _headerColumn(sheet, headerName);
+  var currentCount = Number(sheet.getRange(rowNumber, column).getValue()) || 0;
+  sheet.getRange(rowNumber, column).setValue(Math.max(0, currentCount + delta));
 }
 
 function _savePostImage(imageData, imageName, imageType) {
