@@ -57,6 +57,9 @@ function doPost(e) {
     if (action === 'post') {
       return _savePost(ss, params);
     }
+    if (action === 'react') {
+      return _saveReaction(ss, params);
+    }
 
     var sheet = ss.getSheetByName(SHEET_NAME);
     if (!sheet) {
@@ -141,6 +144,7 @@ function _savePost(ss, params) {
 
   var sheet = _ensurePostLikeSheet(ss, POSTS_SHEET_NAME, false);
   var rowNumber = _appendByHeaders(sheet, {
+    ID: 'post-' + Date.now() + '-' + Math.floor(Math.random() * 100000),
     Timestamp: timestamp,
     Approved: needsPin,
     Name: name,
@@ -162,6 +166,34 @@ function _savePost(ss, params) {
       _setByHeader(sheet, rowNumber, 'Image', 'Image upload failed: ' + String(imageErr).slice(0, 160));
     }
   }
+  return _json({ ok: true });
+}
+
+function _saveReaction(ss, params) {
+  var postId = String(params.postId || '').trim();
+  var reaction = String(params.reaction || '').trim().toLowerCase();
+  var voterKey = String(params.voterKey || '').trim();
+  var allowed = { like: 'Likes', heart: 'Hearts', celebrate: 'Celebrates' };
+  if (!postId || !allowed[reaction] || !voterKey) {
+    return _json({ ok: false, error: 'Missing reaction data' });
+  }
+
+  var sheet = _ensurePostLikeSheet(ss, POSTS_SHEET_NAME, false);
+  var rowNumber = _findPostRowById(sheet, postId);
+  if (!rowNumber) return _json({ ok: false, error: 'Post not found' });
+
+  var voterColumn = _headerColumn(sheet, 'VoterKeys');
+  var currentVoters = String(sheet.getRange(rowNumber, voterColumn).getValue() || '');
+  var tokens = currentVoters.split('|').filter(String);
+  if (tokens.indexOf(voterKey) !== -1) {
+    return _json({ ok: true, duplicate: true });
+  }
+
+  var reactionColumn = _headerColumn(sheet, allowed[reaction]);
+  var currentCount = Number(sheet.getRange(rowNumber, reactionColumn).getValue()) || 0;
+  sheet.getRange(rowNumber, reactionColumn).setValue(currentCount + 1);
+  tokens.push(voterKey);
+  sheet.getRange(rowNumber, voterColumn).setValue(tokens.join('|'));
   return _json({ ok: true });
 }
 
@@ -315,7 +347,9 @@ function _posts(ss) {
     return _truthy(row.approved);
   }).map(function (row) {
     var timestamp = row.timestamp || row.time || row.date;
+    var rowNumber = row._rowNumber || '';
     return {
+      id: String(row.id || (rowNumber ? 'row-' + rowNumber : '')).trim(),
       date: _dateKey(row.date || row.time),
       timestamp: _timestampValue(timestamp),
       sport: String(row.sport || '').trim(),
@@ -326,7 +360,10 @@ function _posts(ss) {
       link: String(row.link || row.url || '').trim(),
       image: String(row.image || row.photo || '').trim(),
       grade: String(row.grade || '').trim(),
-      submitter: String(row.submitter || '').trim()
+      submitter: String(row.submitter || '').trim(),
+      likes: Number(row.likes) || 0,
+      hearts: Number(row.hearts) || 0,
+      celebrates: Number(row.celebrates) || 0
     };
   }).filter(function (post) {
     return post.name && post.body;
@@ -340,13 +377,14 @@ function _ensurePostsSheet(ss) {
 }
 
 function _ensurePostLikeSheet(ss, sheetName, addExample) {
-  var headers = ['Timestamp', 'Approved', 'Name', 'Handle', 'Body', 'Time', 'Accent', 'Date', 'Sport', 'Link', 'Image', 'Grade', 'Submitter'];
+  var headers = ['ID', 'Timestamp', 'Approved', 'Name', 'Handle', 'Body', 'Time', 'Accent', 'Date', 'Sport', 'Link', 'Image', 'Grade', 'Submitter', 'Likes', 'Hearts', 'Celebrates', 'VoterKeys'];
   var sheet = ss.getSheetByName(sheetName);
   if (!sheet) {
     sheet = ss.insertSheet(sheetName);
     sheet.appendRow(headers);
     if (addExample) {
       sheet.appendRow([
+        'post-example',
         new Date(),
         true,
         'SLAM! Athletics',
@@ -359,6 +397,10 @@ function _ensurePostLikeSheet(ss, sheetName, addExample) {
         '',
         '',
         '',
+        '',
+        0,
+        0,
+        0,
         ''
       ]);
     }
@@ -467,6 +509,23 @@ function _appendByHeaders(sheet, valuesByHeader) {
   return rowNumber;
 }
 
+function _findPostRowById(sheet, postId) {
+  var idColumn = _headerColumn(sheet, 'ID');
+  if (idColumn) {
+    var lastRow = Math.max(2, sheet.getLastRow());
+    var ids = sheet.getRange(2, idColumn, lastRow - 1, 1).getValues();
+    for (var i = 0; i < ids.length; i++) {
+      if (String(ids[i][0] || '').trim() === postId) return i + 2;
+    }
+  }
+  var rowMatch = String(postId).match(/^row-(\d+)$/);
+  if (rowMatch) {
+    var rowNumber = Number(rowMatch[1]);
+    if (rowNumber >= 2 && rowNumber <= sheet.getLastRow()) return rowNumber;
+  }
+  return 0;
+}
+
 function _setByHeader(sheet, rowNumber, headerName, value) {
   var column = _headerColumn(sheet, headerName);
   if (column) sheet.getRange(rowNumber, column).setValue(value);
@@ -481,8 +540,9 @@ function _rows(ss, sheetName) {
     return String(header).trim().toLowerCase();
   });
 
-  return values.map(function (valuesRow) {
+  return values.map(function (valuesRow, rowIndex) {
     var row = {};
+    row._rowNumber = rowIndex + 2;
     headers.forEach(function (header, index) {
       row[header] = valuesRow[index];
     });

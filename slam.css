@@ -963,6 +963,45 @@ textarea {
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
+.post-reactions {
+  display: flex;
+  gap: 18px;
+  margin-top: 9px;
+}
+.reaction-btn {
+  min-width: 42px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 7px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #858b92;
+  padding: 0;
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.reaction-btn strong {
+  color: currentColor;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+}
+.reaction-btn:hover:not(:disabled),
+.reaction-btn.selected {
+  transform: translateY(-1px);
+  color: var(--slam-lime);
+}
+.reaction-btn:disabled {
+  cursor: default;
+  opacity: 0.62;
+}
+.reaction-btn.selected:disabled {
+  opacity: 1;
+  color: var(--slam-lime);
+}
 .post-stats {
   display: flex;
   gap: 22px;
@@ -984,24 +1023,34 @@ textarea {
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 48px;
-  margin-top: 14px;
-  border: 1px solid rgba(218,0,22,0.62);
-  border-radius: 999px;
-  background: linear-gradient(135deg, rgba(218,0,22,0.95), rgba(128,255,0,0.9));
-  color: #050505;
-  box-shadow: 0 14px 34px rgba(218,0,22,0.18), 0 0 0 4px rgba(128,255,0,0.08);
+  min-height: 52px;
+  margin-top: 16px;
+  border: 2px solid transparent;
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(18,18,18,0.96), rgba(28,28,28,0.96)) padding-box,
+    conic-gradient(from var(--post-angle), rgba(255,255,255,0.9), rgba(128,255,0,0.9), rgba(132,132,132,0.78), rgba(255,255,255,0.9)) border-box;
+  color: var(--slam-white);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.28), 0 0 22px rgba(128,255,0,0.08);
   font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.16em;
+  font-size: 14px;
+  font-weight: 1000;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   text-decoration: none;
   cursor: pointer;
+  animation: post-border-spin 5s linear infinite;
 }
 .staff-post-open:hover {
-  border-color: rgba(128,255,0,0.72);
   filter: brightness(1.08);
+}
+@property --post-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes post-border-spin {
+  to { --post-angle: 360deg; }
 }
 .staff-modal {
   position: fixed;

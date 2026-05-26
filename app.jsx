@@ -70,6 +70,26 @@ function Icon({ name, size = 16, style }) {
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
         </svg>
       );
+    case "thumbs-up":
+      return (
+        <svg {...common}>
+          <path d="M7 10v11" />
+          <path d="M15 5.9 14 10h5.7a2 2 0 0 1 1.9 2.5l-1.5 6A2 2 0 0 1 18.2 20H9.5A2.5 2.5 0 0 1 7 17.5v-6.2c0-.8.4-1.5 1-2L13.1 4a1.4 1.4 0 0 1 1.9 1.9Z" />
+          <path d="M3 10h4v11H3z" />
+        </svg>
+      );
+    case "bull-head":
+      return (
+        <svg {...common} viewBox="0 0 28 24">
+          <path d="M8.2 9.1C5.3 8.2 3.3 6.3 2.4 3.4c2.5-.1 4.9.8 6.7 2.6" />
+          <path d="M19.8 9.1c2.9-.9 4.9-2.8 5.8-5.7-2.5-.1-4.9.8-6.7 2.6" />
+          <path d="M8.2 9.1c.6-3.2 2.5-4.8 5.8-4.8s5.2 1.6 5.8 4.8" />
+          <path d="M7.3 10.4c.4 6.2 2.6 10 6.7 10s6.3-3.8 6.7-10" />
+          <path d="M10.4 13.5h.1" />
+          <path d="M17.5 13.5h.1" />
+          <path d="M12.1 18.1c.8.6 3 .6 3.8 0" />
+        </svg>
+      );
     default:
       return null;
   }
@@ -678,6 +698,32 @@ function postBadge(post) {
   return { label: "✓", className: "staff", title: "Verified update" };
 }
 
+function reactionDeviceKey() {
+  const storageKey = "slam_reaction_device";
+  try {
+    let value = localStorage.getItem(storageKey);
+    if (!value) {
+      value = `device-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      localStorage.setItem(storageKey, value);
+    }
+    return value;
+  } catch (_) {
+    return navigator.userAgent || "unknown-device";
+  }
+}
+
+function reactedPostIds() {
+  try {
+    return JSON.parse(localStorage.getItem("slam_reacted_posts") || "{}");
+  } catch (_) {
+    return {};
+  }
+}
+
+function saveReactedPostIds(value) {
+  try { localStorage.setItem("slam_reacted_posts", JSON.stringify(value)); } catch (_) {}
+}
+
 function LoadingState({ label = "Loading..." }) {
   return (
     <div className="loading-state" role="status" aria-live="polite">
@@ -962,6 +1008,32 @@ function Calendar({ events, loading }) {
 // --- Updates feed (Twitter/X style) ---
 function Feed({ posts, loading, endpoint }) {
   const sortedPosts = [...posts].sort(sortPostsByDate);
+  const [reactionBumps, setReactionBumps] = useState({});
+  const [reacted, setReacted] = useState(reactedPostIds);
+
+  function reactToPost(post, reaction) {
+    const postId = String(post.id || "").trim();
+    if (!postId || reacted[postId]) return;
+    const nextReacted = { ...reacted, [postId]: reaction };
+    setReacted(nextReacted);
+    saveReactedPostIds(nextReacted);
+    setReactionBumps((current) => ({
+      ...current,
+      [postId]: {
+        ...current[postId],
+        [reaction]: (current[postId]?.[reaction] || 0) + 1,
+      },
+    }));
+    if (!endpoint) return;
+    const body = new FormData();
+    body.append("action", "react");
+    body.append("postId", postId);
+    body.append("reaction", reaction);
+    body.append("voterKey", reactionDeviceKey());
+    body.append("ua", navigator.userAgent);
+    fetch(endpoint, { method: "POST", body, mode: "no-cors" }).catch(() => {});
+  }
+
   return (
     <div className="card feed">
       <div className="card-head">
@@ -980,6 +1052,14 @@ function Feed({ posts, loading, endpoint }) {
           const imageUrl = String(p.image || "").trim();
           const displayUrl = displayImageUrl(imageUrl);
           const badge = postBadge(p);
+          const postId = String(p.id || "").trim();
+          const bumps = reactionBumps[postId] || {};
+          const alreadyReacted = !!reacted[postId];
+          const counts = {
+            like: (Number(p.likes) || 0) + (bumps.like || 0),
+            heart: (Number(p.hearts) || 0) + (bumps.heart || 0),
+            celebrate: (Number(p.celebrates) || 0) + (bumps.celebrate || 0),
+          };
           return (
             <article key={i} className="post">
               <div className="post-avatar" aria-label={p.sport || "Update"}>{icon}</div>
@@ -1007,6 +1087,25 @@ function Feed({ posts, loading, endpoint }) {
                     View photo <Icon name="arrow-right" size={13} />
                   </a>
                 )}
+                <div className="post-reactions" aria-label="Post reactions">
+                  {[
+                    ["like", "thumbs-up", counts.like],
+                    ["heart", "heart", counts.heart],
+                    ["celebrate", "bull-head", counts.celebrate],
+                  ].map(([key, iconName, count]) => (
+                    <button
+                      key={key}
+                      type="button"
+                      className={`reaction-btn${reacted[postId] === key ? " selected" : ""}`}
+                      disabled={alreadyReacted}
+                      onClick={() => reactToPost(p, key)}
+                      aria-label={`React with ${key}`}
+                    >
+                      <Icon name={iconName} size={15} />
+                      <strong>{count}</strong>
+                    </button>
+                  ))}
+                </div>
               </div>
             </article>
           );
