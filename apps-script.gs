@@ -374,7 +374,12 @@ function _ensurePostLikeSheet(ss, sheetName, addExample) {
   var sportColumn = _headerColumn(sheet, 'Sport');
   if (sportColumn) sheet.getRange(2, sportColumn, Math.max(200, sheet.getMaxRows() - 1), 1).setDataValidation(sportRule);
   var approvedColumn = _headerColumn(sheet, 'Approved');
-  if (approvedColumn) sheet.getRange(2, approvedColumn, Math.max(200, sheet.getMaxRows() - 1), 1).insertCheckboxes();
+  if (approvedColumn) {
+    var checkboxRule = SpreadsheetApp.newDataValidation()
+      .requireCheckbox()
+      .build();
+    sheet.getRange(2, approvedColumn, Math.max(200, sheet.getMaxRows() - 1), 1).setDataValidation(checkboxRule);
+  }
   return sheet;
 }
 
@@ -451,8 +456,14 @@ function _appendByHeaders(sheet, valuesByHeader) {
     })[0];
     return match ? valuesByHeader[match] : '';
   });
-  sheet.appendRow(row);
-  return sheet.getLastRow();
+  var rowNumber = _lastMeaningfulRow(sheet) + 1;
+  if (rowNumber > sheet.getMaxRows()) {
+    sheet.insertRowsAfter(sheet.getMaxRows(), rowNumber - sheet.getMaxRows());
+  }
+  var approvedColumn = _headerColumn(sheet, 'Approved');
+  if (approvedColumn) sheet.getRange(rowNumber, approvedColumn).insertCheckboxes();
+  sheet.getRange(rowNumber, 1, 1, row.length).setValues([row]);
+  return rowNumber;
 }
 
 function _setByHeader(sheet, rowNumber, headerName, value) {
@@ -476,6 +487,42 @@ function _rows(ss, sheetName) {
     });
     return row;
   });
+}
+
+function _lastMeaningfulRow(sheet) {
+  var lastRow = Math.max(1, sheet.getLastRow());
+  var lastColumn = sheet.getLastColumn();
+  if (lastRow < 2) return 1;
+  var headers = sheet.getRange(1, 1, 1, lastColumn).getValues()[0].map(function (header) {
+    return String(header).trim().toLowerCase();
+  });
+  var ignore = { approved: true, accent: true };
+  var values = sheet.getRange(2, 1, lastRow - 1, lastColumn).getValues();
+  for (var r = values.length - 1; r >= 0; r--) {
+    for (var c = 0; c < lastColumn; c++) {
+      if (ignore[headers[c]]) continue;
+      if (String(values[r][c] || '').trim() !== '') return r + 2;
+    }
+  }
+  return 1;
+}
+
+function compactPostsSheet() {
+  var ss = _spreadsheet();
+  var sheet = _ensurePostLikeSheet(ss, POSTS_SHEET_NAME, false);
+  var lastColumn = sheet.getLastColumn();
+  var header = sheet.getRange(1, 1, 1, lastColumn).getValues()[0];
+  var rows = sheet.getDataRange().getValues().slice(1).filter(function (row) {
+    return row.some(function (value, index) {
+      var key = String(header[index] || '').trim().toLowerCase();
+      if (key === 'approved' || key === 'accent') return false;
+      return String(value || '').trim() !== '';
+    });
+  });
+  sheet.clearContents();
+  sheet.getRange(1, 1, 1, lastColumn).setValues([header]);
+  if (rows.length) sheet.getRange(2, 1, rows.length, lastColumn).setValues(rows);
+  _ensurePostLikeSheet(ss, POSTS_SHEET_NAME, false);
 }
 
 function _dateKey(value) {
