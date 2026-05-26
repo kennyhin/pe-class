@@ -964,6 +964,7 @@ function Feed({ posts, loading, endpoint }) {
                 <div className="post-meta">
                   <span className="post-name">{p.name}</span>
                   <span className="post-handle">{p.handle}</span>
+                  {p.grade && <span className="post-grade">{p.grade}</span>}
                   {dateLabel && <span className="post-date">{dateLabel}</span>}
                 </div>
                 <p className="post-text">{linkifyText(p.body)}</p>

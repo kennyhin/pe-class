@@ -883,6 +883,14 @@ textarea {
   font-size: 11px;
   color: var(--fg-dim);
 }
+.post-grade {
+  color: #ff5f6b;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
 .post-date {
   margin-left: auto;
   color: var(--slam-lime);
