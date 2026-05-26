@@ -608,13 +608,17 @@ function formatRelativePostTime(post) {
   const diffMs = Date.now() - date.getTime();
   if (diffMs < 0) return "now";
   const minutes = Math.max(1, Math.floor(diffMs / 60000));
-  if (minutes < 60) return `${minutes}m`;
+  if (minutes < 60) return `${minutes} ${minutes === 1 ? "minute" : "minutes"} ago`;
   const hours = Math.floor(minutes / 60);
-  if (hours <= 5) return `${hours}h`;
+  if (hours <= 5) return `${hours} ${hours === 1 ? "hour" : "hours"} ago`;
   const days = Math.floor(hours / 24);
-  if (days < 7) return `${Math.max(1, days)}d`;
+  if (days < 7) {
+    const count = Math.max(1, days);
+    return `${count} ${count === 1 ? "day" : "days"} ago`;
+  }
   const weeks = Math.floor(days / 7);
-  return `${Math.max(1, weeks)}w`;
+  const count = Math.max(1, weeks);
+  return `${count} ${count === 1 ? "week" : "weeks"} ago`;
 }
 
 function linkifyText(text) {
