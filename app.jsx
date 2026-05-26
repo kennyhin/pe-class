@@ -625,6 +625,19 @@ function isImageUrl(url) {
   return /^https?:\/\//i.test(value) || /^data:image\//i.test(value);
 }
 
+function googleDriveFileId(url) {
+  const value = String(url || "").trim();
+  return value.match(/\/d\/([^/?#]+)/)?.[1]
+    || value.match(/[?&]id=([^&#]+)/)?.[1]
+    || "";
+}
+
+function displayImageUrl(url) {
+  const value = String(url || "").trim();
+  const driveId = googleDriveFileId(value);
+  return driveId ? `https://drive.google.com/thumbnail?id=${driveId}&sz=w500` : value;
+}
+
 function LoadingState({ label = "Loading..." }) {
   return (
     <div className="loading-state" role="status" aria-live="polite">
@@ -924,6 +937,8 @@ function Feed({ posts, loading, endpoint }) {
           const icon = getEventIcon({ sport: p.sport, title: p.sport, type: "event" });
           const dateLabel = formatPostDate(postDateKey(p));
           const link = String(p.link || "").trim();
+          const imageUrl = String(p.image || "").trim();
+          const displayUrl = displayImageUrl(imageUrl);
           return (
             <article key={i} className="post">
               <div className="post-avatar" aria-label={p.sport || "Update"}>{icon}</div>
@@ -934,9 +949,9 @@ function Feed({ posts, loading, endpoint }) {
                   {dateLabel && <span className="post-date">{dateLabel}</span>}
                 </div>
                 <p className="post-text">{linkifyText(p.body)}</p>
-                {isImageUrl(p.image) && (
-                  <a className="post-image-link" href={p.image} target="_blank" rel="noopener noreferrer" aria-label="Open update photo">
-                    <img className="post-image" src={p.image} alt="" loading="lazy" />
+                {isImageUrl(imageUrl) && (
+                  <a className="post-image-link" href={imageUrl} target="_blank" rel="noopener noreferrer" aria-label="Open update photo">
+                    <img className="post-image" src={displayUrl} alt="" loading="lazy" />
                   </a>
                 )}
                 {link && (
@@ -944,8 +959,8 @@ function Feed({ posts, loading, endpoint }) {
                     Open link <Icon name="arrow-right" size={13} />
                   </a>
                 )}
-                {p.image && (
-                  <a className="post-cta" href={p.image} target="_blank" rel="noopener noreferrer">
+                {imageUrl && (
+                  <a className="post-cta" href={imageUrl} target="_blank" rel="noopener noreferrer">
                     View photo <Icon name="arrow-right" size={13} />
                   </a>
                 )}

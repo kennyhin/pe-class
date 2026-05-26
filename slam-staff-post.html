@@ -8,49 +8,61 @@
   <style>
     * { box-sizing: border-box; }
     body { margin:0; min-height:100vh; background:#050505; color:#f5f5f5; font-family:Arial,Helvetica,sans-serif; }
-    .page { min-height:100vh; padding:18px; background:radial-gradient(circle at 12% 10%,rgba(128,255,0,.1),transparent 28%),radial-gradient(circle at 90% 0,rgba(218,0,22,.18),transparent 26%),#050505; }
-    .shell { max-width:720px; margin:0 auto; border:1px solid rgba(255,255,255,.13); border-radius:24px; overflow:hidden; background:linear-gradient(180deg,rgba(28,28,28,.98),rgba(8,8,8,.98)); box-shadow:0 24px 80px rgba(0,0,0,.45); }
+    .page { min-height:100vh; padding:18px; background:radial-gradient(circle at 14% 8%,rgba(128,255,0,.1),transparent 28%),radial-gradient(circle at 92% 0,rgba(218,0,22,.18),transparent 27%),#050505; }
+    .shell { max-width:980px; margin:0 auto; border:1px solid rgba(255,255,255,.13); border-radius:24px; overflow:hidden; background:linear-gradient(180deg,rgba(28,28,28,.98),rgba(8,8,8,.98)); box-shadow:0 24px 80px rgba(0,0,0,.45); }
     .top { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:18px; border-bottom:1px solid rgba(218,0,22,.35); background:linear-gradient(90deg,rgba(218,0,22,.24),rgba(255,255,255,.03)); }
     .brand { display:flex; align-items:center; gap:12px; min-width:0; }
     .brand img { width:48px; filter:drop-shadow(0 8px 18px rgba(0,0,0,.3)); }
     h1 { margin:0; font:34px/.9 Impact,"Arial Black",sans-serif; text-transform:uppercase; }
-    .back { color:#80FF00; font:900 11px monospace; letter-spacing:.1em; text-transform:uppercase; text-decoration:none; white-space:nowrap; }
+    .back { display:inline-flex; align-items:center; justify-content:center; min-height:38px; padding:0 14px; border:1px solid rgba(128,255,0,.32); border-radius:999px; background:rgba(128,255,0,.08); color:#80FF00; font:900 10px monospace; letter-spacing:.1em; text-transform:uppercase; text-decoration:none; white-space:nowrap; }
     .content { padding:22px; }
     .kicker { color:#80FF00; font:900 11px monospace; letter-spacing:.14em; text-transform:uppercase; margin-bottom:10px; }
     h2 { margin:0 0 10px; font:38px/.92 Impact,"Arial Black",sans-serif; text-transform:uppercase; }
     p { margin:0 0 18px; color:#bcbcbc; line-height:1.45; }
-    .lock, .form { display:grid; gap:14px; }
-    .pin-row { display:grid; grid-template-columns:1fr auto; gap:10px; }
+    .lock { display:grid; justify-items:center; gap:16px; min-height:420px; align-content:center; text-align:center; }
+    .pin-box { position:relative; width:min(100%,320px); padding:20px; border:1px solid rgba(255,255,255,.12); border-radius:24px; background:rgba(255,255,255,.04); }
+    .pin-dots { display:flex; justify-content:center; gap:12px; margin:12px 0 4px; }
+    .pin-dots span { width:17px; height:17px; border:2px solid rgba(255,255,255,.28); border-radius:50%; background:rgba(255,255,255,.04); }
+    .pin-dots span.on { border-color:#80FF00; background:#80FF00; box-shadow:0 0 20px rgba(128,255,0,.34); }
+    #pin { position:absolute; inset:0; width:100%; height:100%; opacity:.01; color:transparent; caret-color:transparent; border:0; }
+    .status { color:#80FF00; font:900 11px/1.4 monospace; letter-spacing:.08em; text-transform:uppercase; }
+    .status.error { color:#ff5f6b; }
+    .builder { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:20px; align-items:start; }
+    .form { display:grid; gap:14px; }
     input, select, textarea, button { font:inherit; }
-    input, select, textarea {
-      width:100%; min-width:0; border:1px solid rgba(255,255,255,.14); border-radius:13px;
-      background:rgba(0,0,0,.34); color:#fff; outline:none;
-    }
+    input, select, textarea { width:100%; min-width:0; border:1px solid rgba(255,255,255,.14); border-radius:13px; background:rgba(0,0,0,.34); color:#fff; outline:none; }
     input, select { height:48px; padding:0 13px; }
     textarea { min-height:132px; padding:13px; resize:vertical; }
     input:focus, select:focus, textarea:focus { border-color:rgba(128,255,0,.58); box-shadow:0 0 0 3px rgba(128,255,0,.1); }
     label { display:grid; gap:7px; color:#8d8d8d; font:900 10px monospace; letter-spacing:.1em; text-transform:uppercase; }
-    .handle { display:grid; grid-template-columns:42px 1fr; border:1px solid rgba(255,255,255,.14); border-radius:13px; overflow:hidden; background:rgba(0,0,0,.34); }
-    .handle span { display:grid; place-items:center; color:#80FF00; font:900 16px monospace; border-right:1px solid rgba(255,255,255,.1); }
+    .choice-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+    .choice { min-height:48px; border:1px solid rgba(255,255,255,.14); border-radius:999px; background:rgba(255,255,255,.06); color:#fff; font:900 11px monospace; letter-spacing:.12em; text-transform:uppercase; cursor:pointer; }
+    .choice.active { border-color:rgba(218,0,22,.72); background:rgba(218,0,22,.22); box-shadow:0 0 0 3px rgba(218,0,22,.1); }
+    .handle { display:grid; grid-template-columns:44px 1fr; border:1px solid rgba(128,255,0,.24); border-radius:13px; overflow:hidden; background:rgba(128,255,0,.06); }
+    .handle span { display:grid; place-items:center; color:#80FF00; font:900 16px monospace; border-right:1px solid rgba(128,255,0,.2); }
     .handle input { border:0; border-radius:0; background:transparent; }
-    .btn {
-      min-height:48px; border:0; border-radius:999px; padding:0 18px; background:#80FF00; color:#050505;
-      font:900 12px monospace; letter-spacing:.1em; text-transform:uppercase; cursor:pointer;
-    }
-    .btn.secondary { background:rgba(255,255,255,.08); color:#fff; border:1px solid rgba(255,255,255,.14); }
     .photo-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
     .photo-btn { display:grid; place-items:center; min-height:48px; border:1px dashed rgba(128,255,0,.38); border-radius:13px; background:rgba(128,255,0,.07); color:#80FF00; font:900 11px monospace; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; }
     .photo-btn input { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
-    .preview { width:112px; height:112px; object-fit:cover; border-radius:16px; border:1px solid rgba(255,255,255,.14); }
-    .status { color:#80FF00; font:900 11px/1.4 monospace; letter-spacing:.08em; text-transform:uppercase; }
-    .status.error { color:#ff5f6b; }
+    .btn { min-height:50px; border:0; border-radius:999px; padding:0 18px; background:#80FF00; color:#050505; font:900 12px monospace; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; }
+    .btn.secondary { display:grid; place-items:center; background:rgba(255,255,255,.08); color:#fff; border:1px solid rgba(255,255,255,.14); text-decoration:none; }
+    .preview-card { position:sticky; top:18px; border:1px solid rgba(255,255,255,.13); border-radius:20px; padding:18px; background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03)); }
+    .post-preview { display:grid; grid-template-columns:54px 1fr; gap:12px; padding:15px; border:1px solid rgba(255,255,255,.13); border-radius:18px; background:#1c1c1c; }
+    .avatar { width:54px; height:54px; display:grid; place-items:center; border-radius:14px; background:#101010; font-size:29px; }
+    .meta { display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; }
+    .title { font-weight:900; color:#fff; }
+    .handle-copy { color:#80FF00; font:900 11px monospace; opacity:.9; }
+    .date { color:#8d8d8d; font:900 10px monospace; margin-left:auto; text-transform:uppercase; }
+    .post-text { margin:8px 0 10px; color:#f2f2f2; line-height:1.35; }
+    .image-preview { width:104px; height:104px; object-fit:cover; border:1px solid rgba(255,255,255,.18); border-radius:15px; background:#111; }
     .hidden { display:none; }
-    @media (max-width:520px) {
+    @media (max-width:760px) {
       .page { padding:10px; }
       .top { align-items:flex-start; flex-direction:column; }
-      h1 { font-size:30px; }
       .content { padding:18px; }
-      .pin-row, .photo-row { grid-template-columns:1fr; }
+      .builder { grid-template-columns:1fr; }
+      .preview-card { position:static; order:-1; }
+      .photo-row, .choice-row { grid-template-columns:1fr; }
     }
   </style>
 </head>
@@ -62,111 +74,151 @@
           <img src="assets/bull-only-transparent.png" alt="">
           <h1>Staff Post</h1>
         </div>
-        <a class="back" href="slam.html">Back to homepage</a>
+        <a class="back" href="slam.html">← Back to homepage</a>
       </div>
       <div class="content">
         <section id="lock" class="lock">
-          <div class="kicker">Authorized staff only</div>
-          <h2>Enter Staff PIN</h2>
-          <p>This tool is for approved SLAM! Athletics staff and coaches to update the public feed.</p>
-          <div class="pin-row">
-            <input id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="PIN" autocomplete="one-time-code">
-            <button id="unlock" class="btn" type="button">Unlock</button>
+          <div>
+            <div class="kicker">Authorized staff only</div>
+            <h2>Enter Staff PIN</h2>
+            <p>This tool is for approved SLAM! Athletics staff and coaches to update the public feed.</p>
+          </div>
+          <div class="pin-box" onclick="document.getElementById('pin').focus()">
+            <div class="pin-dots" aria-label="Staff PIN">
+              <span></span><span></span><span></span><span></span>
+            </div>
+            <input id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="one-time-code" aria-label="Staff PIN">
           </div>
           <div id="lockStatus" class="status error"></div>
         </section>
 
-        <form id="form" class="form hidden">
-          <div class="kicker">New update</div>
-          <h2>Post</h2>
-          <p>Post encouraging words to athletes, reminders for families, or quick team updates.</p>
-          <label>Name
-            <select id="name" required></select>
-          </label>
-          <label>Sport
-            <select id="sport" required></select>
-          </label>
-          <label>Handle
-            <div class="handle"><span>@</span><input id="handle" required placeholder="Mr_Theo"></div>
-          </label>
-          <label>Post
-            <textarea id="body" required placeholder="Post..."></textarea>
-          </label>
-          <label>Date
-            <input id="date" type="date" required>
-          </label>
-          <label>Link (optional)
-            <input id="link" type="url" placeholder="https://...">
-          </label>
-          <label>Photo link (optional)
-            <input id="image" type="url" placeholder="Shared photo URL">
-          </label>
-          <div class="photo-row">
-            <label class="photo-btn">Choose photo<input id="photo" type="file" accept="image/*"></label>
-            <label class="photo-btn">Take photo<input id="camera" type="file" accept="image/*" capture="environment"></label>
-          </div>
-          <img id="preview" class="preview hidden" alt="Selected photo preview">
-          <button id="submit" class="btn" type="submit">Post update</button>
-          <a class="btn secondary" href="slam.html" style="display:grid;place-items:center;text-decoration:none;">Cancel</a>
-          <div id="status" class="status"></div>
-        </form>
+        <section id="builder" class="builder hidden">
+          <form id="form" class="form">
+            <div>
+              <div class="kicker">New update</div>
+              <h2>Build Post</h2>
+              <p>Post encouraging words to athletes, reminders for families, or quick team updates.</p>
+            </div>
+            <label>Title
+              <div class="choice-row" id="titleChoices">
+                <button class="choice active" type="button" data-title="Admin">Admin</button>
+                <button class="choice" type="button" data-title="Teacher">Teacher</button>
+                <button class="choice" type="button" data-title="Coach">Coach</button>
+              </div>
+            </label>
+            <label>Handle
+              <div class="handle"><span>@</span><input id="handle" required placeholder="Mr_Wong"></div>
+            </label>
+            <label>Sport supporting
+              <select id="sport" required></select>
+            </label>
+            <label>Post
+              <textarea id="body" required placeholder="Post..."></textarea>
+            </label>
+            <label>Date
+              <input id="date" type="date" required>
+            </label>
+            <label>Link (optional)
+              <input id="link" type="url" placeholder="https://...">
+            </label>
+            <label>Photo link (optional)
+              <input id="image" type="url" placeholder="Shared photo URL">
+            </label>
+            <div class="photo-row">
+              <label class="photo-btn">Choose photo<input id="photo" type="file" accept="image/*"></label>
+              <label class="photo-btn">Take photo<input id="camera" type="file" accept="image/*" capture="environment"></label>
+            </div>
+            <button id="submit" class="btn" type="submit">Post update</button>
+            <a class="btn secondary" href="slam.html">Cancel</a>
+            <div id="status" class="status"></div>
+          </form>
+
+          <aside class="preview-card">
+            <div class="kicker">Live preview</div>
+            <div class="post-preview">
+              <div id="previewAvatar" class="avatar">🏀</div>
+              <div>
+                <div class="meta">
+                  <span id="previewTitle" class="title">Admin</span>
+                  <span id="previewHandle" class="handle-copy">@Mr_Wong</span>
+                  <span id="previewDate" class="date"></span>
+                </div>
+                <div id="previewBody" class="post-text">Your update will preview here as you type.</div>
+                <img id="previewImage" class="image-preview hidden" alt="Selected photo preview">
+              </div>
+            </div>
+          </aside>
+        </section>
       </div>
     </section>
   </main>
   <script>
     var ENDPOINT = 'https://script.google.com/macros/s/AKfycbxKWDLcTjDwwXb-rNq9LTpqQwmlGgvLHZf9kJKDG7DHqwNp6vjaXD8S4ccG_41CBMfk/exec';
-    var names = ['SLAM! ES Football','SLAM! ES Volleyball','SLAM! ES Basketball','SLAM! ES Soccer','SLAM! ES Track','SLAM! ES Cross Country','SLAM! ES Cheer','SLAM! ES Baseball','Teacher','Admin'];
     var sports = ['Basketball','Soccer','Track and Field','Cross Country','Cheer','Volleyball','Flag Football','Baseball','Softball','Tennis','Other'];
+    var sportIcons = { Basketball:'🏀', Soccer:'⚽', 'Track and Field':'🏃', 'Cross Country':'🏃', Cheer:'📣', Volleyball:'🏐', 'Flag Football':'🏈', Baseball:'⚾', Softball:'🥎', Tennis:'🎾', Other:'⭐' };
     var enteredPin = '';
+    var title = 'Admin';
     var imageData = '';
     var imageName = '';
     var imageType = '';
 
     function $(id){ return document.getElementById(id); }
-    function fillSelect(id, values) {
-      $(id).innerHTML = values.map(function(v){ return '<option value="'+v.replace(/"/g,'&quot;')+'">'+v+'</option>'; }).join('');
-    }
     function todayKey() {
       var d = new Date();
       return [d.getFullYear(), String(d.getMonth()+1).padStart(2,'0'), String(d.getDate()).padStart(2,'0')].join('-');
     }
-    fillSelect('name', names);
-    fillSelect('sport', sports);
-    $('date').value = todayKey();
-
+    function fillSelect(id, values) {
+      $(id).innerHTML = values.map(function(v){ return '<option value="'+v.replace(/"/g,'&quot;')+'">'+v+'</option>'; }).join('');
+    }
     function pinHash(pin) {
       return String(pin || '').split('').reduce(function(total, char) {
         return (total * 31) + char.charCodeAt(0);
       }, 0);
     }
-
+    function formatDate(value) {
+      if (!value) return '';
+      var parts = value.split('-');
+      if (parts.length !== 3) return value;
+      return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2])).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+    }
+    function updatePinDots() {
+      var length = $('pin').value.length;
+      document.querySelectorAll('.pin-dots span').forEach(function(dot, index) {
+        dot.classList.toggle('on', index < length);
+      });
+    }
     function unlock() {
       var pin = $('pin').value.trim();
-      if (pin.length !== 4) {
-        $('lockStatus').textContent = 'Enter the staff PIN to continue.';
-        $('pin').focus();
-        return;
-      }
+      updatePinDots();
+      if (pin.length < 4) return;
       if (pinHash(pin) !== 1687348) {
-        $('lockStatus').classList.add('error');
         $('lockStatus').textContent = 'That code did not match. Please try again.';
         $('pin').value = '';
+        updatePinDots();
         $('pin').focus();
         return;
       }
       enteredPin = pin;
-      $('lockStatus').textContent = '';
       $('lock').classList.add('hidden');
-      $('form').classList.remove('hidden');
-      $('name').focus();
+      $('builder').classList.remove('hidden');
+      $('handle').focus();
     }
-    $('unlock').addEventListener('click', unlock);
-    $('pin').addEventListener('input', function(){
-      this.value = this.value.replace(/\D/g,'').slice(0,4);
-      if (this.value.length === 4) unlock();
-    });
-    $('pin').addEventListener('keydown', function(e){ if (e.key === 'Enter') unlock(); });
-
+    function updatePreview() {
+      var sport = $('sport').value || 'Basketball';
+      var handle = $('handle').value.trim().replace(/^@+/, '') || 'Mr_Wong';
+      var body = $('body').value.trim() || 'Your update will preview here as you type.';
+      $('previewTitle').textContent = title;
+      $('previewHandle').textContent = '@' + handle;
+      $('previewBody').textContent = body;
+      $('previewDate').textContent = formatDate($('date').value);
+      $('previewAvatar').textContent = sportIcons[sport] || sportIcons.Other;
+      if ($('image').value.trim() && !imageData) {
+        $('previewImage').src = $('image').value.trim();
+        $('previewImage').classList.remove('hidden');
+      } else if (!imageData) {
+        $('previewImage').classList.add('hidden');
+      }
+    }
     function compressPhoto(file) {
       return new Promise(function(resolve, reject) {
         var reader = new FileReader();
@@ -197,16 +249,36 @@
         imageData = dataUrl;
         imageName = file.name || 'slam-update.jpg';
         imageType = 'image/jpeg';
-        $('preview').src = dataUrl;
-        $('preview').classList.remove('hidden');
+        $('previewImage').src = dataUrl;
+        $('previewImage').classList.remove('hidden');
         $('status').textContent = 'Photo ready.';
       }).catch(function() {
         $('status').textContent = 'Could not prepare that photo. Try another image.';
         $('status').classList.add('error');
       });
     }
+
+    fillSelect('sport', sports);
+    $('date').value = todayKey();
+    $('pin').focus();
+    $('pin').addEventListener('input', function(){
+      this.value = this.value.replace(/\D/g,'').slice(0,4);
+      unlock();
+    });
+    document.querySelectorAll('[data-title]').forEach(function(button) {
+      button.addEventListener('click', function() {
+        title = button.getAttribute('data-title');
+        document.querySelectorAll('[data-title]').forEach(function(item) { item.classList.toggle('active', item === button); });
+        updatePreview();
+      });
+    });
+    ['handle','sport','body','date','image'].forEach(function(id) {
+      $(id).addEventListener('input', updatePreview);
+      $(id).addEventListener('change', updatePreview);
+    });
     $('photo').addEventListener('change', choosePhoto);
     $('camera').addEventListener('change', choosePhoto);
+    updatePreview();
 
     $('form').addEventListener('submit', function(e) {
       e.preventDefault();
@@ -216,7 +288,7 @@
       var fd = new FormData();
       fd.append('action', 'post');
       fd.append('pin', enteredPin);
-      fd.append('name', $('name').value);
+      fd.append('name', title);
       fd.append('sport', $('sport').value);
       fd.append('handle', '@' + $('handle').value.trim().replace(/^@+/, ''));
       fd.append('body', $('body').value.trim());
