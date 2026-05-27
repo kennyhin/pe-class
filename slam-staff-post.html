@@ -36,25 +36,30 @@
     #pin { position:absolute; inset:0; width:100%; height:100%; opacity:.01; color:transparent; caret-color:transparent; border:0; }
     .status { color:#80FF00; font:900 11px/1.4 monospace; letter-spacing:.08em; text-transform:uppercase; }
     .status.error { color:#ff5f6b; }
-    .builder { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:20px; align-items:start; }
-    .form { display:grid; gap:14px; }
-    input, select, textarea, button { font:inherit; }
-    input, select, textarea { width:100%; min-width:0; border:1px solid rgba(255,255,255,.14); border-radius:13px; background:rgba(0,0,0,.34); color:#fff; outline:none; }
-    input, select { height:48px; padding:0 13px; font-size:16px; }
-    textarea { min-height:132px; padding:13px; resize:vertical; font-size:16px; }
+    .builder { display:block; }
+    .post-builder-form { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:20px; align-items:start; }
+    .form-fields, .form-actions { display:grid; gap:14px; }
+    button { font:inherit; }
+    input, select, textarea { width:100%; min-width:0; border:1px solid rgba(255,255,255,.12); border-radius:13px; background:rgba(0,0,0,.3); color:#fff; outline:none; }
+    input, select { height:48px; padding:0 13px; font:500 16px/1.2 Arial,Helvetica,sans-serif; }
+    textarea { min-height:132px; padding:13px; resize:vertical; font:500 16px/1.4 Arial,Helvetica,sans-serif; }
     input:focus, select:focus, textarea:focus { border-color:rgba(128,255,0,.58); box-shadow:0 0 0 3px rgba(128,255,0,.1); }
-    label { display:grid; gap:7px; color:#8d8d8d; font:900 10px monospace; letter-spacing:.1em; text-transform:uppercase; }
+    input::placeholder, textarea::placeholder { color:rgba(255,255,255,.3); font-weight:400; }
+    select:invalid { color:rgba(255,255,255,.34); }
+    label { display:grid; gap:8px; color:rgba(255,255,255,.56); font:900 11px monospace; letter-spacing:.09em; text-transform:uppercase; }
     .choice-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
-    .handle { display:grid; grid-template-columns:44px 1fr; border:1px solid rgba(128,255,0,.24); border-radius:13px; overflow:hidden; background:rgba(128,255,0,.06); }
-    .handle span { display:grid; place-items:center; color:#80FF00; font:900 16px monospace; border-right:1px solid rgba(128,255,0,.2); }
+    .handle { display:grid; grid-template-columns:44px 1fr; border:1px solid rgba(255,255,255,.13); border-radius:13px; overflow:hidden; background:rgba(255,255,255,.045); }
+    .handle span { display:grid; place-items:center; color:rgba(128,255,0,.72); font:900 16px monospace; border-right:1px solid rgba(255,255,255,.1); }
     .handle input { border:0; border-radius:0; background:transparent; }
+    .photo-kicker { color:rgba(255,255,255,.56); font:900 11px monospace; letter-spacing:.09em; text-transform:uppercase; }
     .photo-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-    .photo-btn { display:grid; place-items:center; min-height:48px; border:1px dashed rgba(128,255,0,.38); border-radius:13px; background:rgba(128,255,0,.07); color:#80FF00; font:900 11px monospace; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; }
+    .photo-btn { display:grid; place-items:center; min-height:48px; border:1px dashed rgba(255,255,255,.18); border-radius:13px; background:rgba(255,255,255,.045); color:rgba(128,255,0,.86); font:900 11px monospace; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; }
+    .photo-btn:hover { border-color:rgba(128,255,0,.42); background:rgba(128,255,0,.065); }
     .photo-btn input { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
     .btn { min-height:50px; border:0; border-radius:999px; padding:0 18px; background:#80FF00; color:#050505; font:900 12px monospace; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; }
     .btn.secondary { display:grid; place-items:center; background:rgba(255,255,255,.08); color:#fff; border:1px solid rgba(255,255,255,.14); text-decoration:none; }
     .review-note { border:1px solid rgba(128,255,0,.18); border-radius:14px; padding:12px; color:#bcbcbc; background:rgba(128,255,0,.05); font-size:13px; line-height:1.4; }
-    .preview-card { position:sticky; top:18px; border:1px solid rgba(255,255,255,.13); border-radius:20px; padding:18px; background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03)); }
+    .preview-card { grid-column:2; grid-row:1 / span 2; position:sticky; top:18px; border:1px solid rgba(255,255,255,.13); border-radius:20px; padding:18px; background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03)); }
     .post-preview { display:grid; grid-template-columns:54px 1fr; gap:12px; padding:15px; border:1px solid rgba(255,255,255,.13); border-radius:18px; background:#1c1c1c; }
     .avatar { width:54px; height:54px; display:grid; place-items:center; border-radius:14px; background:#101010; font-size:29px; }
     .meta { display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; }
@@ -69,9 +74,11 @@
       .page { padding:10px; }
       .top { align-items:flex-start; flex-direction:column; }
       .content { padding:18px; }
-      .role-grid, .builder { grid-template-columns:1fr; }
+      .role-grid, .post-builder-form { grid-template-columns:1fr; }
       .choice-row, .photo-row { grid-template-columns:1fr; }
-      .preview-card { position:static; order:-1; }
+      .form-fields { order:1; }
+      .preview-card { grid-column:auto; grid-row:auto; position:static; order:2; }
+      .form-actions { grid-column:auto; order:3; }
       .pin-panel-head { align-items:flex-start; flex-direction:column; }
     }
   </style>
@@ -115,63 +122,66 @@
         </section>
 
         <section id="builder" class="builder hidden">
-          <form id="form" class="form">
-            <div>
-              <div class="kicker">Build post</div>
-              <h2 id="builderTitle">New Post</h2>
-              <p id="builderCopy">Post encouraging words to athletes, reminders for families, or quick team updates.</p>
-            </div>
-            <label>Title
-              <div class="choice-row" id="titleChoices">
-                <button class="choice" type="button" data-title="Admin">Admin</button>
-                <button class="choice" type="button" data-title="Teacher">Teacher</button>
-                <button class="choice" type="button" data-title="Coach">Coach</button>
-              </div>
-            </label>
-            <label>Handle
-              <div class="handle"><span>@</span><input id="handle" required placeholder="Mr_Wong"></div>
-            </label>
-            <label id="gradeWrap" class="hidden">Grade level
-              <select id="grade"></select>
-            </label>
-            <label>Sport supporting
-              <select id="sport" required></select>
-            </label>
-            <label>Post
-              <textarea id="body" required placeholder="Post..."></textarea>
-            </label>
-            <label>Link (optional)
-              <input id="link" type="url" placeholder="https://...">
-            </label>
-            <label>Photo link (optional)
-              <input id="image" type="url" placeholder="Shared photo URL">
-            </label>
-            <div class="photo-row">
-              <label class="photo-btn">Choose photo<input id="photo" type="file" accept="image/*"></label>
-              <label class="photo-btn">Take photo<input id="camera" type="file" accept="image/*" capture="environment"></label>
-            </div>
-            <div id="reviewNote" class="review-note hidden">Parent and student posts are sent for review first. They will appear on the feed after SLAM! Athletics approves them.</div>
-            <button id="submit" class="btn" type="submit">Submit post</button>
-            <a class="btn secondary" href="slam.html">Cancel</a>
-            <div id="status" class="status"></div>
-          </form>
-
-          <aside class="preview-card">
-            <div class="kicker">Live preview</div>
-            <div class="post-preview">
-              <div id="previewAvatar" class="avatar">🏀</div>
+          <form id="form" class="post-builder-form">
+            <div class="form-fields">
               <div>
-                <div class="meta">
-                  <span id="previewTitle" class="title">Admin</span>
-                  <span id="previewHandle" class="handle-copy">@Mr_Wong</span>
-                  <span class="date">now</span>
+                <div class="kicker">Build post</div>
+                <h2 id="builderTitle">New Post</h2>
+                <p id="builderCopy">Post encouraging words to athletes, reminders for families, or quick team updates.</p>
+              </div>
+              <label>Title
+                <div class="choice-row" id="titleChoices">
+                  <button class="choice" type="button" data-title="Admin">Admin</button>
+                  <button class="choice" type="button" data-title="Teacher">Teacher</button>
+                  <button class="choice" type="button" data-title="Coach">Coach</button>
                 </div>
-                <div id="previewGrade" class="grade-copy hidden"></div>
-                <div id="previewBody" class="post-text">Your update will preview here as you type.</div>
-                <img id="previewImage" class="image-preview hidden" alt="Selected photo preview">
+              </label>
+              <label>Handle
+                <div class="handle"><span>@</span><input id="handle" required placeholder="johnnys_mom"></div>
+              </label>
+              <label id="gradeWrap" class="hidden">Grade level
+                <select id="grade" required></select>
+              </label>
+              <label>Sport supporting
+                <select id="sport" required></select>
+              </label>
+              <label>Post
+                <textarea id="body" required></textarea>
+              </label>
+              <label>Link (optional)
+                <input id="link" type="url">
+              </label>
+              <div class="photo-kicker">Add photo</div>
+              <div class="photo-row">
+                <label class="photo-btn">Choose photo<input id="photo" type="file" accept="image/*"></label>
+                <label class="photo-btn">Take photo<input id="camera" type="file" accept="image/*" capture="environment"></label>
               </div>
             </div>
-          </aside>
+
+            <aside class="preview-card">
+              <div class="kicker">Live preview</div>
+              <div class="post-preview">
+                <div id="previewAvatar" class="avatar">⭐</div>
+                <div>
+                  <div class="meta">
+                    <span id="previewTitle" class="title">Admin</span>
+                    <span id="previewHandle" class="handle-copy">@johnnys_mom</span>
+                    <span class="date">now</span>
+                  </div>
+                  <div id="previewGrade" class="grade-copy hidden"></div>
+                  <div id="previewBody" class="post-text">Your update will preview here as you type.</div>
+                  <img id="previewImage" class="image-preview hidden" alt="Selected photo preview">
+                </div>
+              </div>
+            </aside>
+
+            <div class="form-actions">
+              <div id="reviewNote" class="review-note hidden">Parent and student posts are sent for review first. They will appear on the feed after SLAM! Athletics approves them.</div>
+              <button id="submit" class="btn" type="submit">Submit post</button>
+              <a class="btn secondary" href="slam.html">Cancel</a>
+              <div id="status" class="status"></div>
+            </div>
+          </form>
         </section>
       </div>
     </section>
@@ -190,8 +200,10 @@
     var imageType = '';
 
     function $(id){ return document.getElementById(id); }
-    function fillSelect(id, values) {
-      $(id).innerHTML = values.map(function(v){ return '<option value="'+v.replace(/"/g,'&quot;')+'">'+v+'</option>'; }).join('');
+    function fillSelect(id, values, placeholder) {
+      var html = placeholder ? '<option value="" disabled selected>'+placeholder+'</option>' : '';
+      html += values.map(function(v){ return '<option value="'+v.replace(/"/g,'&quot;')+'">'+v+'</option>'; }).join('');
+      $(id).innerHTML = html;
     }
     function pinHash(pin) {
       return String(pin || '').split('').reduce(function(total, char) {
@@ -223,6 +235,7 @@
       $('builder').classList.remove('hidden');
       $('reviewNote').classList.toggle('hidden', isStaff(selectedRole));
       $('gradeWrap').classList.toggle('hidden', selectedRole !== 'Student');
+      $('grade').disabled = selectedRole !== 'Student';
       $('builderTitle').textContent = isStaff(selectedRole) ? 'Staff Post' : selectedRole + ' Post';
       $('builderCopy').textContent = isStaff(selectedRole)
         ? 'Build a quick update for families.'
@@ -237,7 +250,7 @@
       } else {
         $('titleChoices').parentElement.classList.remove('hidden');
       }
-      $('handle').placeholder = selectedRole === 'Parent' ? 'Johnnys_Mom' : selectedRole === 'Student' ? 'Student_Bull' : 'Mr_Wong';
+      $('handle').placeholder = selectedRole === 'Parent' ? 'johnnys_mom' : selectedRole === 'Student' ? 'student_name' : 'mr_wong';
       updatePreview();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -262,8 +275,8 @@
       openBuilder();
     }
     function updatePreview() {
-      var sport = $('sport').value || 'Basketball';
-      var handle = $('handle').value.trim().replace(/^@+/, '') || $('handle').placeholder || 'Mr_Wong';
+      var sport = $('sport').value || 'Other';
+      var handle = $('handle').value.trim().replace(/^@+/, '') || $('handle').placeholder || 'mr_wong';
       var body = $('body').value.trim() || 'Your update will preview here as you type.';
       $('previewTitle').textContent = title || selectedRole || 'Post';
       $('previewHandle').textContent = '@' + handle;
@@ -271,10 +284,7 @@
       $('previewAvatar').textContent = sportIcons[sport] || sportIcons.Other;
       $('previewGrade').textContent = selectedRole === 'Student' ? $('grade').value : '';
       $('previewGrade').classList.toggle('hidden', selectedRole !== 'Student');
-      if ($('image').value.trim() && !imageData) {
-        $('previewImage').src = $('image').value.trim();
-        $('previewImage').classList.remove('hidden');
-      } else if (!imageData) {
+      if (!imageData) {
         $('previewImage').classList.add('hidden');
       }
     }
@@ -317,8 +327,8 @@
       });
     }
 
-    fillSelect('sport', sports);
-    fillSelect('grade', grades);
+    fillSelect('sport', sports, 'Pick a sport');
+    fillSelect('grade', grades, 'Pick a grade');
     $('roleBack').addEventListener('click', function() {
       selectedRole = '';
       title = '';
@@ -345,7 +355,7 @@
       this.value = this.value.replace(/\D/g,'').slice(0,4);
       unlock();
     });
-    ['handle','sport','grade','body','image'].forEach(function(id) {
+    ['handle','sport','grade','body'].forEach(function(id) {
       $(id).addEventListener('input', updatePreview);
       $(id).addEventListener('change', updatePreview);
     });
@@ -368,7 +378,7 @@
       fd.append('handle', '@' + $('handle').value.trim().replace(/^@+/, ''));
       fd.append('body', $('body').value.trim());
       fd.append('link', $('link').value.trim());
-      fd.append('image', $('image').value.trim());
+      fd.append('image', '');
       fd.append('imageData', imageData);
       fd.append('imageName', imageName);
       fd.append('imageType', imageType);

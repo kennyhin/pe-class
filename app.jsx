@@ -306,9 +306,15 @@ function Nav() {
         <span>Menu</span>
         <i aria-hidden="true" />
       </button>
-      <a className="side-nav-logo" href="slam.html" aria-label="SLAM! Athletics home">
+      <button
+        className="side-nav-logo"
+        type="button"
+        aria-label="Open athletics menu"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+      >
         <img src="assets/bull-only-transparent.png" alt="SLAM! Athletics bull" />
-      </a>
+      </button>
       {items.map(([label, href]) => (
         <a key={label} href={href}>
           <span>{label}</span>
@@ -362,6 +368,23 @@ function Hero({ bg, endpoint }) {
           Sign up for our newsletter — schedules, sign-ups, and updates
           on upcoming events, sent straight to your inbox.
         </p>
+
+        <div className="hero-shortcuts" aria-label="Quick links">
+          {[
+            ["Register", "Register for sports", "slam-register.html"],
+            ["Eligibility", "Athletic eligibility", "slam-eligibility.html"],
+            ["Physicals", "Sports physicals", "#physicals"],
+            ["Sports", "Sports offered", "#sports"],
+            ["Tryouts", "Tryout form", "slam-tryouts.html"],
+            ["Coach", "Coach for SLAM!", "#coach"],
+          ].map(([eyebrow, label, href]) => (
+            <a className="hero-shortcut" href={href} key={label}>
+              <span>{eyebrow}</span>
+              <strong>{label}</strong>
+              <Icon name="arrow-right" size={14} />
+            </a>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -1332,6 +1355,61 @@ function WhatsHappening({ endpoint }) {
     </section>
   );
 }
+
+function BullsCommitmentCard() {
+  const commitments = [
+    "Respect all people at all times.",
+    "Work hard and sacrifice personal glory for the team.",
+    "Represent SLAM Academy with pride, honor, and integrity.",
+    "Avoid drugs, alcohol, and tobacco to reach full potential.",
+    "Be a positive role model for peers.",
+    "Give best effort and attitude in class and competition.",
+    "Act and play like a winner, regardless of the outcome.",
+    "Abide by decisions made by coaches and officials.",
+    "Wear approved team attire for practices, games, and travel.",
+    "Communicate respectfully with players, coaches, and staff.",
+  ];
+  return (
+    <section className="commitment-card" id="commitment">
+      <h2 className="commitment-title">Bulls Commitment</h2>
+      <ol className="commitment-list">
+        {commitments.map((item, i) => (
+          <li key={item}>
+            <span>{String(i + 1).padStart(2, "0")}</span>
+            <strong>{item}</strong>
+          </li>
+        ))}
+      </ol>
+      <div className="commitment-signoff">I agree to uphold these promises at all times.</div>
+    </section>
+  );
+}
+
+function HomeLayout({ endpoint, heroBg }) {
+  const { posts, events, faq, loaded } = useContent(endpoint);
+  const loading = !loaded;
+  return (
+    <div className="home-layout">
+      <main className="main-scroll">
+        <Hero bg={heroBg} endpoint={endpoint} />
+        <BullsCommitmentCard />
+        <section className="support-grid" aria-label="Calendar and questions">
+          <Calendar events={events} loading={loading} />
+          <QA faq={faq} endpoint={endpoint} loading={loading} />
+        </section>
+      </main>
+
+      <aside className="feed-rail" aria-label="SLAM! Athletics updates">
+        <div className="feed-rail-head">
+          <h2 className="feed-rail-title">What's happening</h2>
+          <p className="feed-rail-sub">Updates from SLAM! Athletics</p>
+        </div>
+        <Feed posts={posts} loading={loading} endpoint={endpoint} />
+      </aside>
+    </div>
+  );
+}
+
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "heroBg": "pattern",
   "signupEndpoint": "https://script.google.com/macros/s/AKfycbxKWDLcTjDwwXb-rNq9LTpqQwmlGgvLHZf9kJKDG7DHqwNp6vjaXD8S4ccG_41CBMfk/exec"
@@ -1342,8 +1420,7 @@ function App() {
 
   return (
     <div className="page">
-      <Hero bg={t.heroBg} endpoint={t.signupEndpoint} />
-      <WhatsHappening endpoint={t.signupEndpoint} />
+      <HomeLayout endpoint={t.signupEndpoint} heroBg={t.heroBg} />
 
       <TweaksPanel title="Tweaks">
         <TweakSection label="Hero background" />
