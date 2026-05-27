@@ -105,6 +105,33 @@
     body.style-modal .top { padding-right:60px; }
     body.style-modal .preview-nav, body.style-modal .back { display:none; }
     body.style-modal .content { padding:22px; }
+    @media (max-width:1100px) {
+      .page { padding:10px; }
+      .shell { border-radius:22px; }
+      .top { align-items:flex-start; flex-direction:column; }
+      .preview-nav { display:none; }
+      .content { padding:18px; }
+      .role-grid, .post-builder-form { grid-template-columns:1fr; }
+      .choice-row, .photo-row { grid-template-columns:1fr; }
+      .form-fields { order:1; }
+      .preview-card {
+        grid-column:auto;
+        grid-row:auto;
+        position:static;
+        order:2;
+        margin-top:4px;
+      }
+      .form-actions { grid-column:auto; order:3; }
+      .pin-panel-head { align-items:flex-start; flex-direction:column; }
+      body.style-split .content,
+      body.style-clipboard .content,
+      body.style-feed .content { padding:18px; }
+      body.style-split .post-builder-form,
+      body.style-clipboard .post-builder-form,
+      body.style-feed .post-builder-form { grid-template-columns:1fr; gap:16px; }
+      body.style-feed .shell { display:block; }
+      body.style-feed .shell::after { display:none; }
+    }
     @media (max-width:760px) {
       .page { padding:10px; }
       .top { align-items:flex-start; flex-direction:column; }

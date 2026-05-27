@@ -346,7 +346,103 @@ function AnimatedHeadline({ text, className }) {
   );
 }
 
+const HERO_SHORTCUTS = [
+  { key: "register", eyebrow: "Register", label: "Register for sports", href: "slam-register.html", mode: "page" },
+  { key: "eligibility", eyebrow: "Eligibility", label: "Athletic eligibility", href: "slam-eligibility.html", mode: "page" },
+  { key: "physicals", eyebrow: "Physicals", label: "Sports physicals", href: "#physicals", mode: "info" },
+  { key: "sports", eyebrow: "Sports", label: "Sports offered", href: "#sports", mode: "info" },
+  { key: "tryouts", eyebrow: "Tryouts", label: "Tryout form", href: "slam-tryouts.html", mode: "page" },
+  { key: "coach", eyebrow: "Coach", label: "Coach for SLAM!", href: "#coach", mode: "info" },
+];
+
+function ShortcutModal({ item, onClose }) {
+  const isPage = item.mode === "page";
+
+  useEffect(() => {
+    function handleShortcutMessage(event) {
+      if (event?.data?.type === "closeShortcutModal") {
+        onClose();
+      }
+    }
+
+    window.addEventListener("message", handleShortcutMessage);
+    return () => window.removeEventListener("message", handleShortcutMessage);
+  }, [onClose]);
+
+  return ReactDOM.createPortal(
+    <div className="shortcut-modal" role="dialog" aria-modal="true" aria-label={item.label}>
+      <button className="shortcut-modal-backdrop" type="button" aria-label="Close" onClick={onClose} />
+      <section className={`shortcut-modal-panel ${isPage ? "page-panel" : ""}`}>
+        <button className="shortcut-modal-close" type="button" onClick={onClose}>×</button>
+        {isPage ? (
+          <iframe title={item.label} src={`${item.href}?modal=1`} />
+        ) : (
+          <ShortcutInfo item={item} />
+        )}
+      </section>
+    </div>,
+    document.body
+  );
+}
+
+function ShortcutInfo({ item }) {
+  if (item.key === "physicals") {
+    return (
+      <div className="shortcut-info">
+        <div className="shortcut-kicker">Sports Physicals</div>
+        <h2>Clear before tryouts</h2>
+        <p>Sports physicals should be uploaded to Register My Athlete. Please do not turn physicals in to teachers, office admin, or athletic directors.</p>
+        <div className="shortcut-actions">
+          <a href="https://www.ncsaasports.com/physicals.html" target="_blank" rel="noopener">Physical form</a>
+          <a href="https://www.cvs.com/minuteclinic/services/sports-physicals" target="_blank" rel="noopener">Schedule physical</a>
+        </div>
+      </div>
+    );
+  }
+  if (item.key === "sports") {
+    const seasons = [
+      ["Fall", "Flag Football, Girls Volleyball, Cross Country, Cheer, Baseball"],
+      ["Winter", "Basketball, Bowling, Cheer, Baseball"],
+      ["Spring", "Soccer, Boys Volleyball, Cheer Competitions, Track & Field"],
+    ];
+    return (
+      <div className="shortcut-info">
+        <div className="shortcut-kicker">Sports Offered</div>
+        <h2>Elementary athletics</h2>
+        <p>SLAM! Athletics offers seasonal sports for elementary students. Final divisions depend on league offerings, coach availability, and student interest.</p>
+        <div className="season-list">
+          {seasons.map(([season, copy]) => (
+            <article key={season}>
+              <span>{season}</span>
+              <strong>{copy}</strong>
+            </article>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="shortcut-info">
+      <div className="shortcut-kicker">Coach for SLAM!</div>
+      <h2>Lead the next team</h2>
+      <p>Interested coaches can help build a positive, organized, student-first athletics experience. Reach out to SLAM! Athletics with the sport, season, and grade level you can support.</p>
+      <div className="shortcut-actions">
+        <a href="mailto:kenny.hin@slamnv.org">Email athletics</a>
+      </div>
+    </div>
+  );
+}
+
 function Hero({ bg, endpoint }) {
+  const [shortcutModal, setShortcutModal] = useState(null);
+
+  function openShortcut(event, item) {
+    const smallScreen = window.matchMedia("(max-width: 760px)").matches;
+    if (smallScreen && item.mode === "page") return;
+    event.preventDefault();
+    setShortcutModal(item);
+  }
+
   return (
     <section className="hero" id="top" data-screen-label="01 Hero">
       <HeroBackground variant={bg} />
@@ -370,22 +466,16 @@ function Hero({ bg, endpoint }) {
         </p>
 
         <div className="hero-shortcuts" aria-label="Quick links">
-          {[
-            ["Register", "Register for sports", "slam-register.html"],
-            ["Eligibility", "Athletic eligibility", "slam-eligibility.html"],
-            ["Physicals", "Sports physicals", "#physicals"],
-            ["Sports", "Sports offered", "#sports"],
-            ["Tryouts", "Tryout form", "slam-tryouts.html"],
-            ["Coach", "Coach for SLAM!", "#coach"],
-          ].map(([eyebrow, label, href]) => (
-            <a className="hero-shortcut" href={href} key={label}>
-              <span>{eyebrow}</span>
-              <strong>{label}</strong>
+          {HERO_SHORTCUTS.map((item) => (
+            <a className="hero-shortcut" href={item.href} key={item.key} onClick={(event) => openShortcut(event, item)}>
+              <span>{item.eyebrow}</span>
+              <strong>{item.label}</strong>
               <Icon name="arrow-right" size={14} />
             </a>
           ))}
         </div>
       </div>
+      {shortcutModal && <ShortcutModal item={shortcutModal} onClose={() => setShortcutModal(null)} />}
     </section>
   );
 }

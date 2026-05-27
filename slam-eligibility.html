@@ -47,7 +47,13 @@
     .btn { display:inline-flex; align-items:center; justify-content:center; min-height:44px; border-radius:999px; padding:0 18px; background:#80FF00; color:#050505; font:900 12px monospace; letter-spacing:.08em; text-decoration:none; text-transform:uppercase; }
     .btn.red { background:#DA0016; color:#fff; }
     .source { margin-left:auto; color:#777; font:800 10px monospace; letter-spacing:.08em; text-transform:uppercase; align-self:center; }
-    @media (max-width:760px){ .page{padding:10px}.top{padding:14px 16px;align-items:flex-start}.top-actions{width:100%;justify-content:flex-start}.page-links{justify-content:flex-start}.brand img{width:48px}h1{font-size:32px}.hero{padding:22px 18px}.headline{font-size:42px}.lead{font-size:15px}.field{padding:18px}.grid{grid-template-columns:1fr}.full{grid-column:auto}.decision{grid-template-columns:1fr}.whistle{width:56px;height:56px;border-radius:16px;font-size:28px}.cta{padding:18px;flex-direction:column}.btn{width:100%}.source{margin-left:0;text-align:center}.bottom-actions{padding:16px;justify-content:stretch}.back{width:100%} }
+    html.modal-embed body { background:transparent; }
+    html.modal-embed .page { padding:0; background:transparent; }
+    html.modal-embed .shell { max-width:none; min-height:100vh; border:0; border-radius:0; box-shadow:none; }
+    html.modal-embed .bottom-actions { position:sticky; bottom:0; z-index:5; background:linear-gradient(180deg,rgba(5,5,5,0),rgba(5,5,5,.95) 38%); }
+    html.modal-embed .back { border-color:rgba(128,255,0,.38); color:#80FF00; }
+    @media (max-width:1100px){ .top{align-items:flex-start;flex-direction:column}.top-actions{width:100%;justify-content:flex-start}.page-links{justify-content:flex-start}.brand{width:100%} }
+    @media (max-width:760px){ .page{padding:10px}.top{padding:14px 16px;align-items:flex-start}.brand img{width:48px}h1{font-size:32px}.hero{padding:22px 18px}.headline{font-size:42px}.lead{font-size:15px}.field{padding:18px}.grid{grid-template-columns:1fr}.full{grid-column:auto}.decision{grid-template-columns:1fr}.whistle{width:56px;height:56px;border-radius:16px;font-size:28px}.cta{padding:18px;flex-direction:column}.btn{width:100%}.source{margin-left:0;text-align:center}.bottom-actions{padding:16px;justify-content:stretch}.back{width:100%} }
   </style>
 </head>
 <body>
@@ -116,9 +122,24 @@
         <span class="source">Based on SLAM! Nevada athletics policy</span>
       </div>
       <div class="bottom-actions">
-        <a class="back" href="slam.html">← Back to homepage</a>
+        <a class="back" href="slam.html">â Back to homepage</a>
       </div>
     </section>
   </main>
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      if (params.get("modal") !== "1") return;
+
+      document.documentElement.classList.add("modal-embed");
+      document.querySelectorAll('a[href$="slam.html"]').forEach(function (link) {
+        link.textContent = "← Back to homepage";
+        link.addEventListener("click", function (event) {
+          event.preventDefault();
+          window.parent.postMessage({ type: "closeShortcutModal" }, "*");
+        });
+      });
+    })();
+  </script>
 </body>
 </html>

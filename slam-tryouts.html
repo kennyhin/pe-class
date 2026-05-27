@@ -68,7 +68,13 @@
     .summary b { display:block; color:#fff; font-size:12px; text-transform:uppercase; margin-bottom:3px; }
     .status { margin-top:14px; color:#80FF00; font:800 12px monospace; text-transform:uppercase; }
     .hidden { display:none; }
-    @media (max-width:850px){ .page{padding:10px}.main{grid-template-columns:1fr}.notice{padding:8px 10px}.notice-grid{grid-template-columns:1fr;gap:5px}.notice-card{padding:9px 11px}.notice-kicker{font-size:10px;margin-bottom:3px}.notice-card ul{margin:4px 0 0;padding-left:16px}.notice-card li{font-size:11px;line-height:1.22}.rail{border-left:0;border-top:1px solid rgba(255,255,255,.1);padding:0;background:rgba(0,0,0,.18)}.rail-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;border:0;background:rgba(255,255,255,.04);color:#fff;padding:13px 18px;font:900 12px monospace;letter-spacing:.12em;text-transform:uppercase}.rail-toggle:after{content:">";color:#80FF00;transition:transform .18s ease}.rail.open .rail-toggle:after{transform:rotate(90deg)}.rail .step,.rail .summary{display:none}.rail.open .step,.rail.open .summary{display:grid}.rail .step{padding:14px 18px 0;margin:0}.rail .summary{padding:12px 18px 18px;gap:7px}.summary div{font-size:12px;padding-bottom:7px}.choices,.fields,.clearance-grid{grid-template-columns:1fr}.stage{padding:18px;min-height:auto}.question{font-size:34px}.top{align-items:flex-start;padding:14px 16px}.top-actions{width:100%;justify-content:flex-start}.page-links{justify-content:flex-start}.brand img{width:48px}h1{font-size:34px}.bottom-actions{padding:16px;justify-content:stretch}.back{width:100%} }
+    html.modal-embed body { background:transparent; }
+    html.modal-embed .page { padding:0; background:transparent; }
+    html.modal-embed .shell { max-width:none; min-height:100vh; border:0; border-radius:0; box-shadow:none; }
+    html.modal-embed .bottom-actions { position:sticky; bottom:0; z-index:5; background:linear-gradient(180deg,rgba(5,5,5,0),rgba(5,5,5,.95) 38%); }
+    html.modal-embed .back { border-color:rgba(128,255,0,.38); color:#80FF00; }
+    @media (max-width:1100px){ .top{align-items:flex-start;flex-direction:column}.top-actions{width:100%;justify-content:flex-start}.page-links{justify-content:flex-start}.brand{width:100%} }
+    @media (max-width:850px){ .page{padding:10px}.main{grid-template-columns:1fr}.notice{padding:8px 10px}.notice-grid{grid-template-columns:1fr;gap:5px}.notice-card{padding:9px 11px}.notice-kicker{font-size:10px;margin-bottom:3px}.notice-card ul{margin:4px 0 0;padding-left:16px}.notice-card li{font-size:11px;line-height:1.22}.rail{border-left:0;border-top:1px solid rgba(255,255,255,.1);padding:0;background:rgba(0,0,0,.18)}.rail-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;border:0;background:rgba(255,255,255,.04);color:#fff;padding:13px 18px;font:900 12px monospace;letter-spacing:.12em;text-transform:uppercase}.rail-toggle:after{content:">";color:#80FF00;transition:transform .18s ease}.rail.open .rail-toggle:after{transform:rotate(90deg)}.rail .step,.rail .summary{display:none}.rail.open .step,.rail.open .summary{display:grid}.rail .step{padding:14px 18px 0;margin:0}.rail .summary{padding:12px 18px 18px;gap:7px}.summary div{font-size:12px;padding-bottom:7px}.choices,.fields,.clearance-grid{grid-template-columns:1fr}.stage{padding:18px;min-height:auto}.question{font-size:34px}.top{padding:14px 16px}.brand img{width:48px}h1{font-size:34px}.bottom-actions{padding:16px;justify-content:stretch}.back{width:100%} }
   </style>
 </head>
 <body>
@@ -95,7 +101,7 @@
               <ul>
                 <li>One form per sport.</li>
                 <li>Sports physical OR waiver option at the end.</li>
-                <li><a href="https://www.ncsaasports.com/physicals.html" target="_blank" rel="noopener">Physical form</a> · <a href="https://www.cvs.com/minuteclinic/services/sports-physicals" target="_blank" rel="noopener">Schedule physical</a></li>
+                <li><a href="https://www.ncsaasports.com/physicals.html" target="_blank" rel="noopener">Physical form</a> Â· <a href="https://www.cvs.com/minuteclinic/services/sports-physicals" target="_blank" rel="noopener">Schedule physical</a></li>
               </ul>
             </div>
             <div>
@@ -127,11 +133,25 @@
         </aside>
       </div>
       <div class="bottom-actions">
-        <a class="back" href="slam.html">← Back to homepage</a>
+        <a class="back" href="slam.html">â Back to homepage</a>
       </div>
     </section>
   </main>
   <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      if (params.get("modal") !== "1") return;
+
+      document.documentElement.classList.add("modal-embed");
+      document.querySelectorAll('a[href$="slam.html"]').forEach(function (link) {
+        link.textContent = "← Back to homepage";
+        link.addEventListener("click", function (event) {
+          event.preventDefault();
+          window.parent.postMessage({ type: "closeShortcutModal" }, "*");
+        });
+      });
+    })();
+
     var ENDPOINT = 'https://script.google.com/macros/s/AKfycbx-a6Rgey0CuqAOTXnQp_puTWihRsclvndOBPrSwdjgbJszTfcwFC2-zXnESPguGwyu7Q/exec';
     var SIZES = ['YXS','YS','YM','YL','YXL','Adult XS','Adult S','Adult M','Adult L','Adult XL','Adult XXL','Adult XXXL'];
     var SPORTS = {
