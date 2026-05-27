@@ -1337,7 +1337,6 @@ function Feed({ posts, loading, endpoint }) {
   const [reactionBumps, setReactionBumps] = useState({});
   const [reacted, setReacted] = useState(reactedPostIds);
   const [showPostModal, setShowPostModal] = useState(false);
-  const usePostModalPreview = new URLSearchParams(window.location.search).get("preview") === "desktop-post-modal";
 
   function reactToPost(post, reaction) {
     const postId = String(post.id || "").trim();
@@ -1450,7 +1449,7 @@ function Feed({ posts, loading, endpoint }) {
         className="staff-post-open"
         href="slam-staff-post.html"
         onClick={(event) => {
-          if (!usePostModalPreview || window.matchMedia("(max-width: 760px)").matches) return;
+          if (window.matchMedia("(max-width: 760px)").matches) return;
           event.preventDefault();
           setShowPostModal(true);
         }}
