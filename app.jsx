@@ -511,6 +511,25 @@ const SPORT_OPTIONS = [
   "Other",
 ];
 
+const STAFF_POST_ROLES = ["Admin", "Teacher", "Coach"];
+const COMMUNITY_POST_ROLES = ["Parent", "Student"];
+const STAFF_PIN_HASH = 1687348;
+const STUDENT_GRADES = ["Kindergarten", "1st Grade", "2nd Grade", "3rd Grade", "4th Grade", "5th Grade"];
+const STAFF_BADGE_COLORS = [
+  ["gold", "Gold"],
+  ["lime", "Green"],
+  ["red", "Red"],
+  ["blue", "Blue"],
+  ["white", "White"],
+];
+const COACH_QUOTES = [
+  ["John Wooden", "Make each day your masterpiece."],
+  ["John Wooden", "Success is peace of mind, which is a direct result of self-satisfaction in knowing you made the effort."],
+  ["Vince Lombardi", "Individual commitment to a group effort is what makes a team work."],
+  ["Pat Summitt", "Discipline helps you finish a job, and finishing is what separates excellent work from average work."],
+  ["Phil Jackson", "The strength of the team is each individual member. The strength of each member is the team."],
+];
+
 const POST_NAME_OPTIONS = [
   "SLAM! ES Football",
   "SLAM! ES Volleyball",
@@ -703,22 +722,29 @@ function postBadge(post) {
   const submitter = String(post?.submitter || post?.name || "").trim().toLowerCase();
   const grade = String(post?.grade || "").trim().toLowerCase();
   if (["admin", "teacher", "coach"].includes(submitter)) {
-    return { label: "✓", className: "staff", title: "Verified staff" };
+    const color = String(post?.badgeColor || post?.badge || "").trim().toLowerCase();
+    const colorKey = STAFF_BADGE_COLORS.some(([key]) => key === color) ? color : "gold";
+    return { label: "✓", className: `staff staff-${colorKey}`, title: "Verified staff" };
   }
   if (submitter === "parent") {
     return { label: "✓", className: "parent", title: "Approved parent" };
   }
   if (submitter === "student" || grade) {
-    const gradeKey = grade.includes("kindergarten") ? "kinder"
-      : grade.includes("1st") ? "first"
-      : grade.includes("2nd") ? "second"
-      : grade.includes("3rd") ? "third"
-      : grade.includes("4th") ? "fourth"
-      : grade.includes("5th") ? "fifth"
-      : "student";
+    const gradeKey = studentBadgeClass(grade).replace("grade-", "");
     return { label: "✓", className: `student grade-${gradeKey}`, title: "Approved student" };
   }
   return { label: "✓", className: "staff", title: "Verified update" };
+}
+
+function studentBadgeClass(grade) {
+  const value = String(grade || "").trim().toLowerCase();
+  if (value.includes("kindergarten")) return "grade-kinder";
+  if (value.includes("1st")) return "grade-first";
+  if (value.includes("2nd")) return "grade-second";
+  if (value.includes("3rd")) return "grade-third";
+  if (value.includes("4th")) return "grade-fourth";
+  if (value.includes("5th")) return "grade-fifth";
+  return "grade-student";
 }
 
 function reactionDeviceKey() {
@@ -1028,11 +1054,290 @@ function Calendar({ events, loading }) {
   );
 }
 
+function staffPinHash(pin) {
+  return String(pin || "").split("").reduce((total, char) => (
+    (total * 31) + char.charCodeAt(0)
+  ), 0);
+}
+
+function readPhotoAsPostImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const size = Math.min(img.width, img.height);
+        const sx = Math.round((img.width - size) / 2);
+        const sy = Math.round((img.height - size) / 2);
+        const canvas = document.createElement("canvas");
+        canvas.width = 420;
+        canvas.height = 420;
+        canvas.getContext("2d").drawImage(img, sx, sy, size, size, 0, 0, 420, 420);
+        resolve(canvas.toDataURL("image/jpeg", 0.64));
+      };
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function DesktopPostModal({ endpoint, onClose }) {
+  const [role, setRole] = useState("");
+  const [pin, setPin] = useState("");
+  const [unlocked, setUnlocked] = useState(false);
+  const [pinError, setPinError] = useState("");
+  const [title, setTitle] = useState("Admin");
+  const [handle, setHandle] = useState("");
+  const [sport, setSport] = useState("");
+  const [grade, setGrade] = useState("");
+  const [badgeColor, setBadgeColor] = useState("gold");
+  const [body, setBody] = useState("");
+  const [link, setLink] = useState("");
+  const [imageData, setImageData] = useState("");
+  const [imageName, setImageName] = useState("");
+  const [imageType, setImageType] = useState("");
+  const [status, setStatus] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const isStaff = STAFF_POST_ROLES.includes(role);
+  const needsReview = role === "Parent" || role === "Student";
+  const canShowForm = role && (!isStaff || unlocked);
+  const visibleTitle = isStaff ? title : role;
+  const quote = useState(() => COACH_QUOTES[Math.floor(Math.random() * COACH_QUOTES.length)])[0];
+  const cleanHandle = handle.trim().replace(/^@+/, "");
+  const previewHandle = cleanHandle || (role === "Parent" ? "johnnys_mom" : role === "Student" ? "student_name" : "mr_wong");
+  const previewSport = sport || "Other";
+
+  function chooseRole(nextRole) {
+    setRole(nextRole);
+    setTitle(STAFF_POST_ROLES.includes(nextRole) ? nextRole : nextRole);
+    setUnlocked(!STAFF_POST_ROLES.includes(nextRole));
+    setBadgeColor("gold");
+    setPin("");
+    setPinError("");
+  }
+
+  function enterPinDigit(digit) {
+    if (!isStaff || unlocked) return;
+    const next = `${pin}${digit}`.slice(0, 4);
+    setPin(next);
+    setPinError("");
+    if (next.length === 4) {
+      if (staffPinHash(next) === STAFF_PIN_HASH) {
+        setUnlocked(true);
+      } else {
+        setPinError("That code did not match. Try again.");
+        setTimeout(() => setPin(""), 140);
+      }
+    }
+  }
+
+  function resetRole() {
+    setRole("");
+    setPin("");
+    setUnlocked(false);
+    setPinError("");
+    setStatus("");
+  }
+
+  async function handlePhoto(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    setStatus("Preparing photo...");
+    try {
+      const dataUrl = await readPhotoAsPostImage(file);
+      setImageData(dataUrl);
+      setImageName(file.name || "slam-update.jpg");
+      setImageType("image/jpeg");
+      setStatus("Photo ready.");
+    } catch (_) {
+      setStatus("Could not prepare that photo. Try another image.");
+    }
+  }
+
+  async function submitPost(event) {
+    event.preventDefault();
+    if (!role || !body.trim() || !sport || !cleanHandle || (role === "Student" && !grade)) {
+      setStatus("Please finish the required fields.");
+      return;
+    }
+    setSubmitting(true);
+    setStatus(needsReview ? "Sending for review..." : "Posting update...");
+    const fd = new FormData();
+    fd.append("action", "post");
+    fd.append("pin", isStaff ? pin : "");
+    fd.append("submitter", role);
+    fd.append("name", visibleTitle);
+    fd.append("grade", role === "Student" ? grade : "");
+    fd.append("badgeColor", isStaff ? badgeColor : "");
+    fd.append("sport", sport);
+    fd.append("handle", `@${cleanHandle}`);
+    fd.append("body", body.trim());
+    fd.append("link", link.trim());
+    fd.append("image", "");
+    fd.append("imageData", imageData);
+    fd.append("imageName", imageName);
+    fd.append("imageType", imageType);
+    fd.append("ua", navigator.userAgent);
+    try {
+      await fetch(endpoint, { method: "POST", body: fd, mode: "no-cors" });
+      setStatus(needsReview ? "Sent for review." : "Post sent. It may take a moment to appear.");
+      setTimeout(onClose, 1200);
+    } catch (_) {
+      setSubmitting(false);
+      setStatus("Could not submit. Check connection and try again.");
+    }
+  }
+
+  return (
+    <div className="staff-post-modal native" role="dialog" aria-modal="true" aria-label="Create update">
+      <button className="staff-post-modal-backdrop" type="button" aria-label="Close post form" onClick={onClose} />
+      <div className="staff-post-modal-panel native">
+        <button className="staff-post-modal-close" type="button" onClick={onClose}>×</button>
+        <div className="native-post">
+          <aside className="native-post-side">
+            <img src="assets/bull-only-transparent.png" alt="" />
+            <span>SLAM! Athletics</span>
+            <h2>Coach's Note</h2>
+            <p>“{quote[1]}”</p>
+            <small>— {quote[0]}</small>
+          </aside>
+
+          <section className="native-post-work">
+            {!role && (
+              <div className="native-step">
+                <div className="native-kicker">Choose access</div>
+                <h3>Who is posting?</h3>
+                <div className="native-role-grid">
+                  {[...STAFF_POST_ROLES, ...COMMUNITY_POST_ROLES].map((item) => (
+                    <button type="button" key={item} onClick={() => chooseRole(item)}>
+                      <strong>{item}</strong>
+                      <span>{STAFF_POST_ROLES.includes(item) ? "Staff" : "Review first"}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {role && isStaff && !unlocked && (
+              <div className="native-step pin">
+                <button className="native-back" type="button" onClick={resetRole}>← Change role</button>
+                <div className="native-kicker">Authorized staff only</div>
+                <h3>Enter staff PIN</h3>
+                <div className="native-pin-dots" aria-label="PIN progress">
+                  {[0, 1, 2, 3].map((dot) => <span key={dot} className={dot < pin.length ? "on" : ""} />)}
+                </div>
+                {pinError && <p className="native-error">{pinError}</p>}
+                <div className="native-keypad">
+                  {[1,2,3,4,5,6,7,8,9].map((digit) => (
+                    <button type="button" key={digit} onClick={() => enterPinDigit(digit)}>{digit}</button>
+                  ))}
+                  <button type="button" onClick={() => setPin((value) => value.slice(0, -1))}>⌫</button>
+                  <button type="button" onClick={() => enterPinDigit(0)}>0</button>
+                  <button type="button" onClick={() => setPin("")}>Clear</button>
+                </div>
+              </div>
+            )}
+
+            {canShowForm && (
+              <form className="native-builder" onSubmit={submitPost}>
+                <div className="native-builder-fields">
+                  <button className="native-back" type="button" onClick={resetRole}>← Change role</button>
+                  <div className="native-kicker">{isStaff ? "Staff post" : `${role} post`}</div>
+                  <h3>Post</h3>
+                  {isStaff && (
+                    <label>Title
+                      <div className="native-title-row">
+                        {STAFF_POST_ROLES.map((item) => (
+                          <button type="button" key={item} className={title === item ? "active" : ""} onClick={() => setTitle(item)}>{item}</button>
+                        ))}
+                      </div>
+                    </label>
+                  )}
+                  {isStaff && (
+                    <label>Badge color
+                      <div className="native-badge-row">
+                        {STAFF_BADGE_COLORS.map(([key, label]) => (
+                          <button
+                            type="button"
+                            key={key}
+                            className={`badge-choice ${key}${badgeColor === key ? " active" : ""}`}
+                            onClick={() => setBadgeColor(key)}
+                            aria-label={`${label} verified badge`}
+                          >
+                            <span>✓</span>
+                            <strong>{label}</strong>
+                          </button>
+                        ))}
+                      </div>
+                    </label>
+                  )}
+                  <label>Handle
+                    <div className="native-handle"><span>@</span><input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder={previewHandle} /></div>
+                  </label>
+                  {role === "Student" && (
+                    <label>Grade
+                      <select value={grade} onChange={(e) => setGrade(e.target.value)}>
+                        <option value="">Pick a grade</option>
+                        {STUDENT_GRADES.map((item) => <option key={item} value={item}>{item}</option>)}
+                      </select>
+                    </label>
+                  )}
+                  <label>Sport supporting
+                    <select value={sport} onChange={(e) => setSport(e.target.value)}>
+                      <option value="">Pick a sport</option>
+                      {SPORT_OPTIONS.map((item) => <option key={item} value={item}>{item}</option>)}
+                    </select>
+                  </label>
+                  <label>Post
+                    <textarea value={body} onChange={(e) => setBody(e.target.value)} />
+                  </label>
+                  <label>Link
+                    <input type="url" value={link} onChange={(e) => setLink(e.target.value)} />
+                  </label>
+                  <div className="native-photo-row">
+                    <label>Add photo<input type="file" accept="image/*" onChange={handlePhoto} /></label>
+                    <label>Take photo<input type="file" accept="image/*" capture="environment" onChange={handlePhoto} /></label>
+                  </div>
+                </div>
+
+                <aside className="native-preview">
+                  <div className="native-kicker">Live preview</div>
+                  <article className="post native-preview-post">
+                    <div className="post-avatar">{getEventIcon({ sport: previewSport, title: previewSport, type: "event" })}</div>
+                    <div className="post-body">
+                      <div className="post-meta">
+                        <span className="post-name">{visibleTitle || "Post"}</span>
+                        <span className={`post-badge ${isStaff ? `staff staff-${badgeColor}` : role === "Parent" ? "parent" : `student ${studentBadgeClass(grade)}`}`}>✓</span>
+                        <span className="post-handle">@{previewHandle}</span>
+                        {role === "Student" && grade && <span className="post-grade">{grade}</span>}
+                        <span className="post-date">now</span>
+                      </div>
+                      <p className="post-text">{body.trim() || "Your update will preview here as you type."}</p>
+                      {imageData && <img className="post-image" src={imageData} alt="" />}
+                    </div>
+                  </article>
+                  {needsReview && <p className="native-review-note">Parent and student posts go to the spreadsheet for approval first.</p>}
+                  <button className="native-submit" type="submit" disabled={submitting}>{submitting ? "Sending..." : "Submit post"}</button>
+                  {status && <p className="native-status">{status}</p>}
+                </aside>
+              </form>
+            )}
+          </section>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // --- Updates feed (Twitter/X style) ---
 function Feed({ posts, loading, endpoint }) {
   const sortedPosts = [...posts].sort(sortPostsByDate);
   const [reactionBumps, setReactionBumps] = useState({});
   const [reacted, setReacted] = useState(reactedPostIds);
+  const [showPostModal, setShowPostModal] = useState(false);
+  const usePostModalPreview = new URLSearchParams(window.location.search).get("preview") === "desktop-post-modal";
 
   function reactToPost(post, reaction) {
     const postId = String(post.id || "").trim();
@@ -1069,7 +1374,7 @@ function Feed({ posts, loading, endpoint }) {
   return (
     <div className="card feed">
       <div className="card-head">
-        <span className="card-eyebrow">Updates</span>
+        <span className="card-eyebrow">Feed</span>
         <span className="card-meta">@slamES</span>
       </div>
       <div className="feed-list">
@@ -1141,9 +1446,21 @@ function Feed({ posts, loading, endpoint }) {
           );
         })}
       </div>
-      <a className="staff-post-open" href="slam-staff-post.html">
+      <a
+        className="staff-post-open"
+        href="slam-staff-post.html"
+        onClick={(event) => {
+          if (!usePostModalPreview || window.matchMedia("(max-width: 760px)").matches) return;
+          event.preventDefault();
+          setShowPostModal(true);
+        }}
+      >
         Post
       </a>
+      {showPostModal && ReactDOM.createPortal(
+        <DesktopPostModal endpoint={endpoint} onClose={() => setShowPostModal(false)} />,
+        document.body
+      )}
     </div>
   );
 }
@@ -1344,8 +1661,8 @@ function WhatsHappening({ endpoint }) {
   return (
     <section className="happening" data-screen-label="02 Happening">
       <div className="happening-head">
-        <h2 className="happening-title">What's happening</h2>
-        <p className="happening-sub">Schedules · Updates · Answers</p>
+        <h2 className="happening-title">What<span className="display-apostrophe">’</span>s happening</h2>
+        <p className="happening-sub">Schedules · Feed · Answers</p>
       </div>
       <div className="happening-grid">
         <Feed posts={posts} loading={loading} endpoint={endpoint} />
@@ -1371,7 +1688,10 @@ function BullsCommitmentCard() {
   ];
   return (
     <section className="commitment-card" id="commitment">
-      <h2 className="commitment-title">Bulls Commitment</h2>
+      <div className="commitment-title-row">
+        <h2 className="commitment-title">Bulls Commitment</h2>
+        <span className="commitment-promise">I promise to</span>
+      </div>
       <ol className="commitment-list">
         {commitments.map((item, i) => (
           <li key={item}>
@@ -1401,8 +1721,7 @@ function HomeLayout({ endpoint, heroBg }) {
 
       <aside className="feed-rail" aria-label="SLAM! Athletics updates">
         <div className="feed-rail-head">
-          <h2 className="feed-rail-title">What's happening</h2>
-          <p className="feed-rail-sub">Updates from SLAM! Athletics</p>
+          <h2 className="feed-rail-title">What<span className="display-apostrophe">’</span>s happening</h2>
         </div>
         <Feed posts={posts} loading={loading} endpoint={endpoint} />
       </aside>

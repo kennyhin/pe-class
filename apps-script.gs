@@ -11,7 +11,7 @@
  *
  * Optional content tabs:
  *   Events: Date | Type | Sport | Title | Time | Location | Opponent | Notes
- *   Posts:  Timestamp | Approved | Name | Handle | Body | Time | Accent | Date | Sport | Link | Image | Grade | Submitter
+ *   Posts:  Timestamp | Approved | Name | Handle | Body | Time | Accent | Date | Sport | Link | Image | Grade | Submitter | BadgeColor
  *   FAQ:    Question | Answer | Keywords | Link
  *
  * Questions columns (created automatically on first parent question):
@@ -133,6 +133,7 @@ function _savePost(ss, params) {
   var link = String(params.link || '').trim();
   var image = String(params.image || '').trim();
   var grade = String(params.grade || '').trim();
+  var badgeColor = String(params.badgeColor || '').trim();
   var imageData = String(params.imageData || '').trim();
   var imageName = String(params.imageName || 'slam-update.jpg').trim();
   var imageType = String(params.imageType || 'image/jpeg').trim();
@@ -156,7 +157,8 @@ function _savePost(ss, params) {
     Link: link,
     Image: image,
     Grade: grade,
-    Submitter: submitter
+    Submitter: submitter,
+    BadgeColor: badgeColor
   });
   if (imageData) {
     try {
@@ -397,6 +399,7 @@ function _posts(ss) {
       image: String(row.image || row.photo || '').trim(),
       grade: String(row.grade || '').trim(),
       submitter: String(row.submitter || '').trim(),
+      badgeColor: String(row.badgecolor || row.badge || '').trim(),
       likes: Number(row.likes) || 0,
       hearts: Number(row.hearts) || 0,
       celebrates: Number(row.celebrates) || 0
@@ -413,7 +416,7 @@ function _ensurePostsSheet(ss) {
 }
 
 function _ensurePostLikeSheet(ss, sheetName, addExample) {
-  var headers = ['ID', 'Timestamp', 'Approved', 'Name', 'Handle', 'Body', 'Time', 'Accent', 'Date', 'Sport', 'Link', 'Image', 'Grade', 'Submitter', 'Likes', 'Hearts', 'Celebrates', 'VoterKeys'];
+  var headers = ['ID', 'Timestamp', 'Approved', 'Name', 'Handle', 'Body', 'Time', 'Accent', 'Date', 'Sport', 'Link', 'Image', 'Grade', 'Submitter', 'BadgeColor', 'Likes', 'Hearts', 'Celebrates', 'VoterKeys'];
   var sheet = ss.getSheetByName(sheetName);
   if (!sheet) {
     sheet = ss.insertSheet(sheetName);
@@ -430,6 +433,7 @@ function _ensurePostLikeSheet(ss, sheetName, addExample) {
         '',
         new Date(),
         'Basketball',
+        '',
         '',
         '',
         '',

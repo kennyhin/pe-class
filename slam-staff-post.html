@@ -15,6 +15,9 @@
     .brand img { width:48px; filter:drop-shadow(0 8px 18px rgba(0,0,0,.3)); }
     h1 { margin:0; font:34px/.9 Impact,"Arial Black",sans-serif; text-transform:uppercase; }
     .back { display:inline-flex; align-items:center; justify-content:center; min-height:38px; padding:0 14px; border:1px solid rgba(128,255,0,.32); border-radius:999px; background:rgba(128,255,0,.08); color:#80FF00; font:900 10px monospace; letter-spacing:.1em; text-transform:uppercase; text-decoration:none; white-space:nowrap; }
+    .preview-nav { display:flex; flex-wrap:wrap; gap:8px; padding:12px 18px; border-bottom:1px solid rgba(255,255,255,.08); background:rgba(0,0,0,.2); }
+    .preview-nav a { display:inline-flex; align-items:center; min-height:30px; padding:0 11px; border:1px solid rgba(255,255,255,.14); border-radius:999px; color:rgba(255,255,255,.74); font:900 9px monospace; letter-spacing:.1em; text-transform:uppercase; text-decoration:none; }
+    .preview-nav a.active { border-color:rgba(128,255,0,.45); color:#80FF00; background:rgba(128,255,0,.08); }
     .content { padding:22px; }
     .kicker { color:#80FF00; font:900 11px monospace; letter-spacing:.14em; text-transform:uppercase; margin-bottom:10px; }
     h2 { margin:0 0 10px; font:38px/.92 Impact,"Arial Black",sans-serif; text-transform:uppercase; }
@@ -48,6 +51,15 @@
     select:invalid { color:rgba(255,255,255,.34); }
     label { display:grid; gap:8px; color:rgba(255,255,255,.56); font:900 11px monospace; letter-spacing:.09em; text-transform:uppercase; }
     .choice-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+    .badge-row { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+    .badge-choice { min-height:46px; border:1px solid rgba(255,255,255,.14); border-radius:13px; background:rgba(255,255,255,.045); color:#fff; font:900 9px monospace; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; }
+    .badge-choice span { width:17px; height:17px; display:grid; place-items:center; margin:0 auto 4px; border-radius:5px; color:#050505; }
+    .badge-choice.gold span { background:#ffd166; }
+    .badge-choice.lime span { background:#80ff00; }
+    .badge-choice.red span { background:#da0016; color:#fff; }
+    .badge-choice.blue span { background:#36a3ff; color:#fff; }
+    .badge-choice.white span { background:#f4f4f4; }
+    .badge-choice.active { border-color:rgba(128,255,0,.48); background:rgba(128,255,0,.08); }
     .handle { display:grid; grid-template-columns:44px 1fr; border:1px solid rgba(255,255,255,.13); border-radius:13px; overflow:hidden; background:rgba(255,255,255,.045); }
     .handle span { display:grid; place-items:center; color:rgba(128,255,0,.72); font:900 16px monospace; border-right:1px solid rgba(255,255,255,.1); }
     .handle input { border:0; border-radius:0; background:transparent; }
@@ -70,9 +82,33 @@
     .post-text { margin:8px 0 10px; color:#f2f2f2; line-height:1.35; }
     .image-preview { width:104px; height:104px; object-fit:cover; border:1px solid rgba(255,255,255,.18); border-radius:15px; background:#111; }
     .hidden { display:none; }
+    body.style-split .shell { max-width:1180px; }
+    body.style-split .content { padding:30px; }
+    body.style-split .gate { min-height:560px; }
+    body.style-split .gate-inner { max-width:920px; padding:38px; border:1px solid rgba(128,255,0,.18); border-radius:28px; background:linear-gradient(135deg,rgba(128,255,0,.08),rgba(255,255,255,.035)); box-shadow:inset 0 0 0 1px rgba(255,255,255,.035); }
+    body.style-split .post-builder-form { grid-template-columns:minmax(0,1fr) minmax(360px,.78fr); gap:28px; }
+    body.style-split .preview-card { padding:22px; background:radial-gradient(circle at 80% 0,rgba(128,255,0,.12),transparent 34%),linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.025)); }
+    body.style-clipboard .page { background:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px),radial-gradient(circle at 15% 10%,rgba(218,0,22,.14),transparent 32%),#050505; background-size:42px 42px,42px 42px,auto,auto; }
+    body.style-clipboard .shell { max-width:1060px; border-radius:18px 18px 34px 34px; transform:rotate(-.18deg); }
+    body.style-clipboard .top { background:linear-gradient(90deg,rgba(218,0,22,.54),rgba(90,0,10,.36)); }
+    body.style-clipboard .content { padding:26px; }
+    body.style-clipboard .gate-inner, body.style-clipboard .form-fields, body.style-clipboard .preview-card { border:1px solid rgba(255,255,255,.13); border-radius:22px; background:rgba(16,16,16,.82); padding:20px; }
+    body.style-clipboard .post-builder-form { grid-template-columns:minmax(0,1fr) 330px; }
+    body.style-clipboard .role-btn, body.style-clipboard .choice { border-radius:14px; border-style:dashed; }
+    body.style-feed .page { background:radial-gradient(circle at 88% 10%,rgba(128,255,0,.08),transparent 28%),#050505; }
+    body.style-feed .shell { max-width:1240px; display:grid; grid-template-columns:minmax(0,1fr) 320px; }
+    body.style-feed .top, body.style-feed .preview-nav, body.style-feed .content { grid-column:1; }
+    body.style-feed .shell::after { content:"Recent feed preview\\A\\A🏀  Admin  @mr_wong\\AQuick reminder for families.\\A\\A🏈  Coach  @CoachMarie\\ASummer workouts today.\\A\\A📣  Parent  @johnnys_mom\\AYo!!! Go Bulls!"; white-space:pre-line; grid-column:2; grid-row:1 / span 3; padding:28px 20px; border-left:1px solid rgba(128,255,0,.16); background:linear-gradient(180deg,rgba(128,255,0,.08),rgba(255,255,255,.025)); color:rgba(255,255,255,.72); font:700 14px/1.55 Arial,Helvetica,sans-serif; }
+    body.style-feed .post-builder-form { grid-template-columns:minmax(0,1fr) 300px; }
+    body.style-modal .page { padding:0; background:transparent; }
+    body.style-modal .shell { max-width:none; min-height:100vh; border:0; border-radius:0; box-shadow:none; }
+    body.style-modal .top { padding-right:60px; }
+    body.style-modal .preview-nav, body.style-modal .back { display:none; }
+    body.style-modal .content { padding:22px; }
     @media (max-width:760px) {
       .page { padding:10px; }
       .top { align-items:flex-start; flex-direction:column; }
+      .preview-nav { display:none; }
       .content { padding:18px; }
       .role-grid, .post-builder-form { grid-template-columns:1fr; }
       .choice-row, .photo-row { grid-template-columns:1fr; }
@@ -80,6 +116,8 @@
       .preview-card { grid-column:auto; grid-row:auto; position:static; order:2; }
       .form-actions { grid-column:auto; order:3; }
       .pin-panel-head { align-items:flex-start; flex-direction:column; }
+      body.style-feed .shell { display:block; }
+      body.style-feed .shell::after { display:none; }
     }
   </style>
 </head>
@@ -93,6 +131,12 @@
         </div>
         <a class="back" href="slam.html">← Back to homepage</a>
       </div>
+      <nav class="preview-nav" aria-label="Post page preview styles">
+        <a href="slam-staff-post.html?style=split" data-style-link="split">Split studio</a>
+        <a href="slam-staff-post.html?style=clipboard" data-style-link="clipboard">Coach clipboard</a>
+        <a href="slam-staff-post.html?style=feed" data-style-link="feed">Feed background</a>
+        <a href="slam.html?preview=desktop-post-modal">Homepage modal</a>
+      </nav>
       <div class="content">
         <section id="gate" class="gate">
           <div class="gate-inner">
@@ -134,6 +178,15 @@
                   <button class="choice" type="button" data-title="Admin">Admin</button>
                   <button class="choice" type="button" data-title="Teacher">Teacher</button>
                   <button class="choice" type="button" data-title="Coach">Coach</button>
+                </div>
+              </label>
+              <label id="badgeWrap">Badge color
+                <div class="badge-row" id="badgeChoices">
+                  <button class="badge-choice gold active" type="button" data-badge-color="gold"><span>✓</span>Gold</button>
+                  <button class="badge-choice lime" type="button" data-badge-color="lime"><span>✓</span>Green</button>
+                  <button class="badge-choice red" type="button" data-badge-color="red"><span>✓</span>Red</button>
+                  <button class="badge-choice blue" type="button" data-badge-color="blue"><span>✓</span>Blue</button>
+                  <button class="badge-choice white" type="button" data-badge-color="white"><span>✓</span>White</button>
                 </div>
               </label>
               <label>Handle
@@ -187,6 +240,12 @@
     </section>
   </main>
   <script>
+    var PARAMS = new URLSearchParams(window.location.search);
+    var STYLE_MODE = PARAMS.get('style') || 'split';
+    document.body.classList.add('style-' + STYLE_MODE);
+    document.querySelectorAll('[data-style-link]').forEach(function(link) {
+      link.classList.toggle('active', link.getAttribute('data-style-link') === STYLE_MODE);
+    });
     var ENDPOINT = 'https://script.google.com/macros/s/AKfycbxKWDLcTjDwwXb-rNq9LTpqQwmlGgvLHZf9kJKDG7DHqwNp6vjaXD8S4ccG_41CBMfk/exec';
     var sports = ['Basketball','Soccer','Track and Field','Cross Country','Cheer','Volleyball','Flag Football','Baseball','Softball','Tennis','Other'];
     var grades = ['Kindergarten','1st Grade','2nd Grade','3rd Grade','4th Grade','5th Grade'];
@@ -194,6 +253,7 @@
     var staffRoles = ['Admin','Teacher','Coach'];
     var selectedRole = '';
     var title = '';
+    var badgeColor = 'gold';
     var enteredPin = '';
     var imageData = '';
     var imageName = '';
@@ -247,8 +307,10 @@
       });
       if (!isStaff(selectedRole)) {
         $('titleChoices').parentElement.classList.add('hidden');
+        $('badgeWrap').classList.add('hidden');
       } else {
         $('titleChoices').parentElement.classList.remove('hidden');
+        $('badgeWrap').classList.remove('hidden');
       }
       $('handle').placeholder = selectedRole === 'Parent' ? 'johnnys_mom' : selectedRole === 'Student' ? 'student_name' : 'mr_wong';
       updatePreview();
@@ -351,6 +413,12 @@
         updatePreview();
       });
     });
+    document.querySelectorAll('[data-badge-color]').forEach(function(button) {
+      button.addEventListener('click', function() {
+        badgeColor = button.getAttribute('data-badge-color');
+        document.querySelectorAll('[data-badge-color]').forEach(function(item) { item.classList.toggle('active', item === button); });
+      });
+    });
     $('pin').addEventListener('input', function(){
       this.value = this.value.replace(/\D/g,'').slice(0,4);
       unlock();
@@ -374,6 +442,7 @@
       fd.append('submitter', selectedRole);
       fd.append('name', title || selectedRole);
       fd.append('grade', selectedRole === 'Student' ? $('grade').value : '');
+      fd.append('badgeColor', isStaff(selectedRole) ? badgeColor : '');
       fd.append('sport', $('sport').value);
       fd.append('handle', '@' + $('handle').value.trim().replace(/^@+/, ''));
       fd.append('body', $('body').value.trim());
