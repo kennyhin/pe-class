@@ -325,12 +325,29 @@ function _events(ss) {
   var sheet = ss.getSheetByName(EVENTS_SHEET_NAME);
   var rows = _rows(ss, EVENTS_SHEET_NAME);
 
-  // Read rich text for Notes column so hyperlinks (display text + URL) are preserved.
+  // Read rich text + formulas for Notes column so hyperlinks are preserved.
+  // Covers both =HYPERLINK("url","label") formulas and Insert > Link style cells.
   var notesCol = _headerColumn(sheet, 'Notes');
   var richNotes = {};
   if (notesCol && sheet.getLastRow() >= 2) {
-    var richValues = sheet.getRange(2, notesCol, sheet.getLastRow() - 1, 1).getRichTextValues();
+    var numRows = sheet.getLastRow() - 1;
+    var notesRange = sheet.getRange(2, notesCol, numRows, 1);
+
+    // 1. Check for =HYPERLINK() formulas first
+    var formulas = notesRange.getFormulas();
+    formulas.forEach(function (cell, i) {
+      var formula = cell[0];
+      if (!formula) return;
+      var match = formula.match(/=HYPERLINK\s*\(\s*"([^"]+)"\s*[,;]\s*"([^"]+)"\s*\)/i);
+      if (match) {
+        richNotes[i + 2] = '[' + match[2] + '](' + match[1] + ')';
+      }
+    });
+
+    // 2. Check for Insert > Link style rich text hyperlinks
+    var richValues = notesRange.getRichTextValues();
     richValues.forEach(function (cell, i) {
+      if (richNotes[i + 2]) return; // already captured from formula
       var rt = cell[0];
       var url = rt.getLinkUrl();
       var text = rt.getText().trim();
