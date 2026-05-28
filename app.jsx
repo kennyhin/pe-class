@@ -790,6 +790,27 @@ function linkifyText(text) {
   });
 }
 
+function linkifyNotes(text) {
+  const str = String(text || "");
+  // Handle [display text](url) markdown-style links
+  const mdParts = str.split(/(\[[^\]]+\]\(https?:\/\/[^)]+\))/g);
+  if (mdParts.length > 1) {
+    return mdParts.map((part, i) => {
+      const match = part.match(/^\[([^\]]+)\]\((https?:\/\/[^)]+)\)$/);
+      if (match) {
+        return (
+          <a key={i} className="post-link" href={match[2]} target="_blank" rel="noopener noreferrer">
+            {match[1]}
+          </a>
+        );
+      }
+      return part;
+    });
+  }
+  // Fallback: plain URL linkification
+  return linkifyText(str);
+}
+
 function isImageUrl(url) {
   const value = String(url || "").trim();
   return /^https?:\/\//i.test(value) || /^data:image\//i.test(value);
@@ -935,6 +956,65 @@ function useContent(endpoint) {
   return content;
 }
 
+function EventDetailModal({ event, onClose }) {
+  const type = eventType(event);
+  const icon = getEventIcon(event);
+  const hasNotes = event.notes && event.notes.trim();
+  const hasOpponent = event.opponent && event.opponent.trim();
+  const hasLocation = event.location && event.location.trim();
+
+  useEffect(() => {
+    function onKey(e) { if (e.key === "Escape") onClose(); }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  return ReactDOM.createPortal(
+    <div className="event-detail-modal" role="dialog" aria-modal="true" aria-label={event.title}>
+      <button className="event-detail-backdrop" type="button" aria-label="Close" onClick={onClose} />
+      <div className="event-detail-panel">
+        <button className="shortcut-modal-close" type="button" onClick={onClose}>×</button>
+        <div className="event-detail-icon">{icon}</div>
+        <div className={`event-detail-type tag-${type}`}>{type}</div>
+        <h2 className="event-detail-title">{event.title}</h2>
+        <div className="event-detail-rows">
+          {event.time && (
+            <div className="event-detail-row">
+              <span className="event-detail-label">When</span>
+              <span>{event.time}</span>
+            </div>
+          )}
+          {hasLocation && (
+            <div className="event-detail-row">
+              <span className="event-detail-label">Where</span>
+              <span>{event.location}</span>
+            </div>
+          )}
+          {event.sport && (
+            <div className="event-detail-row">
+              <span className="event-detail-label">Sport</span>
+              <span>{event.sport}</span>
+            </div>
+          )}
+          {hasOpponent && (
+            <div className="event-detail-row">
+              <span className="event-detail-label">Vs.</span>
+              <span>{event.opponent}</span>
+            </div>
+          )}
+        </div>
+        {hasNotes && (
+          <div className="event-detail-notes">
+            <div className="event-detail-notes-label">Notes</div>
+            <p>{linkifyNotes(event.notes)}</p>
+          </div>
+        )}
+      </div>
+    </div>,
+    document.body
+  );
+}
+
 function Calendar({ events, loading }) {
   // Show the current month, dynamically. Today is highlighted.
   const now = new Date();
@@ -945,8 +1025,9 @@ function Calendar({ events, loading }) {
   const [selectedDate, setSelectedDate] = useState(todayStr);
   const [upcomingType, setUpcomingType] = useState("all");
   const [gameSport, setGameSport] = useState("all");
+  const [detailEvent, setDetailEvent] = useState(null);
   const monthLabel = now.toLocaleString("default", { month: "long", year: "numeric" });
-  const nextWeekStr = addDaysToKey(todayStr, 7);
+  const next3DaysStr = addDaysToKey(todayStr, 3);
 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const firstDayOfWeek = new Date(year, month, 1).getDay();
@@ -969,7 +1050,7 @@ function Calendar({ events, loading }) {
   const upcomingEvents = events
     .filter((e) => {
       const dateKey = eventDateKey(e);
-      return dateKey >= todayStr && dateKey <= nextWeekStr;
+      return dateKey >= todayStr && dateKey <= next3DaysStr;
     })
     .sort(sortEventsByDate);
 
@@ -989,7 +1070,7 @@ function Calendar({ events, loading }) {
     ? futureGames
     : futureGames.filter((e) => getEventSport(e) === gameSport);
 
-  const gamesNextWeek = futureGames.filter((e) => eventDateKey(e) <= nextWeekStr).length;
+  const gamesNextWeek = futureGames.filter((e) => eventDateKey(e) <= next3DaysStr).length;
 
   function renderFilterButton(group, value, label, active, onClick) {
     return (
@@ -1013,12 +1094,13 @@ function Calendar({ events, loading }) {
     const dow = Number.isNaN(date.getTime())
       ? "TBD"
       : date.toLocaleDateString("default", { weekday: "short" }).toUpperCase();
+    const hasDetail = (e.notes && e.notes.trim()) || (e.opponent && e.opponent.trim());
     return (
       <button
         key={`${mode}-${dateKey}-${i}`}
         type="button"
-        className={`cal-month-event${selectedDate === dateKey ? " selected" : ""}`}
-        onClick={() => setSelectedDate(dateKey)}
+        className={`cal-month-event${selectedDate === dateKey ? " selected" : ""}${hasDetail ? " has-detail" : ""}`}
+        onClick={() => { setSelectedDate(dateKey); setDetailEvent(e); }}
       >
         <span className="cal-month-day">
           <span className="cal-month-dow">{dow}</span>
@@ -1028,6 +1110,7 @@ function Calendar({ events, loading }) {
           <span className="cal-month-title">{getEventIcon(e)} {e.title}</span>
           <span className="cal-month-meta">{type} · {e.time || "Time TBA"}</span>
         </span>
+        {hasDetail && <span className="cal-month-info-badge" aria-hidden="true">i</span>}
       </button>
     );
   }
@@ -1076,7 +1159,7 @@ function Calendar({ events, loading }) {
           const type = eventType(e);
           const icon = getEventIcon(e);
           return (
-            <div key={i} className="cal-event">
+            <button key={i} type="button" className="cal-event cal-event-clickable" onClick={() => setDetailEvent(e)}>
               <div className="cal-event-icon">
                 <span className="cal-event-emoji">{icon}</span>
               </div>
@@ -1085,7 +1168,8 @@ function Calendar({ events, loading }) {
                 <div className="cal-event-title">{e.title}</div>
                 <div className="cal-event-time">{e.time}</div>
               </div>
-            </div>
+              <span className="cal-event-info-badge" aria-hidden="true">i</span>
+            </button>
           );
           })}
         </div>
@@ -1140,6 +1224,7 @@ function Calendar({ events, loading }) {
           <div className="cal-empty">No games match this sport yet.</div>
         ) : visibleGames.map((e, i) => renderEventRow(e, i, "game"))}
       </div>
+      {detailEvent && <EventDetailModal event={detailEvent} onClose={() => setDetailEvent(null)} />}
     </div>
   );
 }

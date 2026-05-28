@@ -322,9 +322,30 @@ function _spreadsheet() {
 
 function _events(ss) {
   _ensureEventsSheet(ss);
-  return _rows(ss, EVENTS_SHEET_NAME).map(function (row) {
+  var sheet = ss.getSheetByName(EVENTS_SHEET_NAME);
+  var rows = _rows(ss, EVENTS_SHEET_NAME);
+
+  // Read rich text for Notes column so hyperlinks (display text + URL) are preserved.
+  var notesCol = _headerColumn(sheet, 'Notes');
+  var richNotes = {};
+  if (notesCol && sheet.getLastRow() >= 2) {
+    var richValues = sheet.getRange(2, notesCol, sheet.getLastRow() - 1, 1).getRichTextValues();
+    richValues.forEach(function (cell, i) {
+      var rt = cell[0];
+      var url = rt.getLinkUrl();
+      var text = rt.getText().trim();
+      if (url && text) {
+        richNotes[i + 2] = '[' + text + '](' + url + ')';
+      } else if (url) {
+        richNotes[i + 2] = url;
+      }
+    });
+  }
+
+  return rows.map(function (row) {
     var time = String(row.time || '').trim();
     var location = String(row.location || '').trim();
+    var notes = richNotes[row._rowNumber] || String(row.notes || '').trim();
     return {
       date: _dateKey(row.date),
       type: String(row.type || 'event').trim(),
@@ -333,7 +354,7 @@ function _events(ss) {
       time: location && time.indexOf(location) === -1 ? time + ' · ' + location : time,
       location: location,
       opponent: String(row.opponent || '').trim(),
-      notes: String(row.notes || '').trim()
+      notes: notes
     };
   }).filter(function (event) {
     return event.date && event.title;
