@@ -29,6 +29,11 @@ var POSTS_SHEET_NAME = 'Posts';
 var FAQ_SHEET_NAME = 'FAQ';
 var QUESTIONS_SHEET_NAME = 'Questions';
 var ADMIN_POST_PIN = '7171';
+
+// ---- NOTIFICATIONS --------------------------------------------------------
+// Set this to your email address to receive alerts for new signups,
+// questions, and posts. Leave empty ('') to disable notifications.
+var NOTIFY_EMAIL = 'kenny.hin@slamnv.org';
 var EVENT_TYPES = ['event', 'practice', 'game'];
 var SPORTS = [
   'Basketball',
@@ -88,6 +93,10 @@ function doPost(e) {
     }
 
     sheet.appendRow([new Date(), email, source, ua]);
+    _notify(
+      '📬 New newsletter signup — SLAM!',
+      'Email: ' + email + '\nSource: ' + source + '\nTime: ' + new Date().toLocaleString()
+    );
     return _json({ ok: true });
   } catch (err) {
     return _json({ ok: false, error: String(err) });
@@ -113,6 +122,12 @@ function _saveQuestion(ss, params) {
   }
 
   sheet.appendRow([new Date(), name, email, question, ua]);
+  _notify(
+    '❓ New question — SLAM!',
+    'From: ' + (name || 'Anonymous') + (email ? ' <' + email + '>' : '') +
+    '\n\nQuestion:\n' + question +
+    '\n\nTime: ' + new Date().toLocaleString()
+  );
   return _json({ ok: true });
 }
 
@@ -168,6 +183,16 @@ function _savePost(ss, params) {
       _setByHeader(sheet, rowNumber, 'Image', 'Image upload failed: ' + String(imageErr).slice(0, 160));
     }
   }
+  var needsReview = !needsPin;
+  _notify(
+    (needsReview ? '👀 Post needs review — SLAM!' : '📣 New staff post — SLAM!'),
+    'From: ' + name + ' (' + handle + ')' +
+    '\nRole: ' + submitter +
+    '\nSport: ' + (sport || 'N/A') +
+    (needsReview ? '\n⚠️ Needs approval in the Posts sheet.' : '\n✅ Auto-approved (staff).') +
+    '\n\nMessage:\n' + body +
+    '\n\nTime: ' + new Date().toLocaleString()
+  );
   return _json({ ok: true });
 }
 
@@ -683,4 +708,19 @@ function _truthy(value) {
     || String(value).toLowerCase() === 'true'
     || String(value).toLowerCase() === 'yes'
     || String(value).toLowerCase() === 'approved';
+}
+
+// ---- EMAIL NOTIFICATIONS --------------------------------------------------
+function _notify(subject, body) {
+  if (!NOTIFY_EMAIL) return;
+  try {
+    MailApp.sendEmail({
+      to: NOTIFY_EMAIL,
+      subject: subject,
+      body: body + '\n\n— SLAM! Athletics automated alert'
+    });
+  } catch (err) {
+    // Never let a notification failure break the main response.
+    Logger.log('Notification failed: ' + String(err));
+  }
 }
