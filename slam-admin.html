@@ -784,7 +784,7 @@ function buildNLPreview() {
   var videoCaption = document.getElementById('nl-video-caption').value.trim();
   var now = new Date();
   var twoWeeks = new Date(now.getTime() + 14*24*60*60*1000);
-  var posts = D.posts.filter(function(p){ return ok(p.Approved||p.approved) && (p.Body||p.body); });
+  var DAYS = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
   var evts  = D.events.filter(function(e){
     var d = e.Date ? new Date(e.Date) : null;
     return d && d >= now && d <= twoWeeks && (e.Title||e.title);
@@ -801,107 +801,111 @@ function buildNLPreview() {
   var mo = now.toLocaleDateString('en-US',{month:'long',year:'numeric'}).toUpperCase();
   var html = '';
 
-  // ── 1. HEADER ──
-  html += '<div style="background:#0a0a0a;padding:24px 24px 20px;text-align:center">'
-    +'<div style="display:inline-block;background:#DA0016;color:#fff;font:700 8px monospace;letter-spacing:.14em;text-transform:uppercase;padding:3px 10px;border-radius:99px;margin-bottom:10px">'+mo+'</div>'
-    +'<div style="font:900 40px/1 Impact,sans-serif;color:#fff;text-transform:uppercase;letter-spacing:.02em">SLAM<span style="color:#80FF00">!</span></div>'
-    +'<div style="font:700 8px monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:5px">ATHLETICS NEWSLETTER</div>'
+  // 1 · HEADER
+  html += '<div style="background:#111;padding:28px 28px 22px;text-align:center">'
+    +'<div style="display:inline-block;background:#DA0016;color:#fff;font:700 8px monospace;letter-spacing:.16em;text-transform:uppercase;padding:4px 12px;border-radius:99px;margin-bottom:12px">'+mo+'</div>'
+    +'<div style="font:900 42px/1 Impact,\'Arial Black\',sans-serif;text-transform:uppercase;color:#fff;letter-spacing:.02em">SLAM<span style="color:#80FF00">!</span></div>'
+    +'<div style="font:700 8px monospace;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-top:6px">ATHLETICS NEWSLETTER</div>'
     +'</div>';
 
-  // ── 2. HEADLINE SPOTLIGHT ──
-  if (headline) {
-    html += '<div style="background:#80FF00;padding:18px 24px 20px">'
-      +'<div style="font:700 8px monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(0,0,0,.45);margin-bottom:6px">SPOTLIGHT</div>'
-      +'<div style="font:900 20px/1.2 Impact,\'Arial Black\',sans-serif;text-transform:uppercase;letter-spacing:.01em;color:#000">'+esc(headline)+'</div>'
-      +'</div>';
-  }
+  // 2 · SPOTLIGHT (lime — always shown, placeholder when empty so layout is visible)
+  html += '<div style="background:#80FF00;padding:20px 28px">'
+    +(headline
+      ? '<div style="font:700 8px monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(0,0,0,.4);margin-bottom:6px">SPOTLIGHT</div>'
+        +'<div style="font:900 22px/1.15 Impact,\'Arial Black\',sans-serif;text-transform:uppercase;color:#000">'+esc(headline)+'</div>'
+      : '<div style="font:700 8px monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(0,0,0,.28);margin-bottom:5px">SPOTLIGHT</div>'
+        +'<div style="font:900 18px/1.2 Impact,sans-serif;text-transform:uppercase;color:rgba(0,0,0,.22);font-style:italic">Enter your headline above…</div>')
+    +'</div>';
 
-  // ── 3. NOTE FROM COACH ──
+  // 3 · NOTE FROM COACH (only when filled in)
   if (note) {
-    html += '<div style="background:#fafafa;padding:16px 24px;border-left:4px solid #80FF00">'
+    html += '<div style="background:#fff;padding:18px 28px;border-left:4px solid #80FF00">'
       +'<div style="font:700 8px monospace;letter-spacing:.14em;text-transform:uppercase;color:#80FF00;margin-bottom:8px">FROM YOUR COACH</div>'
-      +'<div style="font-size:14px;line-height:1.65;color:#222">'+esc(note)+'</div>'
+      +'<div style="font-size:14px;line-height:1.7;color:#222">'+esc(note)+'</div>'
       +'</div>';
   }
 
-  // ── 4. REGISTRATION GUIDE ──
-  html += '<div style="background:#fff;padding:16px 24px;border-top:1px solid #f0f0f0">'
-    +'<div style="font:700 8px monospace;letter-spacing:.14em;text-transform:uppercase;color:#888;margin-bottom:12px">HOW TO REGISTER FOR SPORTS</div>'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
-    +['Schedule a Physical','Register My Athlete','National Sports ID','Pay Sports Fee'].map(function(s,i){
-      return '<div style="padding:10px 12px;background:#f8f8f8;border-radius:8px;border:1px solid #ececec">'
-        +'<div style="font:700 9px monospace;color:#DA0016;margin-bottom:3px">STEP '+(i+1)+'</div>'
-        +'<div style="font-weight:700;font-size:12px;color:#111">'+s+'</div>'
-        +'</div>';
-    }).join('')
-    +'</div>'
-    +'<div style="margin-top:10px;text-align:center">'
-    +'<a href="'+REG_URL+'" style="display:inline-block;padding:8px 18px;background:#0a0a0a;color:#80FF00;font:700 9px monospace;letter-spacing:.1em;text-transform:uppercase;border-radius:99px;text-decoration:none">Full Registration Guide →</a>'
+  // 4 · REGISTRATION (simple rows, no circles/boxes)
+  var regSteps = [
+    {n:'1', t:'Schedule a Physical', d:'All athletes must have a sports physical on file before tryouts, practices, or games.'},
+    {n:'2', t:'Register My Athlete', d:'Create/update your account at registermyathlete.com — use the Elementary (K-5) grade bracket.'},
+    {n:'3', t:'National Sports ID', d:'Required for elementary & middle school. Bring birth certificate or passport + school screenshot.'},
+    {n:'4', t:'Pay Sports Fee', d:'$150 per athlete per season — only if your student makes the team.'}
+  ];
+  html += '<div style="background:#fff;padding:20px 28px">'
+    +'<div style="font:700 8px monospace;letter-spacing:.14em;text-transform:uppercase;color:#888;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid #f0f0f0">HOW TO REGISTER FOR SPORTS</div>';
+  regSteps.forEach(function(s){
+    html += '<div style="padding:11px 0;border-bottom:1px solid #f4f4f4">'
+      +'<div style="display:flex;gap:10px;align-items:baseline">'
+      +'<span style="font:700 8px monospace;color:#DA0016;letter-spacing:.1em;white-space:nowrap">STEP '+s.n+'</span>'
+      +'<span style="font-weight:800;font-size:14px;color:#111">'+s.t+'</span>'
+      +'</div>'
+      +'<div style="font-size:12px;color:#666;margin-top:3px;padding-left:52px;line-height:1.5">'+s.d+'</div>'
+      +'</div>';
+  });
+  html += '<div style="text-align:center;margin-top:14px">'
+    +'<a href="https://slamnvathletics.org/slam-register.html" style="display:inline-block;padding:9px 22px;background:#111;color:#80FF00;font:700 9px monospace;letter-spacing:.1em;text-transform:uppercase;border-radius:99px;text-decoration:none">Full Registration Guide →</a>'
     +'</div></div>';
 
-  // ── 5. TRYOUTS ──
-  html += '<div style="background:#DA0016;padding:16px 24px;text-align:center">'
-    +'<div style="font:700 8px monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:6px">TRYOUTS</div>'
-    +'<div style="font:900 16px/1.2 Impact,sans-serif;text-transform:uppercase;color:#fff;margin-bottom:10px">Sign Up For Tryouts Now</div>'
-    +'<a href="'+TRYOUTS_URL+'" style="display:inline-block;padding:9px 20px;background:#fff;color:#DA0016;font:700 9px monospace;letter-spacing:.1em;text-transform:uppercase;border-radius:99px;text-decoration:none">Submit Tryout Interest Form</a>'
+  // 5 · TRYOUTS (always, red)
+  html += '<div style="background:#DA0016;padding:20px 28px;text-align:center">'
+    +'<div style="font:700 8px monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:8px">TRYOUTS</div>'
+    +'<div style="font:900 20px/1.15 Impact,\'Arial Black\',sans-serif;text-transform:uppercase;color:#fff;margin-bottom:12px">Sign Up For Tryouts Now</div>'
+    +'<a href="https://slamnvathletics.org/slam-tryouts" style="display:inline-block;padding:10px 24px;background:#fff;color:#DA0016;font:700 9px monospace;letter-spacing:.1em;text-transform:uppercase;border-radius:99px;text-decoration:none">Submit Tryout Interest Form</a>'
     +'</div>';
 
-  // ── 6. VIDEO ──
+  // 6 · VIDEO (only if URL filled in)
   if (videoUrl) {
-    html += '<div style="background:#0a0a0a;padding:16px 24px;text-align:center">'
-      +'<div style="font:700 8px monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:10px">WATCH</div>'
-      +'<a href="'+esc(videoUrl)+'" style="display:inline-block;background:rgba(128,255,0,.08);border:1px solid rgba(128,255,0,.2);border-radius:12px;padding:18px 28px;text-decoration:none">'
-      +'<div style="font-size:30px;margin-bottom:6px">&#9654;</div>'
+    html += '<div style="background:#111;padding:20px 28px;text-align:center">'
+      +'<div style="font:700 8px monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:12px">WATCH</div>'
+      +'<a href="'+esc(videoUrl)+'" style="display:inline-block;background:rgba(128,255,0,.08);border:1px solid rgba(128,255,0,.25);border-radius:12px;padding:20px 32px;text-decoration:none">'
+      +'<div style="font-size:32px;color:#fff;margin-bottom:8px">&#9654;</div>'
       +'<div style="font:700 11px monospace;letter-spacing:.1em;text-transform:uppercase;color:#80FF00">'+esc(videoCaption||'Watch Now')+'</div>'
       +'</a></div>';
   }
 
-  // ── 7. LATEST POSTS ──
-  html += '<div style="background:#f8f8f8;padding:16px 24px">'
-    +'<div style="font:700 8px monospace;letter-spacing:.14em;text-transform:uppercase;color:#888;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #ececec">LATEST UPDATES</div>';
-  var shown = posts.slice(0,2), extra = posts.length - shown.length;
-  if (shown.length) {
-    shown.forEach(function(p){ html += nlPostCard(pv(p)); });
-    if (extra > 0) html += '<div style="text-align:center;padding:4px 0"><a href="https://slamnvathletics.org" style="font:700 9px monospace;color:#888;letter-spacing:.08em;text-transform:uppercase;text-decoration:none">+'+extra+' more updates on the site →</a></div>';
-  } else html += '<div style="font-size:12px;color:#aaa;text-align:center;padding:8px 0">No approved posts yet.</div>';
-  html += '</div>';
-
-  // ── 8. UPCOMING EVENTS ──
-  html += '<div style="background:#0a0a0a;padding:16px 24px">'
-    +'<div style="font:700 8px monospace;letter-spacing:.14em;text-transform:uppercase;color:#80FF00;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.08)">UPCOMING EVENTS — NEXT 2 WEEKS</div>';
+  // 7 · UPCOMING EVENTS (dark, calendar style with day-of-week)
+  html += '<div style="background:#111;padding:20px 28px">'
+    +'<div style="font:700 8px monospace;letter-spacing:.14em;text-transform:uppercase;color:#80FF00;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.08)">UPCOMING EVENTS — NEXT 2 WEEKS</div>';
   if (evts.length) {
     evts.forEach(function(e){
       var d = e.Date ? new Date(e.Date) : null;
-      html += '<div style="display:flex;gap:12px;align-items:flex-start;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)">'
-        +(d?'<div style="min-width:44px;text-align:center;background:rgba(128,255,0,.1);border-radius:7px;padding:6px 4px;flex-shrink:0">'
+      html += '<div style="display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.07)">'
+        +(d ? '<div style="flex-shrink:0;width:56px;background:rgba(128,255,0,.1);border-radius:8px;padding:8px 6px;text-align:center">'
+          +'<div style="font:700 7px monospace;color:rgba(255,255,255,.38);letter-spacing:.1em">'+DAYS[d.getDay()]+'</div>'
+          +'<div style="font:900 24px/1 Impact,sans-serif;color:#fff;margin:3px 0">'+d.getDate()+'</div>'
           +'<div style="font:700 7px monospace;color:#80FF00;letter-spacing:.08em">'+d.toLocaleDateString('en-US',{month:'short'}).toUpperCase()+'</div>'
-          +'<div style="font:900 18px/1 Impact,sans-serif;color:#fff">'+d.getDate()+'</div></div>':'')
-        +'<div style="padding-top:2px">'
-        +'<div style="font-weight:700;font-size:13px;color:#fff">'+esc(e.Title||e.title||'')+'</div>'
-        +'<div style="font-size:11px;color:rgba(255,255,255,.35);margin-top:2px">'
-        +[e.Sport||e.sport,e.Time||e.time,e.Location||e.location].filter(Boolean).map(esc).join(' · ')
+          +'</div>' : '')
+        +'<div style="padding-top:4px">'
+        +'<div style="font-weight:800;font-size:14px;color:#fff;margin-bottom:4px">'+esc(e.Title||e.title||'')+'</div>'
+        +(e.Sport||e.sport ? '<span style="display:inline-block;background:rgba(218,0,22,.35);color:#ff7070;font:700 8px monospace;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:4px;margin-bottom:4px">'+esc(e.Sport||e.sport||'')+'</span>' : '')
+        +'<div style="font-size:12px;color:rgba(255,255,255,.4)">'
+        +[e.Time||e.time,e.Location||e.location].filter(Boolean).map(esc).join(' · ')
         +'</div></div></div>';
     });
-  } else html += '<div style="font-size:12px;color:rgba(255,255,255,.3);padding:4px 0">No events in the next two weeks.</div>';
+  } else {
+    html += '<div style="font-size:13px;color:rgba(255,255,255,.3);padding:8px 0">No events scheduled in the next two weeks.</div>';
+  }
   html += '</div>';
 
-  // ── 9. FAQ ──
+  // 8 · FAQ
   if (faqItems.length) {
-    html += '<div style="background:#fff;padding:16px 24px">'
-      +'<div style="font:700 8px monospace;letter-spacing:.14em;text-transform:uppercase;color:#888;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #f0f0f0">FREQUENTLY ASKED QUESTIONS</div>';
+    html += '<div style="background:#fff;padding:20px 28px">'
+      +'<div style="font:700 8px monospace;letter-spacing:.14em;text-transform:uppercase;color:#888;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid #f0f0f0">FREQUENTLY ASKED QUESTIONS</div>';
     faqItems.forEach(function(f){
       var q = f.Question||f.q||'', a = f.Answer||f.a||'';
-      html += '<div style="margin-bottom:14px"><div style="font-weight:700;font-size:13px;color:#111;margin-bottom:3px">'+esc(q)+'</div>'
-        +(a?'<div style="font-size:12px;color:#555;line-height:1.5">'+esc(a)+'</div>':'')+'</div>';
+      html += '<div style="margin-bottom:14px">'
+        +'<div style="font-weight:800;font-size:14px;color:#111;margin-bottom:3px">'+esc(q)+'</div>'
+        +(a?'<div style="font-size:13px;color:#555;line-height:1.55">'+esc(a)+'</div>':'')
+        +'</div>';
     });
     html += '</div>';
   }
 
-  // ── 10. FOOTER ──
-  html += '<div style="background:#0a0a0a;padding:16px 24px;text-align:center;border-top:1px solid rgba(255,255,255,.06)">'
+  // 9 · FOOTER
+  html += '<div style="background:#111;padding:18px 28px;text-align:center">'
     +'<div style="font:900 18px/1 Impact,sans-serif;text-transform:uppercase;color:#fff;margin-bottom:6px">SLAM<span style="color:#80FF00">!</span> Athletics</div>'
-    +'<p style="margin:0 0 2px;font-size:11px;color:rgba(255,255,255,.25)"><a href="https://slamnvathletics.org" style="color:rgba(255,255,255,.25)">slamnvathletics.org</a></p>'
-    +'<p style="margin:0;font-size:10px;color:rgba(255,255,255,.15)">You received this because you signed up at slamnvathletics.org</p>'
+    +'<div style="font-size:11px;color:rgba(255,255,255,.22)"><a href="https://slamnvathletics.org" style="color:rgba(255,255,255,.22);text-decoration:none">slamnvathletics.org</a></div>'
     +'</div>';
 
   document.getElementById('nl-prev').innerHTML = html;
