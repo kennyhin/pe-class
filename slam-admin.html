@@ -426,7 +426,7 @@ function renderAll() { renderOverview(); renderPosts(); renderSignups(); renderE
 
 // ── overview ──────────────────────────────────────────────────────────────────
 function renderOverview() {
-  var pendP = D.posts.filter(function(p){ return !ok(p.Approved) && !staff(p.Submitter) && (p.Name||p.Body); });
+  var pendP = D.posts.filter(function(p){ return !ok(p.Approved||p.approved) && !staff(p.Submitter||p.submitter) && (p.Name||p.name||p.Body||p.body); });
   var pendQ = D.questions.filter(function(q){ var s=String(q.Status||'').toLowerCase(); return (s===''||s==='pending') && q.Question; });
   var upEv  = D.events.filter(function(e){ return e.Title && upcoming(e.Date); });
 
@@ -451,10 +451,10 @@ function renderOverview() {
   if (!items.length) { el.innerHTML = '<div class="empty">🎉 All clear — nothing needs attention right now</div>'; return; }
   el.innerHTML = items.slice(0,6).map(function(item){
     if (item.t === 'p') {
-      var p = item.d;
+      var p = item.d; var f = pv(p);
       return '<div class="card" id="op'+p.row+'">'
-        +'<div class="card-top"><div class="card-chips"><span class="chip chip-pending">Post · Needs Approval</span><span class="card-handle">'+esc(p.Handle||p.Name||'')+'</span>'+(p.Sport?'<span class="chip chip-student">'+esc(p.Sport)+'</span>':'')+'</div><span class="card-ts">'+fmtS(p.Timestamp)+'</span></div>'
-        +'<div class="card-body">'+esc(p.Body||'(no content)')+'</div>'
+        +'<div class="card-top"><div class="card-chips"><span class="chip chip-pending">Post · Needs Approval</span><span class="card-handle">'+esc(f.handle||f.name)+'</span>'+(f.sport?'<span class="chip chip-student">'+esc(f.sport)+'</span>':'')+'</div><span class="card-ts">'+fmtS(f.ts)+'</span></div>'
+        +'<div class="card-body">'+esc(f.body||'(no content)')+'</div>'
         +'<div class="card-actions"><button class="btn-ok" onclick="act(\'p\','+p.row+',\'approve\',\'op\')">✓ Approve</button><button class="btn-no" onclick="act(\'p\','+p.row+',\'reject\',\'op\')">✕ Reject</button></div>'
         +'</div>';
     } else {
@@ -470,13 +470,24 @@ function renderOverview() {
 
 // ── posts ─────────────────────────────────────────────────────────────────────
 function renderPosts() {
-  var all = D.posts.filter(function(p){ return p.Name || p.Body; });
-  var pend = all.filter(function(p){ return !ok(p.Approved) && !staff(p.Submitter); });
-  var appr = all.filter(function(p){ return ok(p.Approved) || staff(p.Submitter); });
+  var all = D.posts.filter(function(p){ return p.Name||p.name||p.Body||p.body; });
+  var pend = all.filter(function(p){ return !ok(p.Approved||p.approved) && !staff(p.Submitter||p.submitter); });
+  var appr = all.filter(function(p){ return ok(p.Approved||p.approved) || staff(p.Submitter||p.submitter); });
   setText('pp-ct', pend.length);
   setText('posts-all-ct', all.length);
   document.getElementById('posts-pending').innerHTML = pend.length ? pend.map(function(p){ return postCard(p,'p'); }).join('') : '<div class="empty">All clear — no pending posts</div>';
   document.getElementById('posts-all').innerHTML = appr.length ? appr.map(postCardRO).join('') : '<div class="empty">No approved posts yet</div>';
+}
+
+function pv(p) { // helper: get post field checking both cases
+  return {
+    sub:  p.Submitter||p.submitter||'',
+    name: p.Name||p.name||'',
+    handle: p.Handle||p.handle||'',
+    body: p.Body||p.body||'',
+    sport: p.Sport||p.sport||'',
+    ts:   p.Timestamp||p.timestamp||''
+  };
 }
 
 function roleChip(sub) {
@@ -487,9 +498,10 @@ function roleChip(sub) {
 }
 
 function postCard(p, prefix) {
+  var f = pv(p);
   return '<div class="card" id="'+(prefix||'p')+p.row+'">'
-    +'<div class="card-top"><div class="card-chips">'+roleChip(p.Submitter)+'<span class="card-handle">'+esc(p.Handle||p.Name||'')+'</span>'+(p.Sport?'<span class="chip chip-student">'+esc(p.Sport)+'</span>':'')+'</div><span class="card-ts">'+fmtD(p.Timestamp)+'</span></div>'
-    +'<div class="card-body">'+esc(p.Body||'(no content)')+'</div>'
+    +'<div class="card-top"><div class="card-chips">'+roleChip(f.sub)+'<span class="card-handle">'+esc(f.handle||f.name)+'</span>'+(f.sport?'<span class="chip chip-student">'+esc(f.sport)+'</span>':'')+'</div><span class="card-ts">'+fmtD(f.ts)+'</span></div>'
+    +'<div class="card-body">'+esc(f.body||'(no content)')+'</div>'
     +'<div class="card-actions">'
     +'<button class="btn-ok" onclick="act(\'p\','+p.row+',\'approve\',\''+(prefix||'p')+'\')">✓ Approve</button>'
     +'<button class="btn-no" onclick="act(\'p\','+p.row+',\'reject\',\''+(prefix||'p')+'\')">✕ Reject</button>'
@@ -497,9 +509,10 @@ function postCard(p, prefix) {
 }
 
 function postCardRO(p) {
+  var f = pv(p);
   return '<div class="card">'
-    +'<div class="card-top"><div class="card-chips"><span class="chip chip-approved">Approved</span><span class="card-handle">'+esc(p.Handle||p.Name||'')+'</span>'+(p.Sport?'<span class="chip chip-student">'+esc(p.Sport)+'</span>':'')+'</div><span class="card-ts">'+fmtD(p.Timestamp)+'</span></div>'
-    +'<div class="card-body">'+esc(p.Body||'(no content)')+'</div>'
+    +'<div class="card-top"><div class="card-chips"><span class="chip chip-approved">Approved</span><span class="card-handle">'+esc(f.handle||f.name)+'</span>'+(f.sport?'<span class="chip chip-student">'+esc(f.sport)+'</span>':'')+'</div><span class="card-ts">'+fmtD(f.ts)+'</span></div>'
+    +'<div class="card-body">'+esc(f.body||'(no content)')+'</div>'
     +'</div>';
 }
 
