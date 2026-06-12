@@ -346,17 +346,17 @@
 
 <!-- NEWSLETTER MODAL -->
 <div id="nl-modal" class="modal-bg hidden">
-  <div class="modal" style="max-width:900px;padding:22px">
+  <div class="modal" style="max-width:1100px;padding:22px">
     <div class="modal-head" style="margin-bottom:16px">
       <div class="modal-title">Send Newsletter</div>
       <button class="modal-close" onclick="closeNL()">✕</button>
     </div>
 
     <!-- SPLIT LAYOUT: compose left, live preview right -->
-    <div style="display:flex;gap:20px;min-height:480px">
+    <div style="display:flex;gap:20px;min-height:560px">
 
       <!-- LEFT: COMPOSE FORM -->
-      <div style="width:300px;flex-shrink:0;display:flex;flex-direction:column;gap:11px">
+      <div style="width:420px;flex-shrink:0;display:flex;flex-direction:column;gap:11px">
 
         <div class="nl-row" style="margin:0">
           <label>Subject</label>
@@ -401,7 +401,7 @@
       </div>
 
       <!-- RIGHT: LIVE PREVIEW -->
-      <div style="flex:1;border-left:1px solid rgba(255,255,255,.08);padding-left:20px;overflow-y:auto;max-height:540px">
+      <div style="flex:1;border-left:1px solid rgba(255,255,255,.08);padding-left:20px;overflow-y:auto;max-height:640px">
         <div style="font:700 8px monospace;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:10px">LIVE PREVIEW</div>
         <div id="nl-prev" class="nl-preview" style="max-height:none"></div>
       </div>
@@ -727,6 +727,23 @@ function act(type, row, action, prefix) {
 // ── newsletter ────────────────────────────────────────────────────────────────
 var NL_FAQ_MODE = 'bank';
 
+var STATIC_FAQS = [
+  { id:'f-t1', cat:'Tryouts', q:'When are tryouts?', a:'Tryout dates and sign-up are posted at slamnvathletics.org/slam-tryouts. Sign up early — spots fill fast!' },
+  { id:'f-t2', cat:'Tryouts', q:'Who is eligible to try out?', a:'Students in grades K–5 enrolled at a SLAM! partner school who have a current sports physical on file.' },
+  { id:'f-t3', cat:'Tryouts', q:'What happens after tryouts?', a:'Coaches will notify families within a few days. If selected, complete any remaining registration steps right away.' },
+  { id:'f-r1', cat:'Registration', q:'How do I register my athlete?', a:'Complete all 4 steps: get a physical, register at registermyathlete.com (K-5 bracket), obtain a National Sports ID, and pay the $150 sports fee only if they make the team.' },
+  { id:'f-r2', cat:'Registration', q:'What is Register My Athlete (RMA)?', a:'RMA is our online registration portal at registermyathlete.com. Select the Elementary (K–5) grade bracket when creating your account.' },
+  { id:'f-r3', cat:'Registration', q:'What documents do I need to bring?', a:'Bring your child\'s birth certificate or passport plus a screenshot of their current school enrollment to obtain their National Sports ID.' },
+  { id:'f-p1', cat:'Physicals', q:'Where can I get a sports physical?', a:'CVS MinuteClinic offers affordable sports physicals. Your child\'s doctor or pediatrician can also complete the physical form.' },
+  { id:'f-p2', cat:'Physicals', q:'When does the physical expire?', a:'Sports physicals are valid for one calendar year from the exam date. Make sure yours is current before tryouts begin.' },
+  { id:'f-fe1', cat:'Fees', q:'How much does it cost to participate?', a:'The sports fee is $150 per athlete per season — only if your student makes the team. There is no charge to try out.' },
+  { id:'f-fe2', cat:'Fees', q:'Are there fee waivers available?', a:'Please contact us directly if cost is a barrier. We want every interested athlete to have a chance to participate.' },
+  { id:'f-s1', cat:'Sports & Seasons', q:'What sports does SLAM! offer?', a:'We offer Basketball, Soccer, Track & Field, Cross Country, Cheer, Volleyball, Flag Football, Baseball, Softball, and Tennis.' },
+  { id:'f-s2', cat:'Sports & Seasons', q:'How long is each season?', a:'Seasons typically run 6–10 weeks including practices and games. Check the events calendar for your sport\'s specific schedule.' },
+  { id:'f-e1', cat:'Eligibility', q:'Does my child need good grades?', a:'Athletes must be in good standing with attendance and behavior. Excessive absences or disciplinary issues may affect eligibility.' },
+  { id:'f-e2', cat:'Eligibility', q:'What is a National Sports ID?', a:'A National Sports ID is required for all elementary athletes. You\'ll receive it at the registration event when you bring valid ID documents.' }
+];
+
 function nlFaqMode(mode) {
   NL_FAQ_MODE = mode;
   ['bank','recent','none'].forEach(function(m){
@@ -751,15 +768,24 @@ function openNL() {
   });
   document.getElementById('nl-faq-bank-list').style.display = '';
   var list = document.getElementById('nl-faq-bank-list');
-  var faqs = (D.faq||[]).filter(function(f){ return f.Question; });
-  if (faqs.length) {
-    list.innerHTML = faqs.map(function(f){
-      return '<label class="nl-faq-item"><input type="checkbox" value="'+f.row+'" checked oninput="buildNLPreview()">'
-        +'<span>'+esc(f.Question||'')+(f.Answer?'<br><span style="color:rgba(255,255,255,.28);font-size:11px">'+esc(String(f.Answer).slice(0,60))+(f.Answer.length>60?'…':'')+'</span>':'')+'</span></label>';
-    }).join('');
-  } else {
-    list.innerHTML = '<div style="font-size:12px;color:rgba(255,255,255,.28)">No FAQ items in sheet yet.</div>';
-  }
+  var sheetFaqs = (D.faq||[]).filter(function(f){ return f.Question; });
+  var cats = ['Tryouts','Registration','Physicals','Fees','Sports & Seasons','Eligibility'];
+  var staticHtml = cats.map(function(cat){
+    var items = STATIC_FAQS.filter(function(f){ return f.cat===cat; });
+    return '<div style="font:700 8px monospace;letter-spacing:.1em;text-transform:uppercase;color:rgba(128,255,0,.5);margin:8px 0 3px;padding-top:6px;border-top:1px solid rgba(255,255,255,.06)">'+cat+'</div>'
+      +items.map(function(f){
+        return '<label class="nl-faq-item"><input type="checkbox" data-static="1" value="'+f.id+'" oninput="buildNLPreview()">'
+          +'<span>'+esc(f.q)+'</span></label>';
+      }).join('');
+  }).join('');
+  var sheetHtml = sheetFaqs.length
+    ? '<div style="font:700 8px monospace;letter-spacing:.1em;text-transform:uppercase;color:rgba(128,255,0,.5);margin:8px 0 3px;padding-top:6px;border-top:1px solid rgba(255,255,255,.06)">From Your Sheet</div>'
+      +sheetFaqs.map(function(f){
+        return '<label class="nl-faq-item"><input type="checkbox" value="'+f.row+'" checked oninput="buildNLPreview()">'
+          +'<span>'+esc(f.Question||'')+(f.Answer?'<br><span style="color:rgba(255,255,255,.28);font-size:11px">'+esc(String(f.Answer).slice(0,60))+(f.Answer.length>60?'…':'')+'</span>':'')+'</span></label>';
+      }).join('')
+    : '';
+  list.innerHTML = staticHtml + sheetHtml;
   document.getElementById('nl-modal').classList.remove('hidden');
   buildNLPreview();
 }
@@ -792,10 +818,14 @@ function buildNLPreview() {
 
   var faqItems = [];
   if (NL_FAQ_MODE === 'bank') {
-    var checked = Array.from(document.querySelectorAll('#nl-faq-bank-list input:checked')).map(function(i){ return parseInt(i.value); });
-    faqItems = (D.faq||[]).filter(function(f){ return checked.indexOf(f.row) !== -1; });
+    var checkedInputs = Array.from(document.querySelectorAll('#nl-faq-bank-list input:checked'));
+    var checkedSheet = checkedInputs.filter(function(i){ return !i.dataset.static; }).map(function(i){ return parseInt(i.value); });
+    var checkedStatic = checkedInputs.filter(function(i){ return i.dataset.static; }).map(function(i){ return i.value; });
+    var sheetItems = (D.faq||[]).filter(function(f){ return checkedSheet.indexOf(f.row) !== -1; }).map(function(f){ return { q: f.Question, a: f.Answer||'' }; });
+    var staticItems = STATIC_FAQS.filter(function(f){ return checkedStatic.indexOf(f.id) !== -1; }).map(function(f){ return { q: f.q, a: f.a }; });
+    faqItems = sheetItems.concat(staticItems);
   } else if (NL_FAQ_MODE === 'recent') {
-    faqItems = (D.questions||[]).filter(function(q){ return q.Question; }).slice(0,5);
+    faqItems = (D.questions||[]).filter(function(q){ return q.Question; }).slice(0,5).map(function(q){ return { q: q.Question, a: '' }; });
   }
 
   var mo = now.toLocaleDateString('en-US',{month:'long',year:'numeric'}).toUpperCase();
@@ -808,20 +838,18 @@ function buildNLPreview() {
     +'<div style="font:700 8px monospace;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-top:6px">ATHLETICS NEWSLETTER</div>'
     +'</div>';
 
-  // 2 · SPOTLIGHT (lime — always shown, placeholder when empty so layout is visible)
-  html += '<div style="background:#80FF00;padding:20px 28px">'
+  // 2 · HEADLINE (lime — always shown, placeholder when empty)
+  html += '<div style="background:#80FF00;padding:24px 28px">'
     +(headline
-      ? '<div style="font:700 8px monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(0,0,0,.4);margin-bottom:6px">SPOTLIGHT</div>'
-        +'<div style="font:900 22px/1.15 Impact,\'Arial Black\',sans-serif;text-transform:uppercase;color:#000">'+esc(headline)+'</div>'
-      : '<div style="font:700 8px monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(0,0,0,.28);margin-bottom:5px">SPOTLIGHT</div>'
-        +'<div style="font:900 18px/1.2 Impact,sans-serif;text-transform:uppercase;color:rgba(0,0,0,.22);font-style:italic">Enter your headline above…</div>')
+      ? '<div style="font:900 28px/1.1 Impact,\'Arial Black\',sans-serif;text-transform:uppercase;color:#000">'+esc(headline)+'</div>'
+      : '<div style="font:900 20px/1.2 Impact,sans-serif;text-transform:uppercase;color:rgba(0,0,0,.22);font-style:italic">Enter your headline above…</div>')
     +'</div>';
 
-  // 3 · NOTE FROM COACH (only when filled in)
+  // 3 · MESSAGE (dark bg, only when filled in)
   if (note) {
-    html += '<div style="background:#fff;padding:18px 28px;border-left:4px solid #80FF00">'
-      +'<div style="font:700 8px monospace;letter-spacing:.14em;text-transform:uppercase;color:#80FF00;margin-bottom:8px">FROM YOUR COACH</div>'
-      +'<div style="font-size:14px;line-height:1.7;color:#222">'+esc(note)+'</div>'
+    html += '<div style="background:#1a1a1a;padding:20px 28px;border-left:4px solid #80FF00">'
+      +'<div style="font:700 8px monospace;letter-spacing:.14em;text-transform:uppercase;color:#80FF00;margin-bottom:10px">A MESSAGE FROM SLAM ES ATHLETICS</div>'
+      +'<div style="font-size:14px;line-height:1.7;color:rgba(255,255,255,.85)">'+esc(note)+'</div>'
       +'</div>';
   }
 
@@ -916,9 +944,13 @@ function sendNL() {
   if (!subj) { toast('Please enter a subject', true); return; }
   if (!D.signups.length) { toast('No subscribers to send to', true); return; }
 
-  var faqIds = '';
+  var faqIds = '', faqStatic = '';
   if (NL_FAQ_MODE === 'bank') {
-    faqIds = Array.from(document.querySelectorAll('#nl-faq-bank-list input:checked')).map(function(i){ return i.value; }).join(',');
+    var allChecked = Array.from(document.querySelectorAll('#nl-faq-bank-list input:checked'));
+    faqIds = allChecked.filter(function(i){ return !i.dataset.static; }).map(function(i){ return i.value; }).join(',');
+    var staticSel = allChecked.filter(function(i){ return i.dataset.static; }).map(function(i){ return i.value; });
+    var staticData = STATIC_FAQS.filter(function(f){ return staticSel.indexOf(f.id) !== -1; });
+    if (staticData.length) faqStatic = JSON.stringify(staticData.map(function(f){ return { q: f.q, a: f.a }; }));
   }
 
   var btn = document.getElementById('nl-btn');
@@ -931,6 +963,7 @@ function sendNL() {
     note:          document.getElementById('nl-note').value.trim(),
     faq_mode:      NL_FAQ_MODE,
     faq_ids:       faqIds,
+    faq_static:    faqStatic,
     video_url:     document.getElementById('nl-video-url').value.trim(),
     video_caption: document.getElementById('nl-video-caption').value.trim()
   });
