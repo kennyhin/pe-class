@@ -3,86 +3,174 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SLAM! Admin · Review Queue</title>
+  <title>SLAM! Admin Dashboard</title>
   <link rel="icon" type="image/svg+xml" href="assets/mark-square.svg">
   <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{min-height:100vh;background:radial-gradient(circle at 14% 8%,rgba(128,255,0,.08),transparent 28%),radial-gradient(circle at 92% 0,rgba(218,0,22,.12),transparent 27%),#050505;color:#f5f5f5;font-family:Arial,Helvetica,sans-serif}
-    .hidden{display:none!important}
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { min-height: 100vh; background: #0a0a0a; color: #f0f0f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 14px; line-height: 1.5; }
+    .hidden { display: none !important; }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; font-family: inherit; border: none; }
 
-    /* ── GATE ── */
-    .gate{min-height:100vh;display:grid;place-items:center;padding:24px}
-    .gate-card{width:100%;max-width:380px;border:1px solid rgba(255,255,255,.13);border-radius:24px;padding:36px 32px;background:rgba(16,16,16,.98);text-align:center}
-    .gate-logo{font:900 32px/1 Impact,"Arial Black",sans-serif;text-transform:uppercase;letter-spacing:.02em;margin-bottom:4px}
-    .gate-logo span{color:#80FF00}
-    .gate-sub{font:700 9px monospace;letter-spacing:.18em;text-transform:uppercase;color:#DA0016;margin-bottom:28px;display:block}
-    .gate-copy{color:rgba(255,255,255,.4);font-size:13px;line-height:1.5;margin-bottom:28px}
-    .pin-box{position:relative;cursor:text}
-    .pin-dots{display:flex;justify-content:center;gap:16px;margin:0 0 6px}
-    .pin-dots span{width:18px;height:18px;border:2px solid rgba(255,255,255,.22);border-radius:50%;background:rgba(255,255,255,.04);transition:all .12s}
-    .pin-dots span.on{border-color:#80FF00;background:#80FF00;box-shadow:0 0 16px rgba(128,255,0,.4)}
-    #pinInput{position:absolute;inset:0;width:100%;height:100%;opacity:.01;border:0;background:transparent;color:transparent;caret-color:transparent;font-size:16px}
-    .pin-hint{font:700 10px monospace;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:8px}
-    .pin-error{color:#ff5f6b;font:700 11px monospace;letter-spacing:.08em;text-transform:uppercase;min-height:20px;margin-top:12px}
+    /* ── PIN GATE ── */
+    .gate { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: radial-gradient(circle at 14% 8%, rgba(128,255,0,.07), transparent 30%), radial-gradient(circle at 92% 0, rgba(218,0,22,.1), transparent 28%), #0a0a0a; }
+    .gate-card { width: 100%; max-width: 380px; background: #141414; border: 1px solid rgba(255,255,255,.1); border-radius: 24px; padding: 40px 36px; text-align: center; }
+    .g-logo { font: 900 38px/1 Impact, 'Arial Black', sans-serif; text-transform: uppercase; letter-spacing: .02em; margin-bottom: 4px; }
+    .g-logo span { color: #80FF00; }
+    .g-sub { font: 700 9px monospace; letter-spacing: .18em; text-transform: uppercase; color: #DA0016; display: block; margin-bottom: 28px; }
+    .g-copy { color: rgba(255,255,255,.4); font-size: 13px; margin-bottom: 28px; }
+    .pin-box { position: relative; cursor: text; }
+    .pin-dots { display: flex; justify-content: center; gap: 18px; margin: 0 0 6px; }
+    .pin-dots span { width: 20px; height: 20px; border: 2px solid rgba(255,255,255,.2); border-radius: 50%; background: rgba(255,255,255,.04); transition: all .12s; }
+    .pin-dots span.on { border-color: #80FF00; background: #80FF00; box-shadow: 0 0 18px rgba(128,255,0,.4); }
+    #pinInput { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .01; border: 0; background: transparent; color: transparent; caret-color: transparent; font-size: 16px; }
+    .pin-hint { font: 700 10px monospace; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.25); margin-top: 8px; }
+    .pin-error { color: #ff5f6b; font: 700 11px monospace; letter-spacing: .08em; text-transform: uppercase; min-height: 20px; margin-top: 12px; }
 
-    /* ── DASHBOARD ── */
-    .dashboard{max-width:860px;margin:0 auto;padding:20px 16px 80px}
-    .top-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;background:rgba(18,18,18,.98);border:1px solid rgba(255,255,255,.1);border-radius:18px;margin-bottom:28px;flex-wrap:wrap}
-    .top-brand{font:900 22px/1 Impact,sans-serif;text-transform:uppercase}
-    .top-brand span{color:#80FF00}
-    .top-brand small{font:700 9px monospace;letter-spacing:.14em;text-transform:uppercase;color:#DA0016;display:block;margin-top:4px}
-    .top-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font:700 10px monospace;letter-spacing:.1em;text-transform:uppercase}
-    .pill.red{background:rgba(218,0,22,.16);border:1px solid rgba(218,0,22,.38);color:#ff7070}
-    .pill.lime{background:rgba(128,255,0,.1);border:1px solid rgba(128,255,0,.32);color:#80FF00}
-    .pill .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-    .pill.red .dot{background:#DA0016}
-    .pill.lime .dot{background:#80FF00}
-    .refresh-btn{min-height:32px;padding:0 14px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.05);color:rgba(255,255,255,.7);font:700 10px monospace;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .15s}
-    .refresh-btn:hover{border-color:rgba(128,255,0,.4);color:#80FF00}
-    .refresh-btn:disabled{opacity:.4;pointer-events:none}
+    /* ── APP SHELL ── */
+    .app { display: flex; min-height: 100vh; }
 
-    /* ── SECTION ── */
-    .section{margin-bottom:36px}
-    .section-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.08)}
-    .section-title{font:900 13px/1 Impact,sans-serif;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.85)}
-    .section-ct{padding:3px 10px;border-radius:999px;font:700 10px monospace;letter-spacing:.08em}
-    .section-ct.red{background:rgba(218,0,22,.2);color:#ff8888}
-    .section-ct.lime{background:rgba(128,255,0,.12);color:#80FF00}
+    /* ── SIDEBAR ── */
+    .sidebar { width: 240px; flex-shrink: 0; background: #0d0d0d; border-right: 1px solid rgba(255,255,255,.07); display: flex; flex-direction: column; padding: 0 10px 20px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+    .sb-logo { padding: 22px 10px 20px; border-bottom: 1px solid rgba(255,255,255,.07); margin-bottom: 12px; }
+    .sb-brand { font: 900 22px/1 Impact, sans-serif; text-transform: uppercase; letter-spacing: .02em; }
+    .sb-brand span { color: #80FF00; }
+    .sb-brand-sub { font: 700 8px monospace; letter-spacing: .16em; text-transform: uppercase; color: #DA0016; display: block; margin-top: 3px; }
+    .nav-section { font: 700 9px monospace; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.2); padding: 8px 10px 4px; margin-top: 4px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 10px; color: rgba(255,255,255,.5); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .14s; margin-bottom: 2px; }
+    .nav-item:hover { background: rgba(255,255,255,.05); color: rgba(255,255,255,.9); }
+    .nav-item.active { background: #80FF00; color: #000 !important; }
+    .nav-item .ni { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
+    .nav-badge { margin-left: auto; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; font: 700 10px monospace; background: #DA0016; color: #fff; display: inline-flex; align-items: center; justify-content: center; }
+    .nav-item.active .nav-badge { background: rgba(0,0,0,.22); }
+    .nav-hr { border: none; border-top: 1px solid rgba(255,255,255,.07); margin: 10px 0; }
+    .refresh-row { padding: 12px 10px 0; margin-top: auto; }
+    .refresh-all { width: 100%; min-height: 34px; border: 1px solid rgba(255,255,255,.12); border-radius: 8px; background: transparent; color: rgba(255,255,255,.4); font: 700 9px monospace; letter-spacing: .1em; text-transform: uppercase; transition: all .14s; }
+    .refresh-all:hover { border-color: rgba(128,255,0,.35); color: #80FF00; }
+
+    /* ── MAIN ── */
+    .main { flex: 1; min-width: 0; padding: 28px 28px 60px; }
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ── PAGE HEADER ── */
+    .pg-head { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; }
+    .pg-title { font-size: 26px; font-weight: 900; color: #fff; line-height: 1.1; }
+    .pg-sub { color: rgba(255,255,255,.38); font-size: 13px; margin-top: 4px; }
+
+    /* ── STAT GRID ── */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; margin-bottom: 28px; }
+    .stat-card { background: #141414; border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 18px 20px; }
+    .stat-icon { font-size: 26px; margin-bottom: 10px; }
+    .stat-label { font: 700 9px monospace; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.3); margin-bottom: 4px; }
+    .stat-val { font-size: 34px; font-weight: 900; color: #fff; line-height: 1; }
+    .stat-note { font-size: 12px; color: rgba(255,255,255,.3); margin-top: 4px; }
+    .stat-note.warn { color: #ff8888; }
+    .stat-note.ok { color: #80FF00; }
+
+    /* ── SECTIONS ── */
+    .section { margin-bottom: 30px; }
+    .sec-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .sec-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; color: rgba(255,255,255,.6); }
+    .sec-badge { padding: 2px 9px; border-radius: 99px; font: 700 10px monospace; }
+    .sec-badge.red { background: rgba(218,0,22,.2); color: #ff8888; }
+    .sec-badge.lime { background: rgba(128,255,0,.12); color: #80FF00; }
+    .sec-badge.muted { background: rgba(255,255,255,.07); color: rgba(255,255,255,.35); }
 
     /* ── CARDS ── */
-    .card-list{display:grid;gap:10px}
-    .card{border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:16px;background:rgba(20,20,20,.97);display:grid;gap:10px;transition:opacity .2s}
-    .card.acting{opacity:.4;pointer-events:none}
-    .card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-    .card-chips{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
-    .chip{padding:3px 10px;border-radius:999px;font:700 9px monospace;letter-spacing:.1em;text-transform:uppercase}
-    .chip.parent{background:rgba(54,163,255,.16);border:1px solid rgba(54,163,255,.36);color:#5bb8ff}
-    .chip.student{background:rgba(128,255,0,.1);border:1px solid rgba(128,255,0,.3);color:#80FF00}
-    .chip.staff{background:rgba(218,0,22,.14);border:1px solid rgba(218,0,22,.35);color:#ff7070}
-    .chip.sport{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5)}
-    .handle{font:700 11px monospace;color:#80FF00;opacity:.9}
-    .ts{font:400 11px monospace;color:rgba(255,255,255,.28);white-space:nowrap}
-    .card-body{font-size:14px;line-height:1.55;color:rgba(255,255,255,.8);padding:10px 14px;background:rgba(0,0,0,.28);border-radius:12px;white-space:pre-wrap;word-break:break-word}
-    .card-actions{display:flex;gap:8px}
-    .btn-ok{flex:1;min-height:40px;border:1px solid rgba(128,255,0,.38);border-radius:999px;background:rgba(128,255,0,.12);color:#80FF00;font:900 10px monospace;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background .15s}
-    .btn-ok:hover{background:rgba(128,255,0,.22)}
-    .btn-no{flex:1;min-height:40px;border:1px solid rgba(218,0,22,.38);border-radius:999px;background:rgba(218,0,22,.1);color:#ff7070;font:900 10px monospace;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background .15s}
-    .btn-no:hover{background:rgba(218,0,22,.2)}
+    .card-list { display: grid; gap: 8px; }
+    .card { background: #141414; border: 1px solid rgba(255,255,255,.08); border-radius: 13px; padding: 14px 16px; transition: opacity .2s; }
+    .card.acting { opacity: .35; pointer-events: none; }
+    .card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 9px; }
+    .card-chips { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .chip { padding: 2px 9px; border-radius: 99px; font: 700 9px monospace; letter-spacing: .08em; text-transform: uppercase; }
+    .chip-pending { background: rgba(218,0,22,.14); border: 1px solid rgba(218,0,22,.28); color: #ff8888; }
+    .chip-approved { background: rgba(128,255,0,.1); border: 1px solid rgba(128,255,0,.24); color: #80FF00; }
+    .chip-staff { background: rgba(54,163,255,.14); border: 1px solid rgba(54,163,255,.28); color: #5bb8ff; }
+    .chip-parent { background: rgba(255,165,0,.1); border: 1px solid rgba(255,165,0,.25); color: #ffb347; }
+    .chip-student { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); color: rgba(255,255,255,.5); }
+    .chip-dismissed { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); color: rgba(255,255,255,.3); }
+    .card-handle { font: 700 11px monospace; color: #80FF00; }
+    .card-ts { font-size: 11px; color: rgba(255,255,255,.22); white-space: nowrap; }
+    .card-body { font-size: 13px; line-height: 1.55; color: rgba(255,255,255,.75); background: rgba(0,0,0,.22); border-radius: 9px; padding: 10px 13px; margin-bottom: 10px; white-space: pre-wrap; word-break: break-word; }
+    .card-actions { display: flex; gap: 7px; }
+    .btn-ok { flex: 1; min-height: 34px; border: 1px solid rgba(128,255,0,.33); border-radius: 99px; background: rgba(128,255,0,.09); color: #80FF00; font: 700 9px monospace; letter-spacing: .1em; text-transform: uppercase; transition: background .14s; }
+    .btn-ok:hover { background: rgba(128,255,0,.18); }
+    .btn-no { flex: 1; min-height: 34px; border: 1px solid rgba(218,0,22,.33); border-radius: 99px; background: rgba(218,0,22,.07); color: #ff7070; font: 700 9px monospace; letter-spacing: .1em; text-transform: uppercase; transition: background .14s; }
+    .btn-no:hover { background: rgba(218,0,22,.16); }
+    .btn-dismiss { min-height: 34px; padding: 0 14px; border: 1px solid rgba(255,255,255,.12); border-radius: 99px; background: transparent; color: rgba(255,255,255,.38); font: 700 9px monospace; letter-spacing: .1em; text-transform: uppercase; transition: all .14s; }
+    .btn-dismiss:hover { border-color: rgba(255,255,255,.24); color: rgba(255,255,255,.7); }
+
+    /* ── BUTTONS ── */
+    .btn-primary { min-height: 38px; padding: 0 18px; border: none; border-radius: 10px; background: #80FF00; color: #000; font: 700 11px monospace; letter-spacing: .08em; text-transform: uppercase; transition: opacity .14s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-primary:hover { opacity: .85; }
+    .btn-secondary { min-height: 38px; padding: 0 16px; border: 1px solid rgba(255,255,255,.13); border-radius: 10px; background: rgba(255,255,255,.05); color: rgba(255,255,255,.65); font: 700 11px monospace; letter-spacing: .08em; text-transform: uppercase; transition: all .14s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-secondary:hover { border-color: rgba(255,255,255,.26); color: #fff; }
+    .btn-danger { min-height: 30px; padding: 0 12px; border: 1px solid rgba(218,0,22,.28); border-radius: 7px; background: transparent; color: #ff7070; font: 700 9px monospace; letter-spacing: .08em; text-transform: uppercase; transition: all .14s; }
+    .btn-danger:hover { background: rgba(218,0,22,.1); }
+
+    /* ── TABLE ── */
+    .tbl-wrap { background: #141414; border: 1px solid rgba(255,255,255,.08); border-radius: 13px; overflow: hidden; }
+    table.dtbl { width: 100%; border-collapse: collapse; }
+    table.dtbl th { font: 700 9px monospace; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.28); padding: 10px 14px; text-align: left; border-bottom: 1px solid rgba(255,255,255,.07); }
+    table.dtbl td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,.04); font-size: 13px; color: rgba(255,255,255,.7); vertical-align: middle; }
+    table.dtbl tr:last-child td { border-bottom: none; }
+    table.dtbl tr:hover td { background: rgba(255,255,255,.025); }
+
+    /* ── EVENTS ── */
+    .ev-row { display: flex; align-items: center; gap: 14px; background: #141414; border: 1px solid rgba(255,255,255,.08); border-radius: 12px; padding: 13px 15px; margin-bottom: 8px; }
+    .ev-date { min-width: 56px; text-align: center; background: rgba(128,255,0,.07); border-radius: 8px; padding: 7px 6px; }
+    .ev-mon { font: 700 8px monospace; letter-spacing: .12em; text-transform: uppercase; color: #80FF00; }
+    .ev-day { font-size: 22px; font-weight: 900; color: #fff; line-height: 1.1; }
+    .ev-info { flex: 1; min-width: 0; }
+    .ev-title { font-size: 14px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ev-meta { font-size: 12px; color: rgba(255,255,255,.38); margin-top: 2px; }
+    .ev-type { padding: 2px 8px; border-radius: 99px; font: 700 8px monospace; letter-spacing: .08em; text-transform: uppercase; }
+    .evt-game { background: rgba(218,0,22,.12); color: #ff8888; border: 1px solid rgba(218,0,22,.22); }
+    .evt-practice { background: rgba(128,255,0,.09); color: #80FF00; border: 1px solid rgba(128,255,0,.18); }
+    .evt-event { background: rgba(54,163,255,.1); color: #5bb8ff; border: 1px solid rgba(54,163,255,.22); }
+
+    /* ── FORM ── */
+    .form-card { background: #141414; border: 1px solid rgba(128,255,0,.22); border-radius: 14px; padding: 22px; margin-bottom: 20px; }
+    .form-card-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 18px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-full { grid-column: 1 / -1; }
+    .form-label { font: 700 9px monospace; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.35); }
+    .form-input, .form-select, .form-textarea { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 8px; color: #f0f0f0; font-size: 13px; font-family: inherit; outline: none; transition: border-color .14s; }
+    .form-input, .form-select { height: 38px; padding: 0 11px; }
+    .form-select { cursor: pointer; }
+    .form-textarea { min-height: 80px; padding: 9px 11px; resize: vertical; line-height: 1.5; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: #80FF00; }
+    option { background: #1a1a1a; }
+
+    /* ── MODAL ── */
+    .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,.78); z-index: 100; display: grid; place-items: center; padding: 20px; }
+    .modal { width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; background: #141414; border: 1px solid rgba(255,255,255,.12); border-radius: 20px; padding: 26px; }
+    .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .modal-title { font-size: 18px; font-weight: 800; }
+    .modal-close { width: 30px; height: 30px; border: 1px solid rgba(255,255,255,.14); border-radius: 7px; background: rgba(255,255,255,.05); color: rgba(255,255,255,.5); font-size: 15px; display: grid; place-items: center; }
+    .modal-close:hover { color: #fff; }
+
+    /* ── NEWSLETTER PREVIEW ── */
+    .nl-preview { background: #0a0a0a; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 18px; max-height: 280px; overflow-y: auto; margin: 12px 0 18px; font-size: 13px; line-height: 1.55; color: rgba(255,255,255,.65); }
+    .nl-sec-label { font: 700 9px monospace; letter-spacing: .16em; text-transform: uppercase; color: #80FF00; margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,.08); }
+    .nl-post { padding: 8px 10px; background: rgba(255,255,255,.04); border-radius: 7px; margin-bottom: 6px; }
+    .nl-post strong { font-size: 13px; color: #fff; }
+    .nl-post p { margin: 2px 0 0; font-size: 12px; color: rgba(255,255,255,.5); }
+    .nl-event { padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,.05); }
+    .nl-event strong { color: #fff; }
+    .nl-event span { font-size: 12px; color: rgba(255,255,255,.38); margin-left: 8px; }
 
     /* ── STATES ── */
-    .empty{text-align:center;padding:36px 20px;border:1px dashed rgba(255,255,255,.1);border-radius:16px;color:rgba(255,255,255,.28);font:700 10px monospace;letter-spacing:.12em;text-transform:uppercase}
-    .loading{text-align:center;padding:36px 20px;color:rgba(128,255,0,.55);font:700 10px monospace;letter-spacing:.14em;text-transform:uppercase;animation:blink 1.2s infinite}
-    @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+    .empty { text-align: center; padding: 36px 20px; border: 1px dashed rgba(255,255,255,.09); border-radius: 12px; color: rgba(255,255,255,.25); font: 700 9px monospace; letter-spacing: .13em; text-transform: uppercase; }
+    .loading-st { text-align: center; padding: 36px; color: rgba(128,255,0,.5); font: 700 9px monospace; letter-spacing: .14em; text-transform: uppercase; animation: blink 1.2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
     /* ── TOAST ── */
-    #toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(24,24,24,.97);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:11px 22px;font:700 11px monospace;letter-spacing:.1em;text-transform:uppercase;color:#80FF00;z-index:99;transition:transform .22s;pointer-events:none;white-space:nowrap}
-    #toast.show{transform:translateX(-50%) translateY(0)}
-    #toast.err{color:#ff7070;border-color:rgba(218,0,22,.4)}
-
-    /* ── NAV ── */
-    .back{display:inline-flex;align-items:center;gap:7px;color:rgba(255,255,255,.35);font:700 10px monospace;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;margin-bottom:18px}
-    .back:hover{color:rgba(255,255,255,.65)}
+    #toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(90px); background: #1c1c1c; border: 1px solid rgba(255,255,255,.13); border-radius: 99px; padding: 10px 22px; font: 700 10px monospace; letter-spacing: .1em; text-transform: uppercase; color: #80FF00; z-index: 200; transition: transform .22s; pointer-events: none; white-space: nowrap; }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+    #toast.err { color: #ff7070; border-color: rgba(218,0,22,.35); }
   </style>
 </head>
 <body>
@@ -90,13 +178,11 @@
 <!-- ── PIN GATE ── -->
 <div id="gate" class="gate">
   <div class="gate-card">
-    <div class="gate-logo">SLAM<span>!</span></div>
-    <span class="gate-sub">Admin · Review Queue</span>
-    <p class="gate-copy">Enter your admin PIN to review pending posts and questions.</p>
+    <div class="g-logo">SLAM<span>!</span></div>
+    <span class="g-sub">Admin · Dashboard</span>
+    <p class="g-copy">Enter your admin PIN to access the dashboard.</p>
     <div class="pin-box" id="pinBox">
-      <div class="pin-dots">
-        <span></span><span></span><span></span><span></span>
-      </div>
+      <div class="pin-dots"><span></span><span></span><span></span><span></span></div>
       <input id="pinInput" type="tel" maxlength="4" autocomplete="off" inputmode="numeric">
     </div>
     <div class="pin-hint">4-digit PIN</div>
@@ -104,34 +190,168 @@
   </div>
 </div>
 
-<!-- ── DASHBOARD ── -->
-<div id="dash" class="hidden">
-  <div class="dashboard">
-    <a href="slam.html" class="back">← Back to site</a>
+<!-- ── APP ── -->
+<div id="app" class="app hidden">
 
-    <div class="top-bar">
-      <div class="top-brand">SLAM<span>!</span><small>Review Queue</small></div>
-      <div class="top-right">
-        <span class="pill red"><span class="dot"></span><span id="postCount">–</span> posts</span>
-        <span class="pill lime"><span class="dot"></span><span id="qCount">–</span> questions</span>
-        <button class="refresh-btn" id="refreshBtn" onclick="load()">↻ Refresh</button>
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-brand">SLAM<span>!</span></div>
+      <span class="sb-brand-sub">Admin Dashboard</span>
+    </div>
+    <div class="nav-section">Main Menu</div>
+    <div class="nav-item active" onclick="nav('overview')" data-page="overview"><span class="ni">⬡</span> Overview</div>
+    <div class="nav-item" onclick="nav('posts')" data-page="posts"><span class="ni">📋</span> Posts <span class="nav-badge hidden" id="bdg-posts">0</span></div>
+    <div class="nav-item" onclick="nav('signups')" data-page="signups"><span class="ni">📧</span> Signups</div>
+    <div class="nav-item" onclick="nav('events')" data-page="events"><span class="ni">📅</span> Events</div>
+    <div class="nav-item" onclick="nav('questions')" data-page="questions"><span class="ni">💬</span> Questions <span class="nav-badge hidden" id="bdg-q">0</span></div>
+    <hr class="nav-hr">
+    <div class="nav-section">More</div>
+    <a class="nav-item" href="slam.html"><span class="ni">↗</span> Back to Site</a>
+    <div class="refresh-row">
+      <button class="refresh-all" id="refreshBtn" onclick="loadData()">↻ Refresh All Data</button>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- OVERVIEW -->
+    <div id="page-overview" class="page active">
+      <div class="pg-head"><div><div class="pg-title">Overview</div><div class="pg-sub">Your SLAM! Athletics at a glance</div></div></div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-icon">📧</div><div class="stat-label">Total Signups</div><div class="stat-val" id="ov-su">—</div><div class="stat-note ok" id="ov-su-note"></div></div>
+        <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-label">Pending Posts</div><div class="stat-val" id="ov-pp">—</div><div class="stat-note warn" id="ov-pp-note"></div></div>
+        <div class="stat-card"><div class="stat-icon">📅</div><div class="stat-label">Upcoming Events</div><div class="stat-val" id="ov-ev">—</div><div class="stat-note" id="ov-ev-note"></div></div>
+        <div class="stat-card"><div class="stat-icon">💬</div><div class="stat-label">Pending Questions</div><div class="stat-val" id="ov-pq">—</div><div class="stat-note warn" id="ov-pq-note"></div></div>
+      </div>
+      <div class="section">
+        <div class="sec-head"><span class="sec-title">Needs Attention</span></div>
+        <div id="ov-attn" class="card-list"><div class="loading-st">Loading…</div></div>
       </div>
     </div>
 
-    <div class="section">
-      <div class="section-head">
-        <span class="section-title">Pending Posts</span>
-        <span class="section-ct red" id="postCt">–</span>
+    <!-- POSTS -->
+    <div id="page-posts" class="page">
+      <div class="pg-head"><div><div class="pg-title">Posts</div><div class="pg-sub">Approve or reject community submissions</div></div></div>
+      <div class="section">
+        <div class="sec-head"><span class="sec-title">Needs Approval</span><span class="sec-badge red" id="pp-ct">0</span></div>
+        <div id="posts-pending" class="card-list"><div class="empty">All clear — nothing to review</div></div>
       </div>
-      <div id="postList" class="card-list"><div class="loading">Loading…</div></div>
+      <div class="section">
+        <div class="sec-head"><span class="sec-title">All Posts</span><span class="sec-badge muted" id="posts-all-ct">0</span></div>
+        <div id="posts-all" class="card-list"><div class="loading-st">Loading…</div></div>
+      </div>
     </div>
 
-    <div class="section">
-      <div class="section-head">
-        <span class="section-title">Questions to Review</span>
-        <span class="section-ct lime" id="qCt">–</span>
+    <!-- SIGNUPS -->
+    <div id="page-signups" class="page">
+      <div class="pg-head">
+        <div><div class="pg-title">Signups</div><div class="pg-sub">Everyone subscribed to your newsletter</div></div>
+        <div style="display:flex;gap:9px;flex-wrap:wrap;align-items:flex-start;padding-top:4px">
+          <button class="btn-secondary" onclick="copyEmails()">📋 Copy All Emails</button>
+          <button class="btn-primary" onclick="openNL()">✉ Send Newsletter</button>
+        </div>
       </div>
-      <div id="qList" class="card-list"><div class="loading">Loading…</div></div>
+      <div class="stat-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr));margin-bottom:20px">
+        <div class="stat-card"><div class="stat-label">Total Signups</div><div class="stat-val" id="su-total">—</div></div>
+        <div class="stat-card"><div class="stat-label">Most Recent</div><div class="stat-val" style="font-size:16px;padding-top:6px" id="su-latest">—</div></div>
+      </div>
+      <div class="section">
+        <div class="sec-head"><span class="sec-title">All Subscribers</span><span class="sec-badge muted" id="su-ct">0</span></div>
+        <div class="tbl-wrap">
+          <table class="dtbl">
+            <thead><tr><th>Email</th><th>Source</th><th>Signed Up</th></tr></thead>
+            <tbody id="su-tbody"><tr><td colspan="3"><div class="loading-st">Loading…</div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- EVENTS -->
+    <div id="page-events" class="page">
+      <div class="pg-head">
+        <div><div class="pg-title">Events</div><div class="pg-sub">Practices, games, and events</div></div>
+        <button class="btn-primary" onclick="toggleEventForm()">+ Add Event</button>
+      </div>
+
+      <div id="ev-form" class="form-card hidden">
+        <div class="form-card-title">New Event</div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">Date *</label><input class="form-input" type="date" id="ef-date"></div>
+          <div class="form-group"><label class="form-label">Time</label><input class="form-input" type="time" id="ef-time"></div>
+          <div class="form-group"><label class="form-label">Type</label>
+            <select class="form-select" id="ef-type"><option value="event">Event</option><option value="game">Game</option><option value="practice">Practice</option></select>
+          </div>
+          <div class="form-group"><label class="form-label">Sport</label>
+            <select class="form-select" id="ef-sport">
+              <option value="">— Select —</option>
+              <option>Basketball</option><option>Soccer</option><option>Track and Field</option>
+              <option>Cross Country</option><option>Cheer</option><option>Volleyball</option>
+              <option>Flag Football</option><option>Baseball</option><option>Softball</option>
+              <option>Tennis</option><option>Other</option>
+            </select>
+          </div>
+          <div class="form-group form-full"><label class="form-label">Title *</label><input class="form-input" type="text" id="ef-title" placeholder="e.g. Basketball vs. Lincoln ES"></div>
+          <div class="form-group"><label class="form-label">Location</label><input class="form-input" type="text" id="ef-loc" placeholder="e.g. Main Gym"></div>
+          <div class="form-group"><label class="form-label">Opponent (games)</label><input class="form-input" type="text" id="ef-opp" placeholder="e.g. Lincoln ES"></div>
+          <div class="form-group form-full"><label class="form-label">Notes</label><textarea class="form-textarea" id="ef-notes" placeholder="Any extra details…"></textarea></div>
+        </div>
+        <div style="display:flex;gap:9px;margin-top:16px">
+          <button class="btn-primary" onclick="submitEvent()">Save Event</button>
+          <button class="btn-secondary" onclick="toggleEventForm(true)">Cancel</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sec-head"><span class="sec-title">Upcoming</span><span class="sec-badge lime" id="up-ct">0</span></div>
+        <div id="ev-upcoming"><div class="loading-st">Loading…</div></div>
+      </div>
+      <div class="section">
+        <div class="sec-head"><span class="sec-title">Past Events</span><span class="sec-badge muted" id="past-ct">0</span></div>
+        <div id="ev-past"><div class="empty">No past events</div></div>
+      </div>
+    </div>
+
+    <!-- QUESTIONS -->
+    <div id="page-questions" class="page">
+      <div class="pg-head"><div><div class="pg-title">Questions</div><div class="pg-sub">Messages from families and students</div></div></div>
+      <div class="section">
+        <div class="sec-head"><span class="sec-title">New / Pending</span><span class="sec-badge red" id="pq-ct">0</span></div>
+        <div id="q-pending" class="card-list"><div class="empty">No pending questions</div></div>
+      </div>
+      <div class="section">
+        <div class="sec-head"><span class="sec-title">All Questions</span><span class="sec-badge muted" id="q-all-ct">0</span></div>
+        <div id="q-all" class="card-list"><div class="loading-st">Loading…</div></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- NEWSLETTER MODAL -->
+<div id="nl-modal" class="modal-bg hidden">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Send Newsletter</div>
+      <button class="modal-close" onclick="closeNL()">✕</button>
+    </div>
+    <div class="form-group" style="margin-bottom:11px">
+      <label class="form-label">Subject</label>
+      <input class="form-input" id="nl-subj" type="text">
+    </div>
+    <div class="form-group" style="margin-bottom:11px">
+      <label class="form-label">Intro Message (optional)</label>
+      <textarea class="form-textarea" id="nl-intro" placeholder="Write a short intro — appears at the top of the email…"></textarea>
+    </div>
+    <div class="form-label" style="margin-bottom:7px">Preview</div>
+    <div class="nl-preview" id="nl-prev"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div style="font-size:12px;color:rgba(255,255,255,.28)">Sending to <strong id="nl-cnt" style="color:rgba(255,255,255,.55)">0</strong> subscribers</div>
+      <div style="display:flex;gap:9px">
+        <button class="btn-secondary" onclick="closeNL()">Cancel</button>
+        <button class="btn-primary" id="nl-btn" onclick="sendNL()">✉ Send Now</button>
+      </div>
     </div>
   </div>
 </div>
@@ -140,149 +360,350 @@
 
 <script>
 var EP = 'https://script.google.com/macros/s/AKfycbxKWDLcTjDwwXb-rNq9LTpqQwmlGgvLHZf9kJKDG7DHqwNp6vjaXD8S4ccG_41CBMfk/exec';
-var TOKEN = '';
 var PIN_HASH = 1687348;
+var TOKEN = '';
+var D = { posts: [], signups: [], events: [], questions: [] };
 
-function hashPin(p){return String(p).split('').reduce(function(t,c){return(t*31)+c.charCodeAt(0);},0);}
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function fmt(ts){try{return ts?new Date(ts).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'';} catch(e){return '';}}
-function decr(id){var el=document.getElementById(id);if(el)el.textContent=Math.max(0,(parseInt(el.textContent)||1)-1);}
+// ── utils ────────────────────────────────────────────────────────────────────
+function hashPin(p) { return String(p).split('').reduce(function(t,c){ return (t*31)+c.charCodeAt(0); }, 0); }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmtD(ts) { try { return ts ? new Date(ts).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : ''; } catch(e){ return ''; } }
+function fmtS(ts) { try { return ts ? new Date(ts).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : ''; } catch(e){ return ''; } }
+function ok(v) { return v===true||String(v).toLowerCase()==='true'||String(v).toLowerCase()==='yes'; }
+function staff(s) { return ['admin','teacher','coach'].indexOf(String(s||'').toLowerCase()) !== -1; }
+function upcoming(d) { try { return d && new Date(d) >= new Date(new Date().toDateString()); } catch(e){ return false; } }
 
-// PIN
+// ── PIN ──────────────────────────────────────────────────────────────────────
 var pinEl = document.getElementById('pinInput');
-document.getElementById('pinBox').addEventListener('click', function(){pinEl.focus();});
-document.getElementById('gate').addEventListener('click', function(){pinEl.focus();});
+document.getElementById('pinBox').addEventListener('click', function(){ pinEl.focus(); });
+document.getElementById('gate').addEventListener('click', function(){ pinEl.focus(); });
 pinEl.focus();
 pinEl.addEventListener('input', function(){
   this.value = this.value.replace(/\D/g,'').slice(0,4);
   var dots = document.querySelectorAll('.pin-dots span');
-  dots.forEach(function(d,i){d.classList.toggle('on', i < pinEl.value.length);});
-  if(this.value.length === 4){
-    if(hashPin(this.value) === PIN_HASH){
+  dots.forEach(function(d,i){ d.classList.toggle('on', i < pinEl.value.length); });
+  if (this.value.length === 4) {
+    if (hashPin(this.value) === PIN_HASH) {
       TOKEN = this.value;
       document.getElementById('gate').classList.add('hidden');
-      document.getElementById('dash').classList.remove('hidden');
-      load();
-      setInterval(function(){if(!document.hidden)load();}, 60000);
+      document.getElementById('app').classList.remove('hidden');
+      loadData();
+      setInterval(function(){ if (!document.hidden) loadData(); }, 60000);
     } else {
       document.getElementById('pinErr').textContent = 'Incorrect PIN — try again.';
       var self = this;
-      setTimeout(function(){
-        self.value='';
-        dots.forEach(function(d){d.classList.remove('on');});
-        document.getElementById('pinErr').textContent='';
-        pinEl.focus();
-      }, 900);
+      setTimeout(function(){ self.value=''; dots.forEach(function(d){ d.classList.remove('on'); }); document.getElementById('pinErr').textContent=''; pinEl.focus(); }, 900);
     }
   }
 });
 
-// Load
-function load(){
+// ── navigation ────────────────────────────────────────────────────────────────
+function nav(page) {
+  document.querySelectorAll('.nav-item').forEach(function(el){ el.classList.remove('active'); });
+  document.querySelectorAll('.page').forEach(function(el){ el.classList.remove('active'); });
+  var ni = document.querySelector('[data-page="'+page+'"]');
+  var pg = document.getElementById('page-'+page);
+  if (ni) ni.classList.add('active');
+  if (pg) pg.classList.add('active');
+}
+
+// ── load ──────────────────────────────────────────────────────────────────────
+function loadData() {
   var btn = document.getElementById('refreshBtn');
   btn.disabled = true; btn.textContent = '↻ Loading…';
-  var url = EP + '?action=getPending&token=' + encodeURIComponent(TOKEN);
-  fetch(url)
-    .then(function(r){return r.json();})
+  fetch(EP + '?action=getDashboard&token=' + encodeURIComponent(TOKEN))
+    .then(function(r){ return r.json(); })
     .then(function(d){
-      btn.disabled=false; btn.textContent='↻ Refresh';
-      if(!d.ok){toast('Could not load: '+d.error, true); return;}
-      renderPosts(d.posts||[]);
-      renderQs(d.questions||[]);
+      btn.disabled = false; btn.textContent = '↻ Refresh All Data';
+      if (!d.ok) { toast('Could not load: ' + (d.error||'unknown'), true); return; }
+      D = d;
+      renderAll();
     })
-    .catch(function(){
-      btn.disabled=false; btn.textContent='↻ Refresh';
-      toast('Connection error — check Apps Script setup', true);
-    });
+    .catch(function(){ btn.disabled = false; btn.textContent = '↻ Refresh All Data'; toast('Connection error — check Apps Script', true); });
 }
 
-function renderPosts(posts){
-  var n = posts.length;
-  document.getElementById('postCount').textContent = n;
-  document.getElementById('postCt').textContent = n;
-  var el = document.getElementById('postList');
-  if(!n){el.innerHTML='<div class="empty">All clear — no pending posts 🎉</div>';return;}
-  el.innerHTML = posts.map(function(p){
-    var r = (p.Submitter||p.submitter||'');
-    var rc = ['Admin','Teacher','Coach'].indexOf(r)>=0?'staff':r==='Parent'?'parent':'student';
-    var sport = p.Sport||p.sport||'';
-    var handle = p.Handle||p.handle||'';
-    return '<div class="card" id="p'+p.row+'">'+
-      '<div class="card-top">'+
-        '<div class="card-chips">'+
-          '<span class="chip '+rc+'">'+esc(r)+'</span>'+
-          (handle?'<span class="handle">'+esc(handle)+'</span>':'')+
-          (sport?'<span class="chip sport">'+esc(sport)+'</span>':'')+
-        '</div>'+
-        '<span class="ts">'+fmt(p.Timestamp||p.timestamp)+'</span>'+
-      '</div>'+
-      '<div class="card-body">'+esc(p.Body||p.body||'(no content)')+'</div>'+
-      '<div class="card-actions">'+
-        '<button class="btn-ok" onclick="act(\'p\','+p.row+',\'approve\')">✓ Approve</button>'+
-        '<button class="btn-no" onclick="act(\'p\','+p.row+',\'reject\')">✕ Reject</button>'+
-      '</div>'+
-    '</div>';
+function renderAll() { renderOverview(); renderPosts(); renderSignups(); renderEvents(); renderQuestions(); }
+
+// ── overview ──────────────────────────────────────────────────────────────────
+function renderOverview() {
+  var pendP = D.posts.filter(function(p){ return !ok(p.Approved) && !staff(p.Submitter) && (p.Name||p.Body); });
+  var pendQ = D.questions.filter(function(q){ var s=String(q.Status||'').toLowerCase(); return (s===''||s==='pending') && q.Question; });
+  var upEv  = D.events.filter(function(e){ return e.Title && upcoming(e.Date); });
+
+  setText('ov-su', D.signups.length);
+  setText('ov-pp', pendP.length);
+  setText('ov-ev', upEv.length);
+  setText('ov-pq', pendQ.length);
+  setText('ov-pp-note', pendP.length ? pendP.length + ' need your review' : '');
+  setText('ov-pq-note', pendQ.length ? pendQ.length + ' awaiting response' : '');
+  setText('ov-ev-note', upEv.length ? (upEv[0] ? 'Next: '+fmtS(upEv[0].Date) : '') : 'No upcoming events');
+
+  var bp = document.getElementById('bdg-posts');
+  var bq = document.getElementById('bdg-q');
+  bp.textContent = pendP.length; bp.classList.toggle('hidden', !pendP.length);
+  bq.textContent = pendQ.length; bq.classList.toggle('hidden', !pendQ.length);
+
+  var items = [];
+  pendP.forEach(function(p){ items.push({t:'p',d:p}); });
+  pendQ.forEach(function(q){ items.push({t:'q',d:q}); });
+
+  var el = document.getElementById('ov-attn');
+  if (!items.length) { el.innerHTML = '<div class="empty">🎉 All clear — nothing needs attention right now</div>'; return; }
+  el.innerHTML = items.slice(0,6).map(function(item){
+    if (item.t === 'p') {
+      var p = item.d;
+      return '<div class="card" id="op'+p.row+'">'
+        +'<div class="card-top"><div class="card-chips"><span class="chip chip-pending">Post · Needs Approval</span><span class="card-handle">'+esc(p.Handle||p.Name||'')+'</span>'+(p.Sport?'<span class="chip chip-student">'+esc(p.Sport)+'</span>':'')+'</div><span class="card-ts">'+fmtS(p.Timestamp)+'</span></div>'
+        +'<div class="card-body">'+esc(p.Body||'(no content)')+'</div>'
+        +'<div class="card-actions"><button class="btn-ok" onclick="act(\'p\','+p.row+',\'approve\',\'op\')">✓ Approve</button><button class="btn-no" onclick="act(\'p\','+p.row+',\'reject\',\'op\')">✕ Reject</button></div>'
+        +'</div>';
+    } else {
+      var q = item.d;
+      return '<div class="card" id="oq'+q.row+'">'
+        +'<div class="card-top"><div class="card-chips"><span class="chip chip-pending">Question · Pending</span><span class="card-handle">'+esc(q.Name||'Anonymous')+'</span></div><span class="card-ts">'+fmtS(q.Timestamp)+'</span></div>'
+        +'<div class="card-body">'+esc(q.Question||'(no content)')+'</div>'
+        +'<div class="card-actions"><button class="btn-dismiss" onclick="act(\'q\','+q.row+',\'dismiss\',\'oq\')">Dismiss</button></div>'
+        +'</div>';
+    }
   }).join('');
 }
 
-function renderQs(qs){
-  var n = qs.length;
-  document.getElementById('qCount').textContent = n;
-  document.getElementById('qCt').textContent = n;
-  var el = document.getElementById('qList');
-  if(!n){el.innerHTML='<div class="empty">No questions to review</div>';return;}
-  el.innerHTML = qs.map(function(q){
-    var name = q.Name||q.name||q.Handle||q.handle||'Anonymous';
-    var email = q.Email||q.email||'';
-    var body = q.Question||q.question||q.Body||q.body||'(no content)';
-    return '<div class="card" id="q'+q.row+'">'+
-      '<div class="card-top">'+
-        '<div class="card-chips">'+
-          '<span class="chip parent">'+esc(name)+'</span>'+
-          (email?'<span class="handle">'+esc(email)+'</span>':'')+
-        '</div>'+
-        '<span class="ts">'+fmt(q.Timestamp||q.timestamp)+'</span>'+
-      '</div>'+
-      '<div class="card-body">'+esc(body)+'</div>'+
-      '<div class="card-actions">'+
-        '<button class="btn-no" onclick="act(\'q\','+q.row+',\'dismiss\')">✕ Dismiss</button>'+
-      '</div>'+
-    '</div>';
-  }).join('');
+// ── posts ─────────────────────────────────────────────────────────────────────
+function renderPosts() {
+  var all = D.posts.filter(function(p){ return p.Name || p.Body; });
+  var pend = all.filter(function(p){ return !ok(p.Approved) && !staff(p.Submitter); });
+  var appr = all.filter(function(p){ return ok(p.Approved) || staff(p.Submitter); });
+  setText('pp-ct', pend.length);
+  setText('posts-all-ct', all.length);
+  document.getElementById('posts-pending').innerHTML = pend.length ? pend.map(function(p){ return postCard(p,'p'); }).join('') : '<div class="empty">All clear — no pending posts</div>';
+  document.getElementById('posts-all').innerHTML = appr.length ? appr.map(postCardRO).join('') : '<div class="empty">No approved posts yet</div>';
 }
 
-function act(prefix, row, action){
-  var card = document.getElementById(prefix+row);
-  if(card) card.classList.add('acting');
-  var type = prefix==='q'?'question':'post';
-  var url = EP+'?action='+action+'&type='+type+'&row='+row+'&token='+encodeURIComponent(TOKEN);
-  fetch(url)
-    .then(function(r){return r.json();})
+function roleChip(sub) {
+  var s = String(sub||'').toLowerCase();
+  if (staff(s)) return '<span class="chip chip-staff">'+esc(sub||'Staff')+'</span>';
+  if (s==='parent') return '<span class="chip chip-parent">Parent</span>';
+  return '<span class="chip chip-student">'+esc(sub||'Student')+'</span>';
+}
+
+function postCard(p, prefix) {
+  return '<div class="card" id="'+(prefix||'p')+p.row+'">'
+    +'<div class="card-top"><div class="card-chips">'+roleChip(p.Submitter)+'<span class="card-handle">'+esc(p.Handle||p.Name||'')+'</span>'+(p.Sport?'<span class="chip chip-student">'+esc(p.Sport)+'</span>':'')+'</div><span class="card-ts">'+fmtD(p.Timestamp)+'</span></div>'
+    +'<div class="card-body">'+esc(p.Body||'(no content)')+'</div>'
+    +'<div class="card-actions">'
+    +'<button class="btn-ok" onclick="act(\'p\','+p.row+',\'approve\',\''+(prefix||'p')+'\')">✓ Approve</button>'
+    +'<button class="btn-no" onclick="act(\'p\','+p.row+',\'reject\',\''+(prefix||'p')+'\')">✕ Reject</button>'
+    +'</div></div>';
+}
+
+function postCardRO(p) {
+  return '<div class="card">'
+    +'<div class="card-top"><div class="card-chips"><span class="chip chip-approved">Approved</span><span class="card-handle">'+esc(p.Handle||p.Name||'')+'</span>'+(p.Sport?'<span class="chip chip-student">'+esc(p.Sport)+'</span>':'')+'</div><span class="card-ts">'+fmtD(p.Timestamp)+'</span></div>'
+    +'<div class="card-body">'+esc(p.Body||'(no content)')+'</div>'
+    +'</div>';
+}
+
+// ── signups ───────────────────────────────────────────────────────────────────
+function renderSignups() {
+  var su = D.signups;
+  setText('su-total', su.length);
+  setText('su-ct', su.length);
+  setText('su-latest', su.length ? fmtS(su[su.length-1].Timestamp||su[su.length-1].timestamp||'') : '—');
+  var tbody = document.getElementById('su-tbody');
+  tbody.innerHTML = su.length ? su.slice().reverse().map(function(s){
+    return '<tr><td>'+esc(s.Email||s.email||'')+'</td><td>'+esc(s.Source||s.source||'—')+'</td><td>'+fmtD(s.Timestamp||s.timestamp||'')+'</td></tr>';
+  }).join('') : '<tr><td colspan="3"><div class="empty">No signups yet</div></td></tr>';
+}
+
+function copyEmails() {
+  var emails = D.signups.map(function(s){ return s.Email||s.email||''; }).filter(Boolean).join(', ');
+  if (!emails) { toast('No emails to copy', true); return; }
+  navigator.clipboard.writeText(emails).then(function(){ toast('Copied '+D.signups.length+' emails!'); }).catch(function(){
+    var ta = document.createElement('textarea'); ta.value=emails; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); toast('Copied '+D.signups.length+' emails!');
+  });
+}
+
+// ── events ────────────────────────────────────────────────────────────────────
+function renderEvents() {
+  var now = new Date(new Date().toDateString());
+  var up   = D.events.filter(function(e){ return e.Title && new Date(e.Date) >= now; }).sort(function(a,b){ return new Date(a.Date)-new Date(b.Date); });
+  var past = D.events.filter(function(e){ return e.Title && new Date(e.Date) < now; }).sort(function(a,b){ return new Date(b.Date)-new Date(a.Date); });
+  setText('up-ct', up.length);
+  setText('past-ct', past.length);
+  document.getElementById('ev-upcoming').innerHTML = up.length ? up.map(evRow).join('') : '<div class="empty">No upcoming events — add one!</div>';
+  document.getElementById('ev-past').innerHTML = past.length ? past.map(function(e){ return evRow(e,true); }).join('') : '<div class="empty">No past events</div>';
+}
+
+function evRow(e, isPast) {
+  var d = e.Date ? new Date(e.Date) : null;
+  var mon = d ? d.toLocaleDateString('en-US',{month:'short'}).toUpperCase() : '—';
+  var day = d ? d.getDate() : '—';
+  var typeKey = String(e.Type||'event').toLowerCase();
+  var tCls = typeKey==='game' ? 'evt-game' : typeKey==='practice' ? 'evt-practice' : 'evt-event';
+  var meta = [e.Sport,e.Time,e.Location].filter(function(x){ return x&&String(x).trim(); }).map(esc).join(' · ');
+  return '<div class="ev-row" id="ev'+e.row+'" style="'+(isPast?'opacity:.5':'')+'">'+
+    '<div class="ev-date"><div class="ev-mon">'+mon+'</div><div class="ev-day">'+day+'</div></div>'+
+    '<div class="ev-info">'+
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">'+
+        '<div class="ev-title">'+esc(e.Title||'')+'</div>'+
+        '<span class="ev-type '+tCls+'">'+esc(e.Type||'event')+'</span>'+
+      '</div>'+
+      (meta ? '<div class="ev-meta">'+meta+'</div>' : '')+
+      (e.Notes && String(e.Notes).trim() ? '<div class="ev-meta" style="font-style:italic;margin-top:2px">'+esc(e.Notes)+'</div>' : '')+
+    '</div>'+
+    '<button class="btn-danger" onclick="delEvent('+e.row+')">Delete</button>'+
+  '</div>';
+}
+
+function toggleEventForm(hide) {
+  var f = document.getElementById('ev-form');
+  if (hide) { f.classList.add('hidden'); return; }
+  f.classList.toggle('hidden');
+  if (!f.classList.contains('hidden')) document.getElementById('ef-date').focus();
+}
+
+function submitEvent() {
+  var date  = document.getElementById('ef-date').value;
+  var title = document.getElementById('ef-title').value.trim();
+  if (!date || !title) { toast('Date and title are required', true); return; }
+  var p = new URLSearchParams({
+    action: 'saveEvent', token: TOKEN,
+    date:     date,
+    time:     document.getElementById('ef-time').value,
+    type:     document.getElementById('ef-type').value,
+    sport:    document.getElementById('ef-sport').value,
+    title:    title,
+    location: document.getElementById('ef-loc').value.trim(),
+    opponent: document.getElementById('ef-opp').value.trim(),
+    notes:    document.getElementById('ef-notes').value.trim()
+  });
+  fetch(EP + '?' + p.toString())
+    .then(function(r){ return r.json(); })
     .then(function(d){
-      if(d.ok){
-        if(card) card.remove();
-        var msg = action==='approve'?'Post approved ✓':action==='reject'?'Post rejected':'Dismissed';
-        toast(msg);
-        decr(prefix==='q'?'qCount':'postCount');
-        decr(prefix==='q'?'qCt':'postCt');
+      if (d.ok) {
+        toast('Event saved!');
+        toggleEventForm(true);
+        ['ef-date','ef-time','ef-title','ef-loc','ef-opp','ef-notes'].forEach(function(id){ document.getElementById(id).value=''; });
+        loadData();
+      } else toast('Error: '+(d.error||'unknown'), true);
+    })
+    .catch(function(){ toast('Failed to save — check connection', true); });
+}
+
+function delEvent(row) {
+  if (!confirm('Delete this event? This cannot be undone.')) return;
+  document.getElementById('ev'+row).style.opacity = '.35';
+  fetch(EP + '?action=deleteEvent&row='+row+'&token='+encodeURIComponent(TOKEN))
+    .then(function(r){ return r.json(); })
+    .then(function(d){ if (d.ok) { toast('Event deleted'); loadData(); } else { document.getElementById('ev'+row).style.opacity=''; toast('Error: '+(d.error||'unknown'), true); } })
+    .catch(function(){ document.getElementById('ev'+row).style.opacity=''; toast('Failed', true); });
+}
+
+// ── questions ─────────────────────────────────────────────────────────────────
+function renderQuestions() {
+  var all   = D.questions.filter(function(q){ return q.Question; });
+  var pend  = all.filter(function(q){ var s=String(q.Status||'').toLowerCase(); return s===''||s==='pending'; });
+  var done  = all.filter(function(q){ var s=String(q.Status||'').toLowerCase(); return s!==''&&s!=='pending'; });
+  setText('pq-ct', pend.length);
+  setText('q-all-ct', all.length);
+  document.getElementById('q-pending').innerHTML = pend.length ? pend.map(function(q){ return qCard(q,false,'qp'); }).join('') : '<div class="empty">No pending questions</div>';
+  document.getElementById('q-all').innerHTML = done.length ? done.map(function(q){ return qCard(q,true,'qa'); }).join('') : '<div class="empty">No reviewed questions yet</div>';
+}
+
+function qCard(q, ro, pfx) {
+  var st = String(q.Status||'pending').toLowerCase();
+  var cc = st==='dismissed'?'chip-dismissed':st==='approved'||st==='answered'?'chip-approved':'chip-pending';
+  return '<div class="card" id="'+(pfx||'q')+q.row+'">'
+    +'<div class="card-top"><div class="card-chips"><span class="chip '+cc+'">'+esc(st||'pending')+'</span><span class="card-handle">'+esc(q.Name||'Anonymous')+'</span>'+(q.Email?'<span style="font-size:11px;color:rgba(255,255,255,.28)">'+esc(q.Email)+'</span>':'')+'</div><span class="card-ts">'+fmtD(q.Timestamp)+'</span></div>'
+    +'<div class="card-body">'+esc(q.Question||'(no content)')+'</div>'
+    +(!ro ? '<div class="card-actions"><button class="btn-dismiss" onclick="act(\'q\','+q.row+',\'dismiss\',\''+(pfx||'q')+'\')">Dismiss</button></div>' : '')
+    +'</div>';
+}
+
+// ── actions ───────────────────────────────────────────────────────────────────
+function act(type, row, action, prefix) {
+  var card = document.getElementById((prefix||type)+row);
+  if (card) card.classList.add('acting');
+  var sheetType = type==='q' ? 'question' : 'post';
+  fetch(EP+'?action='+action+'&type='+sheetType+'&row='+row+'&token='+encodeURIComponent(TOKEN))
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (d.ok) {
+        toast(action==='approve'?'Post approved ✓':action==='reject'?'Post rejected':'Dismissed');
+        if (sheetType==='post') {
+          var p = D.posts.find(function(x){ return x.row===row; });
+          if (p) { if (action==='approve') p.Approved=true; else p.Approved=false; }
+        } else {
+          var q = D.questions.find(function(x){ return x.row===row; });
+          if (q) q.Status='dismissed';
+        }
+        renderAll();
       } else {
-        if(card) card.classList.remove('acting');
+        if (card) card.classList.remove('acting');
         toast('Error: '+(d.error||'unknown'), true);
       }
     })
-    .catch(function(){
-      if(card) card.classList.remove('acting');
-      toast('Failed — check connection', true);
-    });
+    .catch(function(){ if(card) card.classList.remove('acting'); toast('Failed — check connection', true); });
 }
 
-function toast(msg, err){
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = err?'err show':'show';
-  clearTimeout(t._t);
-  t._t = setTimeout(function(){t.classList.remove('show');}, 2600);
+// ── newsletter ────────────────────────────────────────────────────────────────
+function openNL() {
+  var now = new Date();
+  var mo  = now.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  document.getElementById('nl-subj').value = 'SLAM! Athletics Update — ' + mo;
+  document.getElementById('nl-cnt').textContent = D.signups.length;
+  buildNLPreview();
+  document.getElementById('nl-modal').classList.remove('hidden');
 }
+function closeNL() { document.getElementById('nl-modal').classList.add('hidden'); }
+document.getElementById('nl-intro').addEventListener('input', buildNLPreview);
+
+function buildNLPreview() {
+  var intro   = document.getElementById('nl-intro').value.trim();
+  var now     = new Date(new Date().toDateString());
+  var posts   = D.posts.filter(function(p){ return ok(p.Approved) && p.Body; }).slice(0,5);
+  var evts    = D.events.filter(function(e){ return e.Title && new Date(e.Date)>=now; }).sort(function(a,b){ return new Date(a.Date)-new Date(b.Date); }).slice(0,5);
+  var faqs    = (D.faq||[]).filter(function(f){ return f.Question && f.Answer; }).slice(0,3);
+  var html = '';
+  if (intro) html += '<div style="padding:10px;background:rgba(128,255,0,.06);border-left:3px solid #80FF00;border-radius:0 7px 7px 0;margin-bottom:12px;font-size:13px;color:rgba(255,255,255,.75)">'+esc(intro)+'</div>';
+  html += '<div class="nl-sec-label">Latest Updates</div>';
+  if (posts.length) posts.forEach(function(p){ html += '<div class="nl-post"><strong>'+esc(p.Name||'')+'</strong> <span style="color:rgba(255,255,255,.3);font-size:11px">'+esc(p.Handle||'')+'</span><p>'+esc(String(p.Body||'').slice(0,120)+(p.Body&&p.Body.length>120?'…':''))+'</p></div>'; });
+  else html += '<p style="color:rgba(255,255,255,.28);font-size:12px">No approved posts yet.</p>';
+  html += '<div class="nl-sec-label" style="margin-top:12px">Upcoming Events</div>';
+  if (evts.length) evts.forEach(function(e){ html += '<div class="nl-event"><strong>'+esc(e.Title||'')+'</strong><span>'+fmtS(e.Date)+(e.Time?' · '+esc(String(e.Time)):'')+(e.Location?' · '+esc(String(e.Location)):'')+'</span></div>'; });
+  else html += '<p style="color:rgba(255,255,255,.28);font-size:12px">No upcoming events.</p>';
+  if (faqs.length) {
+    html += '<div class="nl-sec-label" style="margin-top:12px">FAQ</div>';
+    faqs.forEach(function(f){ html += '<div style="margin-bottom:8px"><strong style="font-size:13px;color:#fff">'+esc(f.Question||f.q||'')+'</strong><p style="font-size:12px;color:rgba(255,255,255,.5);margin:2px 0 0">'+esc(f.Answer||f.a||'')+'</p></div>'; });
+  }
+  document.getElementById('nl-prev').innerHTML = html;
+}
+
+function sendNL() {
+  var subj  = document.getElementById('nl-subj').value.trim();
+  var intro = document.getElementById('nl-intro').value.trim();
+  if (!subj) { toast('Please enter a subject', true); return; }
+  if (!D.signups.length) { toast('No subscribers to send to', true); return; }
+  var btn = document.getElementById('nl-btn');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  var p = new URLSearchParams({ action:'sendNewsletter', token:TOKEN, subject:subj, intro:intro });
+  fetch(EP + '?' + p.toString())
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      btn.disabled=false; btn.textContent='✉ Send Now';
+      if (d.ok) { toast('Sent to '+(d.sent||D.signups.length)+' subscribers!'); closeNL(); }
+      else toast('Error: '+(d.error||'unknown'), true);
+    })
+    .catch(function(){ btn.disabled=false; btn.textContent='✉ Send Now'; toast('Failed to send', true); });
+}
+
+// ── toast + helpers ───────────────────────────────────────────────────────────
+function toast(msg, err) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.className = err ? 'err show' : 'show';
+  clearTimeout(t._t); t._t = setTimeout(function(){ t.classList.remove('show'); }, 2800);
+}
+function setText(id, val) { var el=document.getElementById(id); if(el) el.textContent=val; }
 </script>
 </body>
 </html>
