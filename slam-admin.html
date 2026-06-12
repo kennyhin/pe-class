@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SLAM! Admin · Review Queue</title>
+  <link rel="icon" type="image/svg+xml" href="assets/mark-square.svg">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{min-height:100vh;background:radial-gradient(circle at 14% 8%,rgba(128,255,0,.08),transparent 28%),radial-gradient(circle at 92% 0,rgba(218,0,22,.12),transparent 27%),#050505;color:#f5f5f5;font-family:Arial,Helvetica,sans-serif}
+    .hidden{display:none!important}
+
+    /* ── GATE ── */
+    .gate{min-height:100vh;display:grid;place-items:center;padding:24px}
+    .gate-card{width:100%;max-width:380px;border:1px solid rgba(255,255,255,.13);border-radius:24px;padding:36px 32px;background:rgba(16,16,16,.98);text-align:center}
+    .gate-logo{font:900 32px/1 Impact,"Arial Black",sans-serif;text-transform:uppercase;letter-spacing:.02em;margin-bottom:4px}
+    .gate-logo span{color:#80FF00}
+    .gate-sub{font:700 9px monospace;letter-spacing:.18em;text-transform:uppercase;color:#DA0016;margin-bottom:28px;display:block}
+    .gate-copy{color:rgba(255,255,255,.4);font-size:13px;line-height:1.5;margin-bottom:28px}
+    .pin-box{position:relative;cursor:text}
+    .pin-dots{display:flex;justify-content:center;gap:16px;margin:0 0 6px}
+    .pin-dots span{width:18px;height:18px;border:2px solid rgba(255,255,255,.22);border-radius:50%;background:rgba(255,255,255,.04);transition:all .12s}
+    .pin-dots span.on{border-color:#80FF00;background:#80FF00;box-shadow:0 0 16px rgba(128,255,0,.4)}
+    #pinInput{position:absolute;inset:0;width:100%;height:100%;opacity:.01;border:0;background:transparent;color:transparent;caret-color:transparent;font-size:16px}
+    .pin-hint{font:700 10px monospace;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:8px}
+    .pin-error{color:#ff5f6b;font:700 11px monospace;letter-spacing:.08em;text-transform:uppercase;min-height:20px;margin-top:12px}
+
+    /* ── DASHBOARD ── */
+    .dashboard{max-width:860px;margin:0 auto;padding:20px 16px 80px}
+    .top-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;background:rgba(18,18,18,.98);border:1px solid rgba(255,255,255,.1);border-radius:18px;margin-bottom:28px;flex-wrap:wrap}
+    .top-brand{font:900 22px/1 Impact,sans-serif;text-transform:uppercase}
+    .top-brand span{color:#80FF00}
+    .top-brand small{font:700 9px monospace;letter-spacing:.14em;text-transform:uppercase;color:#DA0016;display:block;margin-top:4px}
+    .top-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font:700 10px monospace;letter-spacing:.1em;text-transform:uppercase}
+    .pill.red{background:rgba(218,0,22,.16);border:1px solid rgba(218,0,22,.38);color:#ff7070}
+    .pill.lime{background:rgba(128,255,0,.1);border:1px solid rgba(128,255,0,.32);color:#80FF00}
+    .pill .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+    .pill.red .dot{background:#DA0016}
+    .pill.lime .dot{background:#80FF00}
+    .refresh-btn{min-height:32px;padding:0 14px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.05);color:rgba(255,255,255,.7);font:700 10px monospace;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .15s}
+    .refresh-btn:hover{border-color:rgba(128,255,0,.4);color:#80FF00}
+    .refresh-btn:disabled{opacity:.4;pointer-events:none}
+
+    /* ── SECTION ── */
+    .section{margin-bottom:36px}
+    .section-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .section-title{font:900 13px/1 Impact,sans-serif;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.85)}
+    .section-ct{padding:3px 10px;border-radius:999px;font:700 10px monospace;letter-spacing:.08em}
+    .section-ct.red{background:rgba(218,0,22,.2);color:#ff8888}
+    .section-ct.lime{background:rgba(128,255,0,.12);color:#80FF00}
+
+    /* ── CARDS ── */
+    .card-list{display:grid;gap:10px}
+    .card{border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:16px;background:rgba(20,20,20,.97);display:grid;gap:10px;transition:opacity .2s}
+    .card.acting{opacity:.4;pointer-events:none}
+    .card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+    .card-chips{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+    .chip{padding:3px 10px;border-radius:999px;font:700 9px monospace;letter-spacing:.1em;text-transform:uppercase}
+    .chip.parent{background:rgba(54,163,255,.16);border:1px solid rgba(54,163,255,.36);color:#5bb8ff}
+    .chip.student{background:rgba(128,255,0,.1);border:1px solid rgba(128,255,0,.3);color:#80FF00}
+    .chip.staff{background:rgba(218,0,22,.14);border:1px solid rgba(218,0,22,.35);color:#ff7070}
+    .chip.sport{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5)}
+    .handle{font:700 11px monospace;color:#80FF00;opacity:.9}
+    .ts{font:400 11px monospace;color:rgba(255,255,255,.28);white-space:nowrap}
+    .card-body{font-size:14px;line-height:1.55;color:rgba(255,255,255,.8);padding:10px 14px;background:rgba(0,0,0,.28);border-radius:12px;white-space:pre-wrap;word-break:break-word}
+    .card-actions{display:flex;gap:8px}
+    .btn-ok{flex:1;min-height:40px;border:1px solid rgba(128,255,0,.38);border-radius:999px;background:rgba(128,255,0,.12);color:#80FF00;font:900 10px monospace;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background .15s}
+    .btn-ok:hover{background:rgba(128,255,0,.22)}
+    .btn-no{flex:1;min-height:40px;border:1px solid rgba(218,0,22,.38);border-radius:999px;background:rgba(218,0,22,.1);color:#ff7070;font:900 10px monospace;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background .15s}
+    .btn-no:hover{background:rgba(218,0,22,.2)}
+
+    /* ── STATES ── */
+    .empty{text-align:center;padding:36px 20px;border:1px dashed rgba(255,255,255,.1);border-radius:16px;color:rgba(255,255,255,.28);font:700 10px monospace;letter-spacing:.12em;text-transform:uppercase}
+    .loading{text-align:center;padding:36px 20px;color:rgba(128,255,0,.55);font:700 10px monospace;letter-spacing:.14em;text-transform:uppercase;animation:blink 1.2s infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+
+    /* ── TOAST ── */
+    #toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(24,24,24,.97);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:11px 22px;font:700 11px monospace;letter-spacing:.1em;text-transform:uppercase;color:#80FF00;z-index:99;transition:transform .22s;pointer-events:none;white-space:nowrap}
+    #toast.show{transform:translateX(-50%) translateY(0)}
+    #toast.err{color:#ff7070;border-color:rgba(218,0,22,.4)}
+
+    /* ── NAV ── */
+    .back{display:inline-flex;align-items:center;gap:7px;color:rgba(255,255,255,.35);font:700 10px monospace;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;margin-bottom:18px}
+    .back:hover{color:rgba(255,255,255,.65)}
+  </style>
+</head>
+<body>
+
+<!-- ── PIN GATE ── -->
+<div id="gate" class="gate">
+  <div class="gate-card">
+    <div class="gate-logo">SLAM<span>!</span></div>
+    <span class="gate-sub">Admin · Review Queue</span>
+    <p class="gate-copy">Enter your admin PIN to review pending posts and questions.</p>
+    <div class="pin-box" id="pinBox">
+      <div class="pin-dots">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <input id="pinInput" type="tel" maxlength="4" autocomplete="off" inputmode="numeric">
+    </div>
+    <div class="pin-hint">4-digit PIN</div>
+    <div id="pinErr" class="pin-error"></div>
+  </div>
+</div>
+
+<!-- ── DASHBOARD ── -->
+<div id="dash" class="hidden">
+  <div class="dashboard">
+    <a href="slam.html" class="back">← Back to site</a>
+
+    <div class="top-bar">
+      <div class="top-brand">SLAM<span>!</span><small>Review Queue</small></div>
+      <div class="top-right">
+        <span class="pill red"><span class="dot"></span><span id="postCount">–</span> posts</span>
+        <span class="pill lime"><span class="dot"></span><span id="qCount">–</span> questions</span>
+        <button class="refresh-btn" id="refreshBtn" onclick="load()">↻ Refresh</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <span class="section-title">Pending Posts</span>
+        <span class="section-ct red" id="postCt">–</span>
+      </div>
+      <div id="postList" class="card-list"><div class="loading">Loading…</div></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <span class="section-title">Questions to Review</span>
+        <span class="section-ct lime" id="qCt">–</span>
+      </div>
+      <div id="qList" class="card-list"><div class="loading">Loading…</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+var EP = 'https://script.google.com/macros/s/AKfycbxKWDLcTjDwwXb-rNq9LTpqQwmlGgvLHZf9kJKDG7DHqwNp6vjaXD8S4ccG_41CBMfk/exec';
+var TOKEN = '';
+var PIN_HASH = 1687348;
+
+function hashPin(p){return String(p).split('').reduce(function(t,c){return(t*31)+c.charCodeAt(0);},0);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fmt(ts){try{return ts?new Date(ts).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'';} catch(e){return '';}}
+function decr(id){var el=document.getElementById(id);if(el)el.textContent=Math.max(0,(parseInt(el.textContent)||1)-1);}
+
+// PIN
+var pinEl = document.getElementById('pinInput');
+document.getElementById('pinBox').addEventListener('click', function(){pinEl.focus();});
+document.getElementById('gate').addEventListener('click', function(){pinEl.focus();});
+pinEl.focus();
+pinEl.addEventListener('input', function(){
+  this.value = this.value.replace(/\D/g,'').slice(0,4);
+  var dots = document.querySelectorAll('.pin-dots span');
+  dots.forEach(function(d,i){d.classList.toggle('on', i < pinEl.value.length);});
+  if(this.value.length === 4){
+    if(hashPin(this.value) === PIN_HASH){
+      TOKEN = this.value;
+      document.getElementById('gate').classList.add('hidden');
+      document.getElementById('dash').classList.remove('hidden');
+      load();
+      setInterval(function(){if(!document.hidden)load();}, 60000);
+    } else {
+      document.getElementById('pinErr').textContent = 'Incorrect PIN — try again.';
+      var self = this;
+      setTimeout(function(){
+        self.value='';
+        dots.forEach(function(d){d.classList.remove('on');});
+        document.getElementById('pinErr').textContent='';
+        pinEl.focus();
+      }, 900);
+    }
+  }
+});
+
+// Load
+function load(){
+  var btn = document.getElementById('refreshBtn');
+  btn.disabled = true; btn.textContent = '↻ Loading…';
+  var url = EP + '?action=getPending&token=' + encodeURIComponent(TOKEN);
+  fetch(url)
+    .then(function(r){return r.json();})
+    .then(function(d){
+      btn.disabled=false; btn.textContent='↻ Refresh';
+      if(!d.ok){toast('Could not load: '+d.error, true); return;}
+      renderPosts(d.posts||[]);
+      renderQs(d.questions||[]);
+    })
+    .catch(function(){
+      btn.disabled=false; btn.textContent='↻ Refresh';
+      toast('Connection error — check Apps Script setup', true);
+    });
+}
+
+function renderPosts(posts){
+  var n = posts.length;
+  document.getElementById('postCount').textContent = n;
+  document.getElementById('postCt').textContent = n;
+  var el = document.getElementById('postList');
+  if(!n){el.innerHTML='<div class="empty">All clear — no pending posts 🎉</div>';return;}
+  el.innerHTML = posts.map(function(p){
+    var r = (p.Submitter||p.submitter||'');
+    var rc = ['Admin','Teacher','Coach'].indexOf(r)>=0?'staff':r==='Parent'?'parent':'student';
+    var sport = p.Sport||p.sport||'';
+    var handle = p.Handle||p.handle||'';
+    return '<div class="card" id="p'+p.row+'">'+
+      '<div class="card-top">'+
+        '<div class="card-chips">'+
+          '<span class="chip '+rc+'">'+esc(r)+'</span>'+
+          (handle?'<span class="handle">'+esc(handle)+'</span>':'')+
+          (sport?'<span class="chip sport">'+esc(sport)+'</span>':'')+
+        '</div>'+
+        '<span class="ts">'+fmt(p.Timestamp||p.timestamp)+'</span>'+
+      '</div>'+
+      '<div class="card-body">'+esc(p.Body||p.body||'(no content)')+'</div>'+
+      '<div class="card-actions">'+
+        '<button class="btn-ok" onclick="act(\'p\','+p.row+',\'approve\')">✓ Approve</button>'+
+        '<button class="btn-no" onclick="act(\'p\','+p.row+',\'reject\')">✕ Reject</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function renderQs(qs){
+  var n = qs.length;
+  document.getElementById('qCount').textContent = n;
+  document.getElementById('qCt').textContent = n;
+  var el = document.getElementById('qList');
+  if(!n){el.innerHTML='<div class="empty">No questions to review</div>';return;}
+  el.innerHTML = qs.map(function(q){
+    var name = q.Name||q.name||q.Handle||q.handle||'Anonymous';
+    var email = q.Email||q.email||'';
+    var body = q.Question||q.question||q.Body||q.body||'(no content)';
+    return '<div class="card" id="q'+q.row+'">'+
+      '<div class="card-top">'+
+        '<div class="card-chips">'+
+          '<span class="chip parent">'+esc(name)+'</span>'+
+          (email?'<span class="handle">'+esc(email)+'</span>':'')+
+        '</div>'+
+        '<span class="ts">'+fmt(q.Timestamp||q.timestamp)+'</span>'+
+      '</div>'+
+      '<div class="card-body">'+esc(body)+'</div>'+
+      '<div class="card-actions">'+
+        '<button class="btn-no" onclick="act(\'q\','+q.row+',\'dismiss\')">✕ Dismiss</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function act(prefix, row, action){
+  var card = document.getElementById(prefix+row);
+  if(card) card.classList.add('acting');
+  var type = prefix==='q'?'question':'post';
+  var url = EP+'?action='+action+'&type='+type+'&row='+row+'&token='+encodeURIComponent(TOKEN);
+  fetch(url)
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.ok){
+        if(card) card.remove();
+        var msg = action==='approve'?'Post approved ✓':action==='reject'?'Post rejected':'Dismissed';
+        toast(msg);
+        decr(prefix==='q'?'qCount':'postCount');
+        decr(prefix==='q'?'qCt':'postCt');
+      } else {
+        if(card) card.classList.remove('acting');
+        toast('Error: '+(d.error||'unknown'), true);
+      }
+    })
+    .catch(function(){
+      if(card) card.classList.remove('acting');
+      toast('Failed — check connection', true);
+    });
+}
+
+function toast(msg, err){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = err?'err show':'show';
+  clearTimeout(t._t);
+  t._t = setTimeout(function(){t.classList.remove('show');}, 2600);
+}
+</script>
+</body>
+</html>
