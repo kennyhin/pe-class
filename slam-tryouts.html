@@ -152,7 +152,7 @@
       });
     })();
 
-    var ENDPOINT = 'https://script.google.com/a/macros/slamnv.org/s/AKfycbyBz-QJipBIJoyGG3z4Sk01jQc8zjttT5DXh4mdaojogXjrFGAtvJBJWUV10HuPnAiB/exec';
+    var ENDPOINT = 'https://athletic-director-hub.vercel.app/api/tryouts';
     var SIZES = ['YXS','YS','YM','YL','YXL','Adult XS','Adult S','Adult M','Adult L','Adult XL','Adult XXL','Adult XXXL'];
     var SPORTS = {
       fall: {
@@ -325,16 +325,22 @@
     function back(){ saveInputs(); if (step > 0) { step--; render(); } }
     function submit(){
       $('nextBtn').disabled = true; $('status').textContent = 'Submitting...';
-      var fd = new FormData();
-      fd.append('action','tryout');
-      Object.keys(data).forEach(function(k){ fd.append(k, data[k] === true ? 'yes' : data[k]); });
-      fd.append('ua', navigator.userAgent);
-      fetch(ENDPOINT, { method:'POST', body:fd, mode:'no-cors' }).then(function(){
+      var payload = {};
+      Object.keys(data).forEach(function(k){ payload[k] = data[k]; });
+      payload.ua = navigator.userAgent;
+      fetch(ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(function(res){
+        return res.json().then(function(body){ return { ok: res.ok, body: body }; });
+      }).then(function(result){
+        if (!result.ok || !result.body.ok) throw new Error((result.body && result.body.error) || 'Submission failed');
         $('question').textContent = 'You are signed up';
         $('content').innerHTML = '<div class="choice active"><b>Tryout form sent</b><span>We will follow up using the email you provided.</span></div>';
         $('nextBtn').classList.add('hidden'); $('backBtn').classList.add('hidden'); $('status').textContent = '';
-      }).catch(function(){
-        $('status').textContent = 'Could not submit. Please try again.';
+      }).catch(function(err){
+        $('status').textContent = err && err.message ? err.message : 'Could not submit. Please try again.';
         $('nextBtn').disabled = false;
       });
     }
