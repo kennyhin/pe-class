@@ -999,6 +999,12 @@ textarea {
 .cal-cell.empty { visibility: hidden; }
 .cal-cell.has-event { color: var(--slam-white); font-weight: 700; }
 .cal-cell.has-event:hover { background: var(--slam-coal); cursor: pointer; }
+.cal-cell.has-range {
+  background: rgba(218,0,22,0.22);
+  color: var(--slam-white);
+}
+.cal-cell.has-range:hover { background: rgba(218,0,22,0.32); }
+.cal-cell.has-range.today { background: var(--slam-red); }
 .cal-cell.today {
   background: var(--slam-red);
   color: var(--slam-white);

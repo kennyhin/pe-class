@@ -671,6 +671,32 @@ function eventDateKey(event) {
   return String(event?.date || "").slice(0, 10);
 }
 
+function eventEndDateKey(event) {
+  const end = String(event?.endDate || "").slice(0, 10);
+  return end || eventDateKey(event);
+}
+
+function eventIsMultiDay(event) {
+  const end = eventEndDateKey(event);
+  const start = eventDateKey(event);
+  return !!end && !!start && end !== start;
+}
+
+function eventCoversDate(event, dateKey) {
+  const start = eventDateKey(event);
+  const end = eventEndDateKey(event);
+  if (!start) return false;
+  return dateKey >= start && dateKey <= end;
+}
+
+function formatEventDateRange(event) {
+  const start = eventDateKey(event);
+  const end = eventEndDateKey(event);
+  if (!start) return "";
+  if (!eventIsMultiDay(event)) return formatEventDate(start);
+  return `${formatEventDate(start)} – ${formatEventDate(end)}`;
+}
+
 function addDaysToKey(dateKey, days) {
   const date = new Date(`${dateKey}T00:00:00`);
   if (Number.isNaN(date.getTime())) return dateKey;
@@ -685,39 +711,6 @@ function addDaysToKey(dateKey, days) {
 function eventType(event) {
   const type = String(event?.type || "event").toLowerCase().trim();
   return type === "games" ? "game" : type;
-}
-
-function getEventSport(event) {
-  const text = `${event?.sport || ""} ${event?.title || ""}`.toLowerCase();
-  if (text.includes("basketball") || text.includes("hoops")) return "basketball";
-  if (text.includes("soccer") || text.includes("futsal")) return "soccer";
-  if (text.includes("track")) return "track";
-  if (text.includes("cross country") || text.includes("xc")) return "cross-country";
-  if (text.includes("cheer")) return "cheer";
-  if (text.includes("volleyball")) return "volleyball";
-  if (text.includes("t-ball") || text.includes("tball") || text.includes("baseball")) return "baseball";
-  if (text.includes("softball")) return "softball";
-  if (text.includes("football") || text.includes("flag")) return "football";
-  if (text.includes("tennis")) return "tennis";
-  if (text.includes("swim")) return "swim";
-  return "other";
-}
-
-function sportLabel(sport) {
-  return {
-    basketball: "Basketball",
-    soccer: "Soccer",
-    track: "Track and Field",
-    "cross-country": "Cross Country",
-    cheer: "Cheer",
-    baseball: "Baseball",
-    softball: "Softball",
-    football: "Football",
-    volleyball: "Volleyball",
-    tennis: "Tennis",
-    swim: "Swim",
-    other: "Other",
-  }[sport] || sport;
 }
 
 function sortEventsByDate(a, b) {
@@ -978,10 +971,13 @@ function EventDetailModal({ event, onClose }) {
         <div className={`event-detail-type tag-${type}`}>{type}</div>
         <h2 className="event-detail-title">{event.title}</h2>
         <div className="event-detail-rows">
-          {event.time && (
+          {(event.time || eventIsMultiDay(event)) && (
             <div className="event-detail-row">
               <span className="event-detail-label">When</span>
-              <span>{event.time}</span>
+              <span>
+                {eventIsMultiDay(event) ? formatEventDateRange(event) : event.time}
+                {eventIsMultiDay(event) && event.time ? ` · ${event.time}` : ""}
+              </span>
             </div>
           )}
           {hasLocation && (
@@ -1025,7 +1021,6 @@ function Calendar({ events, loading }) {
   const [viewMonth, setViewMonth] = useState(actualMonth);
   const [selectedDate, setSelectedDate] = useState(todayStr);
   const [upcomingType, setUpcomingType] = useState("all");
-  const [gameSport, setGameSport] = useState("all");
   const [detailEvent, setDetailEvent] = useState(null);
   const monthLabel = new Date(viewYear, viewMonth, 1).toLocaleString("default", { month: "long", year: "numeric" });
   const next3DaysStr = addDaysToKey(todayStr, 3);
@@ -1046,41 +1041,43 @@ function Calendar({ events, loading }) {
   for (let i = 0; i < firstDayOfWeek; i++) cells.push(null);
   for (let d = 1; d <= daysInMonth; d++) cells.push(d);
 
-  // Which days this month have events?
+  // Which days this month have events? Multi-day events (e.g. a tryout
+  // window spanning Aug 1-18) mark every day they cover, not just the start.
   const monthPrefix = `${viewYear}-${String(viewMonth + 1).padStart(2, "0")}`;
-  const eventDays = events
-    .filter((e) => eventDateKey(e).startsWith(monthPrefix))
-    .map((e) => parseInt(eventDateKey(e).slice(8, 10), 10))
-    .filter((n) => !isNaN(n));
+  const monthDayKeys = [];
+  for (let d = 1; d <= daysInMonth; d++) {
+    monthDayKeys.push(`${monthPrefix}-${String(d).padStart(2, "0")}`);
+  }
+  const dayEventInfo = {};
+  events.forEach((e) => {
+    const start = eventDateKey(e);
+    if (!start) return;
+    const end = eventEndDateKey(e);
+    const isRange = eventIsMultiDay(e);
+    monthDayKeys.forEach((dayKey) => {
+      if (dayKey < start || dayKey > end) return;
+      const info = dayEventInfo[dayKey] || { hasEvent: false, hasRange: false };
+      info.hasEvent = true;
+      if (isRange) info.hasRange = true;
+      dayEventInfo[dayKey] = info;
+    });
+  });
 
   const selectedEvents = events
-    .filter((e) => eventDateKey(e) === selectedDate)
+    .filter((e) => eventCoversDate(e, selectedDate))
     .sort((a, b) => String(a.time || "").localeCompare(String(b.time || "")));
 
   const upcomingEvents = events
     .filter((e) => {
-      const dateKey = eventDateKey(e);
-      return dateKey >= todayStr && dateKey <= next3DaysStr;
+      const start = eventDateKey(e);
+      const end = eventEndDateKey(e);
+      return end >= todayStr && start <= next3DaysStr;
     })
     .sort(sortEventsByDate);
 
   const visibleUpcoming = upcomingType === "all"
     ? upcomingEvents
     : upcomingEvents.filter((e) => eventType(e) === upcomingType);
-
-  const futureGames = events
-    .filter((e) => eventType(e) === "game" && eventDateKey(e) >= todayStr)
-    .sort(sortEventsByDate);
-
-  const gameSports = Array.from(new Set(futureGames.map(getEventSport)))
-    .filter(Boolean)
-    .sort((a, b) => sportLabel(a).localeCompare(sportLabel(b)));
-
-  const visibleGames = gameSport === "all"
-    ? futureGames
-    : futureGames.filter((e) => getEventSport(e) === gameSport);
-
-  const gamesNextWeek = futureGames.filter((e) => eventDateKey(e) <= next3DaysStr).length;
 
   function renderFilterButton(group, value, label, active, onClick) {
     return (
@@ -1105,6 +1102,7 @@ function Calendar({ events, loading }) {
       ? "TBD"
       : date.toLocaleDateString("default", { weekday: "short" }).toUpperCase();
     const hasDetail = (e.notes && e.notes.trim()) || (e.opponent && e.opponent.trim());
+    const isRange = eventIsMultiDay(e);
     return (
       <button
         key={`${mode}-${dateKey}-${i}`}
@@ -1118,7 +1116,9 @@ function Calendar({ events, loading }) {
         </span>
         <span className="cal-month-copy">
           <span className="cal-month-title">{getEventIcon(e)} {e.title}</span>
-          <span className="cal-month-meta">{type} · {e.time || "Time TBA"}</span>
+          <span className="cal-month-meta">
+            {isRange ? formatEventDateRange(e) : type} · {e.time || "Time TBA"}
+          </span>
         </span>
         {hasDetail && <span className="cal-month-info-badge" aria-hidden="true">i</span>}
       </button>
@@ -1144,15 +1144,17 @@ function Calendar({ events, loading }) {
       <div className="cal-grid">
         {cells.map((d, i) => {
           if (d === null) return <span key={i} className="cal-cell empty" />;
-          const hasEvent = eventDays.includes(d);
-          const isToday = viewYear === actualYear && viewMonth === actualMonth && d === today;
           const dayKey = `${monthPrefix}-${String(d).padStart(2, "0")}`;
+          const info = dayEventInfo[dayKey] || {};
+          const hasEvent = !!info.hasEvent;
+          const hasRange = !!info.hasRange;
+          const isToday = viewYear === actualYear && viewMonth === actualMonth && d === today;
           const isSelected = selectedDate === dayKey;
           return (
             <button
               key={i}
               type="button"
-              className={`cal-cell${isToday ? " today" : ""}${hasEvent ? " has-event" : ""}${isSelected ? " selected" : ""}`}
+              className={`cal-cell${isToday ? " today" : ""}${hasEvent ? " has-event" : ""}${hasRange ? " has-range" : ""}${isSelected ? " selected" : ""}`}
               onClick={() => setSelectedDate(dayKey)}
               aria-pressed={isSelected}
               aria-label={`${formatEventDate(dayKey)}${hasEvent ? ", has events" : ""}`}
@@ -1212,31 +1214,8 @@ function Calendar({ events, loading }) {
         {loading ? (
           <LoadingState label="Loading events..." />
         ) : visibleUpcoming.length === 0 ? (
-          <div className="cal-empty">No matching events in the next 7 days.</div>
+          <div className="cal-empty">No matching events in the next 3 days.</div>
         ) : visibleUpcoming.map((e, i) => renderEventRow(e, i, "upcoming"))}
-      </div>
-
-      <div className="cal-games-list">
-        <div className="cal-section-head">
-          <div>
-            <div className="cal-upcoming-label">Games</div>
-          </div>
-          <div className="cal-filter" aria-label="Filter games by sport">
-            {renderFilterButton("games", "all", "All sports", gameSport === "all", () => setGameSport("all"))}
-            {gameSports.map((sport) => renderFilterButton(
-              "games",
-              sport,
-              sportLabel(sport),
-              gameSport === sport,
-              () => setGameSport(sport)
-            ))}
-          </div>
-        </div>
-        {loading ? (
-          <LoadingState label="Loading games..." />
-        ) : visibleGames.length === 0 ? (
-          <div className="cal-empty">No games match this sport yet.</div>
-        ) : visibleGames.map((e, i) => renderEventRow(e, i, "game"))}
       </div>
       {detailEvent && <EventDetailModal event={detailEvent} onClose={() => setDetailEvent(null)} />}
     </div>

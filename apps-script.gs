@@ -365,11 +365,19 @@ function _events(ss) {
         var calEvents = calendar.getEvents(start, end);
         calEvents.forEach(function (ce) {
           var startTime = ce.getStartTime();
+          var endTime = ce.getEndTime();
+          var isAllDay = ce.isAllDayEvent();
           var title = ce.getTitle().trim();
           var location = (ce.getLocation() || '').trim();
           var description = (ce.getDescription() || '').trim();
           var dateKey = _dateKey(startTime);
-          var timeStr = ce.isAllDayEvent()
+          // All-day events store an exclusive end date (day after the last day);
+          // shift back one day so a 3-day event reports its real last day.
+          var endDateKey = isAllDay
+            ? _dateKey(new Date(endTime.getTime() - 24 * 60 * 60 * 1000))
+            : _dateKey(endTime);
+          if (endDateKey < dateKey) endDateKey = dateKey;
+          var timeStr = isAllDay
             ? ''
             : Utilities.formatDate(startTime, Session.getScriptTimeZone(), 'h:mm a');
           var type = _parseCalendarEventType(title, description);
@@ -381,6 +389,7 @@ function _events(ss) {
           seenKeys[dedupeKey] = true;
           events.push({
             date: dateKey,
+            endDate: endDateKey,
             type: type,
             sport: sport,
             title: title,
