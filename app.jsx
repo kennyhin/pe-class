@@ -1016,28 +1016,38 @@ function EventDetailModal({ event, onClose }) {
 }
 
 function Calendar({ events, loading }) {
-  // Show the current month, dynamically. Today is highlighted.
   const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth();
+  const actualYear = now.getFullYear();
+  const actualMonth = now.getMonth();
   const today = now.getDate();
-  const todayStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(today).padStart(2, "0")}`;
+  const todayStr = `${actualYear}-${String(actualMonth + 1).padStart(2, "0")}-${String(today).padStart(2, "0")}`;
+  const [viewYear, setViewYear] = useState(actualYear);
+  const [viewMonth, setViewMonth] = useState(actualMonth);
   const [selectedDate, setSelectedDate] = useState(todayStr);
   const [upcomingType, setUpcomingType] = useState("all");
   const [gameSport, setGameSport] = useState("all");
   const [detailEvent, setDetailEvent] = useState(null);
-  const monthLabel = now.toLocaleString("default", { month: "long", year: "numeric" });
+  const monthLabel = new Date(viewYear, viewMonth, 1).toLocaleString("default", { month: "long", year: "numeric" });
   const next3DaysStr = addDaysToKey(todayStr, 3);
 
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const firstDayOfWeek = new Date(year, month, 1).getDay();
+  function prevMonth() {
+    if (viewMonth === 0) { setViewYear((y) => y - 1); setViewMonth(11); }
+    else setViewMonth((m) => m - 1);
+  }
+  function nextMonth() {
+    if (viewMonth === 11) { setViewYear((y) => y + 1); setViewMonth(0); }
+    else setViewMonth((m) => m + 1);
+  }
+
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const firstDayOfWeek = new Date(viewYear, viewMonth, 1).getDay();
 
   const cells = [];
   for (let i = 0; i < firstDayOfWeek; i++) cells.push(null);
   for (let d = 1; d <= daysInMonth; d++) cells.push(d);
 
   // Which days this month have events?
-  const monthPrefix = `${year}-${String(month + 1).padStart(2, "0")}`;
+  const monthPrefix = `${viewYear}-${String(viewMonth + 1).padStart(2, "0")}`;
   const eventDays = events
     .filter((e) => eventDateKey(e).startsWith(monthPrefix))
     .map((e) => parseInt(eventDateKey(e).slice(8, 10), 10))
@@ -1119,7 +1129,11 @@ function Calendar({ events, loading }) {
     <div className="card cal">
       <div className="card-head">
         <span className="card-eyebrow">Calendar</span>
-        <span className="card-meta">{monthLabel}</span>
+        <div className="cal-month-nav">
+          <button type="button" className="cal-nav-btn" onClick={prevMonth} aria-label="Previous month">‹</button>
+          <span className="card-meta">{monthLabel}</span>
+          <button type="button" className="cal-nav-btn" onClick={nextMonth} aria-label="Next month">›</button>
+        </div>
       </div>
 
       <div className="cal-dow">
@@ -1131,7 +1145,7 @@ function Calendar({ events, loading }) {
         {cells.map((d, i) => {
           if (d === null) return <span key={i} className="cal-cell empty" />;
           const hasEvent = eventDays.includes(d);
-          const isToday = d === today;
+          const isToday = viewYear === actualYear && viewMonth === actualMonth && d === today;
           const dayKey = `${monthPrefix}-${String(d).padStart(2, "0")}`;
           const isSelected = selectedDate === dayKey;
           return (

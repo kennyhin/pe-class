@@ -30,6 +30,11 @@ var FAQ_SHEET_NAME = 'FAQ';
 var QUESTIONS_SHEET_NAME = 'Questions';
 var ADMIN_POST_PIN = '7171';
 
+// ---- GOOGLE CALENDAR SYNC -------------------------------------------------
+// Paste your Google Calendar ID here to pull events directly from it.
+// Find it in Google Calendar → Settings → your calendar → "Calendar ID"
+var CALENDAR_ID = 'c_3489039be6a588592d8e24c7633e17d52c5dca4072458d649da3c3a5e4cd9a84@group.calendar.google.com';
+
 // ---- NOTIFICATIONS --------------------------------------------------------
 // Set this to your email address to receive alerts for new signups,
 // questions, and posts. Leave empty ('') to disable notifications.
@@ -346,61 +351,123 @@ function _spreadsheet() {
 }
 
 function _events(ss) {
+  var events = [];
+  var seenKeys = {};
+
+  // 1. Pull from Google Calendar (primary source)
+  if (CALENDAR_ID) {
+    try {
+      var calendar = CalendarApp.getCalendarById(CALENDAR_ID);
+      if (calendar) {
+        var now = new Date();
+        var start = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+        var end = new Date(now.getFullYear(), now.getMonth() + 7, 0);
+        var calEvents = calendar.getEvents(start, end);
+        calEvents.forEach(function (ce) {
+          var startTime = ce.getStartTime();
+          var title = ce.getTitle().trim();
+          var location = (ce.getLocation() || '').trim();
+          var description = (ce.getDescription() || '').trim();
+          var dateKey = _dateKey(startTime);
+          var timeStr = ce.isAllDayEvent()
+            ? ''
+            : Utilities.formatDate(startTime, Session.getScriptTimeZone(), 'h:mm a');
+          var type = _parseCalendarEventType(title, description);
+          var sport = _guessSportFromText(title + ' ' + description);
+          var opponent = '';
+          var vsMatch = title.match(/\bvs\.?\s+(.+)$/i);
+          if (vsMatch) opponent = vsMatch[1].trim();
+          var dedupeKey = dateKey + '|' + title.toLowerCase();
+          seenKeys[dedupeKey] = true;
+          events.push({
+            date: dateKey,
+            type: type,
+            sport: sport,
+            title: title,
+            time: location && timeStr ? timeStr + ' · ' + location : timeStr,
+            location: location,
+            opponent: opponent,
+            notes: description
+          });
+        });
+      }
+    } catch (calErr) {
+      Logger.log('Google Calendar sync error: ' + String(calErr));
+    }
+  }
+
+  // 2. Merge in Events sheet rows (manual additions not already in Google Calendar)
   _ensureEventsSheet(ss);
   var sheet = ss.getSheetByName(EVENTS_SHEET_NAME);
   var rows = _rows(ss, EVENTS_SHEET_NAME);
 
-  // Read rich text + formulas for Notes column so hyperlinks are preserved.
-  // Covers both =HYPERLINK("url","label") formulas and Insert > Link style cells.
   var notesCol = _headerColumn(sheet, 'Notes');
   var richNotes = {};
   if (notesCol && sheet.getLastRow() >= 2) {
     var numRows = sheet.getLastRow() - 1;
     var notesRange = sheet.getRange(2, notesCol, numRows, 1);
-
-    // 1. Check for =HYPERLINK() formulas first
     var formulas = notesRange.getFormulas();
     formulas.forEach(function (cell, i) {
       var formula = cell[0];
       if (!formula) return;
       var match = formula.match(/=HYPERLINK\s*\(\s*"([^"]+)"\s*[,;]\s*"([^"]+)"\s*\)/i);
-      if (match) {
-        richNotes[i + 2] = '[' + match[2] + '](' + match[1] + ')';
-      }
+      if (match) richNotes[i + 2] = '[' + match[2] + '](' + match[1] + ')';
     });
-
-    // 2. Check for Insert > Link style rich text hyperlinks
     var richValues = notesRange.getRichTextValues();
     richValues.forEach(function (cell, i) {
-      if (richNotes[i + 2]) return; // already captured from formula
+      if (richNotes[i + 2]) return;
       var rt = cell[0];
       var url = rt.getLinkUrl();
       var text = rt.getText().trim();
-      if (url && text) {
-        richNotes[i + 2] = '[' + text + '](' + url + ')';
-      } else if (url) {
-        richNotes[i + 2] = url;
-      }
+      if (url && text) richNotes[i + 2] = '[' + text + '](' + url + ')';
+      else if (url) richNotes[i + 2] = url;
     });
   }
 
-  return rows.map(function (row) {
+  rows.forEach(function (row) {
+    var title = String(row.title || '').trim();
+    var dateKey = _dateKey(row.date);
+    if (!dateKey || !title) return;
+    var dedupeKey = dateKey + '|' + title.toLowerCase();
+    if (seenKeys[dedupeKey]) return;
     var time = String(row.time || '').trim();
     var location = String(row.location || '').trim();
     var notes = richNotes[row._rowNumber] || String(row.notes || '').trim();
-    return {
-      date: _dateKey(row.date),
+    events.push({
+      date: dateKey,
       type: String(row.type || 'event').trim(),
       sport: String(row.sport || '').trim(),
-      title: String(row.title || '').trim(),
+      title: title,
       time: location && time.indexOf(location) === -1 ? time + ' · ' + location : time,
       location: location,
       opponent: String(row.opponent || '').trim(),
       notes: notes
-    };
-  }).filter(function (event) {
-    return event.date && event.title;
+    });
   });
+
+  return events.filter(function (e) { return e.date && e.title; });
+}
+
+function _guessSportFromText(text) {
+  var lower = String(text || '').toLowerCase();
+  if (lower.indexOf('basketball') !== -1) return 'Basketball';
+  if (lower.indexOf('soccer') !== -1) return 'Soccer';
+  if (lower.indexOf('flag football') !== -1 || lower.indexOf('football') !== -1) return 'Flag Football';
+  if (lower.indexOf('volleyball') !== -1) return 'Volleyball';
+  if (lower.indexOf('baseball') !== -1) return 'Baseball';
+  if (lower.indexOf('softball') !== -1) return 'Softball';
+  if (lower.indexOf('track') !== -1) return 'Track and Field';
+  if (lower.indexOf('cross country') !== -1) return 'Cross Country';
+  if (lower.indexOf('cheer') !== -1) return 'Cheer';
+  if (lower.indexOf('tennis') !== -1) return 'Tennis';
+  return 'Other';
+}
+
+function _parseCalendarEventType(title, description) {
+  var text = (String(title || '') + ' ' + String(description || '')).toLowerCase();
+  if (text.indexOf(' vs ') !== -1 || text.indexOf(' vs.') !== -1 || /\bgame\b/.test(text)) return 'game';
+  if (/\bpractice\b/.test(text) || /\bdrill\b/.test(text) || /\bworkout\b/.test(text)) return 'practice';
+  return 'event';
 }
 
 function _ensureEventsSheet(ss) {
