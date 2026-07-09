@@ -401,9 +401,32 @@ function ShortcutInfo({ item }) {
   }
   if (item.key === "sports") {
     const seasons = [
-      ["Fall", "Flag Football, Girls Volleyball, Cross Country, Cheer, Baseball"],
-      ["Winter", "Basketball, Bowling, Cheer, Baseball"],
-      ["Spring", "Soccer, Boys Volleyball, Cheer Competitions, Track & Field"],
+      ["Fall", [
+        "Elementary Recreational Flag Football (1-3)",
+        "Elementary Flag Football (3-5)",
+        "Elementary Girls Competitive Volleyball (3-5)",
+        "Elementary Girls Recreational Volleyball (3-5)",
+        "Elementary Cross Country (3-4)",
+        "Elementary T-Ball (K-1)",
+        "Elementary Coach Pitch Baseball (2-3)",
+        "Elementary Cheer",
+      ]],
+      ["Winter", [
+        "Elementary Bowling (3-5)",
+        "Elementary Comp Boys Basketball (4-5)",
+        "Elementary Comp Girls Basketball (4-5)",
+        "Elementary Recreational Basketball (K-1)",
+        "Elementary Recreational Basketball (2-3)",
+        "Elementary Kids Pitch Baseball (4-5)",
+      ]],
+      ["Spring", [
+        "Elementary Boys Volleyball (4-5)",
+        "Elementary Comp Boys Soccer (4-5)",
+        "Elementary Comp Girls Soccer (4-5)",
+        "Elementary Recreational Soccer (2-3)",
+        "Elementary Recreational Soccer (K-1)",
+        "Elementary Track (4-5)",
+      ]],
     ];
     return (
       <div className="shortcut-info">
@@ -411,10 +434,12 @@ function ShortcutInfo({ item }) {
         <h2>Elementary athletics</h2>
         <p>SLAM! Athletics offers seasonal sports for elementary students. Final divisions depend on league offerings, coach availability, and student interest.</p>
         <div className="season-list">
-          {seasons.map(([season, copy]) => (
+          {seasons.map(([season, sports]) => (
             <article key={season}>
               <span>{season}</span>
-              <strong>{copy}</strong>
+              <ul className="season-sports">
+                {sports.map((sport) => <li key={sport}>{sport}</li>)}
+              </ul>
             </article>
           ))}
         </div>

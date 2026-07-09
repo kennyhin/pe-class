@@ -474,6 +474,30 @@ textarea {
   font-size: 14px;
   line-height: 1.35;
 }
+.season-sports {
+  display: grid;
+  gap: 6px;
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.season-sports li {
+  position: relative;
+  padding-left: 14px;
+  color: var(--fg);
+  font-size: 14px;
+  line-height: 1.35;
+}
+.season-sports li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--slam-lime);
+}
 
 .commitment-card {
   margin-top: 20px;
