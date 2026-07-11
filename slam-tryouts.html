@@ -199,6 +199,19 @@
     // TryoutWizard.tsx) exactly — the admin tryout list matches on this string to
     // show a "pick their teacher" dropdown once the family finds out.
     var UNKNOWN_TEACHER = "Don't know yet";
+    // TEACHERS_BY_GRADE above is only the offline/error fallback now — the live
+    // source of truth is AthleticsOS's Teacher table, edited from
+    // /admin/tryouts/teachers there. Fetched in the background so it doesn't
+    // block the form; by the time someone reaches this question (question 5)
+    // it's almost always already resolved.
+    fetch('https://athletic-director-hub.vercel.app/api/teachers')
+      .then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(json){
+        if (!json || typeof json !== 'object' || !Object.keys(json).length) return;
+        TEACHERS_BY_GRADE = json;
+        if (steps[step] === 'homeroomTeacher') render();
+      })
+      .catch(function(){ /* keep the hardcoded fallback above */ });
     var WAIVER = [
       ['Liability waiver and release','Participation in SLAM! Athletics tryouts and programs is voluntary and involves physical activity and inherent risks, including injury. I release and hold harmless SLAM Nevada Elementary School, SLAM! Athletics, staff, coaches, volunteers, and affiliated organizations from claims or damages arising out of participation.'],
       ['Assumption of risk','I understand athletic activities carry inherent risks including sprains, fractures, concussions, illness, and other harm. SLAM! Athletics makes no guarantee regarding placement on any team or roster.'],
