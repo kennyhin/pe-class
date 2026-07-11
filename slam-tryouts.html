@@ -187,6 +187,18 @@
         ]
       }
     };
+    // SPORTS above is only the offline/error fallback now — the live source of
+    // truth is AthleticsOS's season/sport/division config, edited from the
+    // tryout config admin pages there (Sports & Divisions). Fetched in the
+    // background on load, same pattern as the teacher list below.
+    fetch('https://athletic-director-hub.vercel.app/api/sports')
+      .then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(json){
+        if (!json || typeof json !== 'object' || !Object.keys(json).length) return;
+        SPORTS = json;
+        if (['season','sport','division','grade'].indexOf(steps[step]) !== -1) render();
+      })
+      .catch(function(){ /* keep the hardcoded fallback above */ });
     var TEACHERS_BY_GRADE = {
       'K': ['Molanari','Gray','Rollans','Vela'],
       '1': ['Luangrath','Weber','Buckhanan','Harris'],
