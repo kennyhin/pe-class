@@ -43,7 +43,7 @@
     <div id="faq" class="faq"><div class="loading"><span class="spinner"></span>Loading answers...</div></div>
   </main>
   <script>
-    var endpoint = 'https://script.google.com/macros/s/AKfycbxKWDLcTjDwwXb-rNq9LTpqQwmlGgvLHZf9kJKDG7DHqwNp6vjaXD8S4ccG_41CBMfk/exec';
+    var endpoint = 'https://athletic-director-hub.vercel.app/api/site-faq';
     var groups = [
       { label:'Registration', terms:['register','rma','athlete','form','paperwork'] },
       { label:'Tryouts', terms:['tryout','roster','team','selection'] },
@@ -89,7 +89,7 @@
       var cached = JSON.parse(localStorage.getItem('slam_content_cache') || 'null');
       if (cached && Array.isArray(cached.faq)) render(cached.faq);
     } catch(e) {}
-    fetch(endpoint + '?action=all&t=' + Date.now())
+    fetch(endpoint)
       .then(function(r){ return r.json(); })
       .then(function(data){
         var faq = Array.isArray(data.faq) ? data.faq : [];

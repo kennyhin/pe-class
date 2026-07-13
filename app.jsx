@@ -3,6 +3,8 @@
 
 const { useState, useEffect } = React;
 
+const API_BASE = "https://athletic-director-hub.vercel.app";
+
 // ---------------------------------------------------------------------------
 // Inline icons (don't use lucide.createIcons — it mutates DOM nodes React
 // owns, which breaks reconciliation on the next state change).
@@ -193,10 +195,9 @@ function HeroBackground({ variant }) {
 }
 
 // ---------------------------------------------------------------------------
-// Signup form — POSTs to a Google Apps Script Web App URL.
-// Falls back to localStorage when no endpoint is configured.
+// Signup form — POSTs to AthleticsOS. Always mirrors to localStorage too.
 // ---------------------------------------------------------------------------
-function SignupForm({ endpoint, accent }) {
+function SignupForm({ accent }) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState({ kind: "idle", msg: "" });
 
@@ -210,7 +211,7 @@ function SignupForm({ endpoint, accent }) {
 
     setStatus({ kind: "sending", msg: "Sending…" });
 
-    // Always mirror to localStorage so the data isn't lost if the endpoint is down
+    // Always mirror to localStorage so the data isn't lost if the request fails
     try {
       const key = "slam_signups";
       const prev = JSON.parse(localStorage.getItem(key) || "[]");
@@ -220,29 +221,20 @@ function SignupForm({ endpoint, accent }) {
       }
     } catch (_) {}
 
-    if (!endpoint) {
-      setStatus({
-        kind: "success",
-        msg: "Saved locally — add endpoint in Tweaks to ship to the sheet.",
-      });
-      setEmail("");
-      return;
-    }
-
     try {
-      const fd = new FormData();
-      fd.append("email", cleaned);
-      fd.append("source", "landing");
-      fd.append("ua", navigator.userAgent);
-      // Apps Script web apps don't set CORS headers — use no-cors and assume
-      // success on resolution. (Errors only fire on network failure.)
-      await fetch(endpoint, { method: "POST", body: fd, mode: "no-cors" });
+      const res = await fetch(`${API_BASE}/api/site-signups`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: cleaned, source: "landing" }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data?.ok) throw new Error(data?.error || "request failed");
       setStatus({ kind: "success", msg: "You're in. We'll be in touch." });
       setEmail("");
     } catch (err) {
       setStatus({
         kind: "error",
-        msg: "Couldn't reach the endpoint — saved locally.",
+        msg: "Couldn't reach the server — saved locally.",
       });
     }
   }
@@ -458,7 +450,7 @@ function ShortcutInfo({ item }) {
   );
 }
 
-function Hero({ bg, endpoint }) {
+function Hero({ bg }) {
   const [shortcutModal, setShortcutModal] = useState(null);
 
   function openShortcut(event, item) {
@@ -482,7 +474,7 @@ function Hero({ bg, endpoint }) {
         />
 
         <div className="signup-wrap-center">
-          <SignupForm endpoint={endpoint} accent="red" />
+          <SignupForm accent="red" />
         </div>
 
         <p className="hero-desc">
@@ -568,49 +560,9 @@ function Footer() {
 
 // ---------------------------------------------------------------------------
 // "What's happening" — calendar · feed · Q&A
-// Content comes from the Apps Script endpoint (Posts/Events/FAQ sheet tabs);
-// these arrays are fallbacks shown before the fetch completes or if it fails.
+// Content comes from the AthleticsOS API (/api/site-posts, /api/site-events,
+// /api/site-faq).
 // ---------------------------------------------------------------------------
-
-const DEFAULT_EVENTS = [
-  { date: "2026-05-27", type: "practice", sport: "Basketball", title: "Basketball · Grades 3-5", time: "5:30 PM · Gym B" },
-  { date: "2026-05-29", type: "game", sport: "Soccer", title: "Soccer Friday Night Lights", time: "6:00 PM · East Field" },
-  { date: "2026-06-02", type: "practice", sport: "Baseball", title: "T-Ball · Grades K-2", time: "4:30 PM · Field 1" },
-  { date: "2026-06-05", type: "event", sport: "Other", title: "Family BBQ + Skills Day", time: "11:00 AM · Park Pavilion" },
-  { date: "2026-06-10", type: "game", sport: "Basketball", title: "Championship — Spring League", time: "7:00 PM · Center Court" },
-  { date: "2026-06-14", type: "event", sport: "Other", title: "Summer Camp Kickoff", time: "9:00 AM · Main Gym" },
-];
-
-const DEFAULT_POSTS = [
-  {
-    date: "2026-05-24",
-    sport: "Basketball",
-    name: "Coach Marcus",
-    handle: "@coachmarc",
-    body: "Practice moved indoors tonight — field's a mud pit. Gym B, same time. Bring water bottles.",
-  },
-  {
-    date: "2026-05-23",
-    sport: "Soccer",
-    name: "SLAM! Athletics",
-    handle: "@slamES",
-    body: "Spring league finals THIS Saturday. 4 fields, 8 games, 100+ kids. Come loud.",
-  },
-  {
-    date: "2026-05-22",
-    sport: "Basketball",
-    name: "Coach Riley",
-    handle: "@rileyhoops",
-    body: "Mason hit his first three-pointer in a game today. The bench EXPLODED. This is why we coach.",
-  },
-  {
-    date: "2026-05-20",
-    sport: "Other",
-    name: "SLAM! Athletics",
-    handle: "@slamES",
-    body: "Summer camp registration opens Monday at 9AM. K-5, 8 weeks, every kid plays every game.",
-  },
-];
 
 const SPORT_OPTIONS = [
   "Basketball",
@@ -656,14 +608,6 @@ const POST_NAME_OPTIONS = [
   "SLAM! ES Baseball",
   "Teacher",
   "Admin",
-];
-
-const DEFAULT_FAQ = [
-  { q: "What ages do you serve?", a: "Kindergarten through 5th grade (ages 5-11). Programs are split by age band so kids play with peers their own size and skill level.", link: "" },
-  { q: "How much does it cost?", a: "Most seasons run $240 for 8 weeks (1 practice + 1 game per week). Scholarships available — just ask." },
-  { q: "Are coaches certified?", a: "Every coach is CPR + first-aid certified, background-checked, and trained on our developmental model." },
-  { q: "What if my kid has never played before?", a: "Perfect. That's exactly who we built this for. Every program starts with fundamentals — running, throwing, catching, sportsmanship. No experience required." },
-  { q: "Can I get a refund if my kid hates it?", a: "Yes. Full refund within the first 2 weeks, no questions asked." },
 ];
 
 function getEventIcon(event) {
@@ -911,10 +855,8 @@ function LoadingState({ label = "Loading..." }) {
   );
 }
 
-// Pulls all three content arrays from the Apps Script endpoint on mount.
-// Keep the sheet-backed sections empty while loading so old fallback content
-// does not flash before the live sheet response arrives.
-function useContent(endpoint) {
+// Pulls posts/events/faq from AthleticsOS on mount.
+function useContent() {
   const [content, setContent] = useState({
     posts: [],
     events: [],
@@ -924,17 +866,6 @@ function useContent(endpoint) {
   });
 
   useEffect(() => {
-    if (!endpoint) {
-      setContent({
-        posts: DEFAULT_POSTS,
-        events: DEFAULT_EVENTS,
-        faq: DEFAULT_FAQ,
-        loaded: true,
-        error: false,
-      });
-      return;
-    }
-
     let cancelled = false;
     const cacheKey = "slam_content_cache";
     try {
@@ -947,21 +878,20 @@ function useContent(endpoint) {
     } catch (_) {
       setContent({ posts: [], events: [], faq: [], loaded: false, error: false });
     }
-    fetch(`${endpoint}?action=all&t=${Date.now()}`)
-      .then((r) => r.json())
-      .then((data) => {
+    Promise.all([
+      fetch(`${API_BASE}/api/site-posts`).then((r) => r.json()),
+      fetch(`${API_BASE}/api/site-events`).then((r) => r.json()),
+      fetch(`${API_BASE}/api/site-faq`).then((r) => r.json()),
+    ])
+      .then(([postsData, eventsData, faqData]) => {
         if (cancelled) return;
         const next = {
-          posts: Array.isArray(data.posts) ? data.posts : [],
-          events: Array.isArray(data.events) ? data.events : [],
-          faq: Array.isArray(data.faq) ? data.faq : [],
+          posts: Array.isArray(postsData.posts) ? postsData.posts : [],
+          events: Array.isArray(eventsData.events) ? eventsData.events : [],
+          faq: Array.isArray(faqData.faq) ? faqData.faq : [],
         };
         try { localStorage.setItem(cacheKey, JSON.stringify(next)); } catch (_) {}
-        setContent({
-          ...next,
-          loaded: true,
-          error: data.ok === false,
-        });
+        setContent({ ...next, loaded: true, error: false });
       })
       .catch(() => {
         if (!cancelled) {
@@ -969,7 +899,7 @@ function useContent(endpoint) {
         }
       });
     return () => { cancelled = true; };
-  }, [endpoint]);
+  }, []);
 
   return content;
 }
@@ -1276,7 +1206,7 @@ function readPhotoAsPostImage(file) {
   });
 }
 
-function DesktopPostModal({ endpoint, onClose }) {
+function DesktopPostModal({ onClose }) {
   const [role, setRole] = useState("");
   const [pin, setPin] = useState("");
   const [unlocked, setUnlocked] = useState(false);
@@ -1357,25 +1287,25 @@ function DesktopPostModal({ endpoint, onClose }) {
     }
     setSubmitting(true);
     setStatus(needsReview ? "Sending for review..." : "Posting update...");
-    const fd = new FormData();
-    fd.append("action", "post");
-    fd.append("pin", isStaff ? pin : "");
-    fd.append("submitter", role);
-    fd.append("name", visibleTitle);
-    fd.append("grade", role === "Student" ? grade : "");
-    fd.append("badgeColor", isStaff ? badgeColor : "");
-    fd.append("sport", sport);
-    fd.append("handle", `@${cleanHandle}`);
-    fd.append("body", body.trim());
-    fd.append("link", link.trim());
-    fd.append("image", "");
-    fd.append("imageData", imageData);
-    fd.append("imageName", imageName);
-    fd.append("imageType", imageType);
-    fd.append("ua", navigator.userAgent);
     try {
-      await fetch(endpoint, { method: "POST", body: fd, mode: "no-cors" });
-      setStatus(needsReview ? "Sent for review." : "Post sent. It may take a moment to appear.");
+      const res = await fetch(`${API_BASE}/api/site-posts`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: visibleTitle,
+          handle: `@${cleanHandle}`,
+          body: body.trim(),
+          link: link.trim(),
+          sport,
+          grade: role === "Student" ? grade : "",
+          badgeColor: isStaff ? badgeColor : "",
+          submitterRole: role,
+          pin: isStaff ? pin : "",
+        }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data?.ok) throw new Error(data?.error || "request failed");
+      setStatus(data.needsReview ? "Sent for review." : "Post sent. It may take a moment to appear.");
       setTimeout(onClose, 1200);
     } catch (_) {
       setSubmitting(false);
@@ -1493,6 +1423,7 @@ function DesktopPostModal({ endpoint, onClose }) {
                     <label>Add photo<input type="file" accept="image/*" onChange={handlePhoto} /></label>
                     <label>Take photo<input type="file" accept="image/*" capture="environment" onChange={handlePhoto} /></label>
                   </div>
+                  <p className="native-review-note">Photos preview here but aren&rsquo;t published yet — coming soon.</p>
                 </div>
 
                 <aside className="native-preview">
@@ -1525,7 +1456,7 @@ function DesktopPostModal({ endpoint, onClose }) {
 }
 
 // --- Updates feed (Twitter/X style) ---
-function Feed({ posts, loading, endpoint }) {
+function Feed({ posts, loading }) {
   const sortedPosts = [...posts].sort(sortPostsByDate);
   const [reactionBumps, setReactionBumps] = useState({});
   const [reacted, setReacted] = useState(reactedPostIds);
@@ -1551,16 +1482,16 @@ function Feed({ posts, loading, endpoint }) {
         ...(previous !== reaction && { [reaction]: (current[postId]?.[reaction] || 0) + 1 }),
       },
     }));
-    if (!endpoint) return;
-    const body = new FormData();
-    body.append("action", "react");
-    body.append("postId", postId);
-    body.append("reaction", reaction);
-    body.append("mode", previous === reaction ? "remove" : "add");
-    body.append("previousReaction", previous);
-    body.append("voterKey", reactionDeviceKey());
-    body.append("ua", navigator.userAgent);
-    fetch(endpoint, { method: "POST", body, mode: "no-cors" }).catch(() => {});
+    fetch(`${API_BASE}/api/site-reactions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        postId,
+        reaction,
+        mode: previous === reaction ? "remove" : "add",
+        voterKey: reactionDeviceKey(),
+      }),
+    }).catch(() => {});
   }
 
   return (
@@ -1650,7 +1581,7 @@ function Feed({ posts, loading, endpoint }) {
         Post
       </a>
       {showPostModal && ReactDOM.createPortal(
-        <DesktopPostModal endpoint={endpoint} onClose={() => setShowPostModal(false)} />,
+        <DesktopPostModal onClose={() => setShowPostModal(false)} />,
         document.body
       )}
     </div>
@@ -1700,7 +1631,7 @@ function findFaqMatches(question, faq) {
     .slice(0, maxMatches);
 }
 
-function AskQuestionForm({ endpoint, faq }) {
+function AskQuestionForm({ faq }) {
   const [form, setForm] = useState({ email: "", question: "" });
   const [status, setStatus] = useState({ kind: "idle", msg: "" });
   const matches = findFaqMatches(form.question, faq);
@@ -1737,24 +1668,18 @@ function AskQuestionForm({ endpoint, faq }) {
       localStorage.setItem(key, JSON.stringify(prev.slice(-50)));
     } catch (_) {}
 
-    if (!endpoint) {
-      setStatus({ kind: "success", msg: "Saved locally for now." });
-      setForm({ email: "", question: "" });
-      return;
-    }
-
     try {
-      const fd = new FormData();
-      fd.append("action", "question");
-      fd.append("name", "");
-      fd.append("email", email);
-      fd.append("question", question);
-      fd.append("ua", navigator.userAgent);
-      await fetch(endpoint, { method: "POST", body: fd, mode: "no-cors" });
+      const res = await fetch(`${API_BASE}/api/site-questions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, question }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data?.ok) throw new Error(data?.error || "request failed");
       setStatus({ kind: "success", msg: "Question sent. We will follow up soon." });
       setForm({ email: "", question: "" });
     } catch (_) {
-      setStatus({ kind: "error", msg: "Could not reach the sheet. Saved locally." });
+      setStatus({ kind: "error", msg: "Could not reach the server. Saved locally." });
     }
   }
 
@@ -1804,7 +1729,7 @@ function AskQuestionForm({ endpoint, faq }) {
   );
 }
 
-function QA({ faq, endpoint, loading }) {
+function QA({ faq, loading }) {
   const [open, setOpen] = useState(-1);
   const visibleFaq = faq.slice(0, 3);
   return (
@@ -1842,26 +1767,8 @@ function QA({ faq, endpoint, loading }) {
           );
         })}
       </div>
-      <AskQuestionForm endpoint={endpoint} faq={faq} />
+      <AskQuestionForm faq={faq} />
     </div>
-  );
-}
-
-function WhatsHappening({ endpoint }) {
-  const { posts, events, faq, loaded } = useContent(endpoint);
-  const loading = !loaded;
-  return (
-    <section className="happening" data-screen-label="02 Happening">
-      <div className="happening-head">
-        <h2 className="happening-title">What<span className="display-apostrophe">’</span>s happening</h2>
-        <p className="happening-sub">Schedules · Feed · Answers</p>
-      </div>
-      <div className="happening-grid">
-        <Feed posts={posts} loading={loading} endpoint={endpoint} />
-        <Calendar events={events} loading={loading} />
-        <QA faq={faq} endpoint={endpoint} loading={loading} />
-      </div>
-    </section>
   );
 }
 
@@ -1897,17 +1804,17 @@ function BullsCommitmentCard() {
   );
 }
 
-function HomeLayout({ endpoint, heroBg }) {
-  const { posts, events, faq, loaded } = useContent(endpoint);
+function HomeLayout({ heroBg }) {
+  const { posts, events, faq, loaded } = useContent();
   const loading = !loaded;
   return (
     <div className="home-layout">
       <main className="main-scroll">
-        <Hero bg={heroBg} endpoint={endpoint} />
+        <Hero bg={heroBg} />
         <BullsCommitmentCard />
         <section className="support-grid" aria-label="Calendar and questions">
           <Calendar events={events} loading={loading} />
-          <QA faq={faq} endpoint={endpoint} loading={loading} />
+          <QA faq={faq} loading={loading} />
         </section>
       </main>
 
@@ -1915,15 +1822,14 @@ function HomeLayout({ endpoint, heroBg }) {
         <div className="feed-rail-head">
           <h2 className="feed-rail-title">What<span className="display-apostrophe">’</span>s happening</h2>
         </div>
-        <Feed posts={posts} loading={loading} endpoint={endpoint} />
+        <Feed posts={posts} loading={loading} />
       </aside>
     </div>
   );
 }
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
-  "heroBg": "pattern",
-  "signupEndpoint": "https://script.google.com/macros/s/AKfycbxKWDLcTjDwwXb-rNq9LTpqQwmlGgvLHZf9kJKDG7DHqwNp6vjaXD8S4ccG_41CBMfk/exec"
+  "heroBg": "pattern"
 }/*EDITMODE-END*/;
 
 function App() {
@@ -1931,7 +1837,7 @@ function App() {
 
   return (
     <div className="page">
-      <HomeLayout endpoint={t.signupEndpoint} heroBg={t.heroBg} />
+      <HomeLayout heroBg={t.heroBg} />
 
       <TweaksPanel title="Tweaks">
         <TweakSection label="Hero background" />
@@ -1942,13 +1848,7 @@ function App() {
           onChange={(v) => setTweak("heroBg", v)}
         />
 
-        <TweakSection label="Email backend" />
-        <TweakText
-          label="Apps Script URL"
-          value={t.signupEndpoint}
-          placeholder="https://script.google.com/.../exec"
-          onChange={(v) => setTweak("signupEndpoint", v)}
-        />
+        <TweakSection label="Local backups" />
         <TweakButton
           label="View local backup"
           onClick={() => {

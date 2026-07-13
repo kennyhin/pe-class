@@ -236,6 +236,7 @@
                 <label class="photo-btn">Choose photo<input id="photo" type="file" accept="image/*"></label>
                 <label class="photo-btn">Take photo<input id="camera" type="file" accept="image/*" capture="environment"></label>
               </div>
+              <p style="margin:0; color:#8d8d8d; font-size:12px; line-height:1.4;">Photos preview here but aren't published yet — coming soon.</p>
             </div>
 
             <aside class="preview-card">
@@ -273,7 +274,7 @@
     document.querySelectorAll('[data-style-link]').forEach(function(link) {
       link.classList.toggle('active', link.getAttribute('data-style-link') === STYLE_MODE);
     });
-    var ENDPOINT = 'https://script.google.com/macros/s/AKfycbxKWDLcTjDwwXb-rNq9LTpqQwmlGgvLHZf9kJKDG7DHqwNp6vjaXD8S4ccG_41CBMfk/exec';
+    var ENDPOINT = 'https://athletic-director-hub.vercel.app/api/site-posts';
     var sports = ['Basketball','Soccer','Track and Field','Cross Country','Cheer','Volleyball','Flag Football','Baseball','Softball','Tennis','Other'];
     var grades = ['Kindergarten','1st Grade','2nd Grade','3rd Grade','4th Grade','5th Grade'];
     var sportIcons = { Basketball:'🏀', Soccer:'⚽', 'Track and Field':'🏃', 'Cross Country':'🏃', Cheer:'📣', Volleyball:'🏐', 'Flag Football':'🏈', Baseball:'⚾', Softball:'🥎', Tennis:'🎾', Other:'⭐' };
@@ -463,32 +464,35 @@
       $('submit').disabled = true;
       $('status').classList.remove('error');
       $('status').textContent = isStaff(selectedRole) ? 'Posting update...' : 'Sending for review...';
-      var fd = new FormData();
-      fd.append('action', 'post');
-      fd.append('pin', enteredPin);
-      fd.append('submitter', selectedRole);
-      fd.append('name', title || selectedRole);
-      fd.append('grade', selectedRole === 'Student' ? $('grade').value : '');
-      fd.append('badgeColor', isStaff(selectedRole) ? badgeColor : '');
-      fd.append('sport', $('sport').value);
-      fd.append('handle', '@' + $('handle').value.trim().replace(/^@+/, ''));
-      fd.append('body', $('body').value.trim());
-      fd.append('link', $('link').value.trim());
-      fd.append('image', '');
-      fd.append('imageData', imageData);
-      fd.append('imageName', imageName);
-      fd.append('imageType', imageType);
-      fd.append('ua', navigator.userAgent);
-      fetch(ENDPOINT, { method:'POST', body:fd, mode:'no-cors' }).then(function() {
-        $('status').textContent = isStaff(selectedRole)
-          ? 'Post sent. It may take a moment to appear in the feed.'
-          : 'Post sent for review. Thank you for sharing!';
-        setTimeout(function(){ location.href = 'slam.html'; }, 1400);
-      }).catch(function() {
-        $('submit').disabled = false;
-        $('status').classList.add('error');
-        $('status').textContent = 'Could not submit. Check connection and try again.';
-      });
+      var payload = {
+        pin: enteredPin,
+        submitterRole: selectedRole,
+        name: title || selectedRole,
+        grade: selectedRole === 'Student' ? $('grade').value : '',
+        badgeColor: isStaff(selectedRole) ? badgeColor : '',
+        sport: $('sport').value,
+        handle: '@' + $('handle').value.trim().replace(/^@+/, ''),
+        body: $('body').value.trim(),
+        link: $('link').value.trim()
+      };
+      fetch(ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(function(r) { return r.json().then(function(data) { return { ok: r.ok, data: data }; }); })
+        .then(function(result) {
+          if (!result.ok || !result.data || !result.data.ok) {
+            throw new Error((result.data && result.data.error) || 'request failed');
+          }
+          $('status').textContent = result.data.needsReview
+            ? 'Post sent for review. Thank you for sharing!'
+            : 'Post sent. It may take a moment to appear in the feed.';
+          setTimeout(function(){ location.href = 'slam.html'; }, 1400);
+        }).catch(function() {
+          $('submit').disabled = false;
+          $('status').classList.add('error');
+          $('status').textContent = 'Could not submit. Check connection and try again.';
+        });
     });
   </script>
 </body>
