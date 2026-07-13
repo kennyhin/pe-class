@@ -5,6 +5,27 @@ const { useState, useEffect } = React;
 
 const API_BASE = "https://athletic-director-hub.vercel.app";
 
+// Editable page copy from AthleticsOS (/api/site-content). Fetched once and shared
+// via context; every consumer falls back to its own hardcoded text until (or if)
+// the fetch resolves, so the homepage never depends on the network to render.
+const SiteContentContext = React.createContext({});
+function useSiteContentValue() {
+  const [content, setContent] = useState({});
+  useEffect(() => {
+    let cancelled = false;
+    fetch(API_BASE + "/api/site-content")
+      .then((r) => r.json())
+      .then((data) => { if (!cancelled && data && typeof data === "object") setContent(data); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+  return content;
+}
+function useSC(key) {
+  const content = React.useContext(SiteContentContext);
+  return (content && content[key]) || {};
+}
+
 // ---------------------------------------------------------------------------
 // Inline icons (don't use lucide.createIcons — it mutates DOM nodes React
 // owns, which breaks reconciliation on the next state change).
@@ -377,23 +398,45 @@ function ShortcutModal({ item, onClose }) {
   );
 }
 
+function renderShortcutLinks(section, fallback) {
+  const links = Array.isArray(section.links) && section.links.length ? section.links : fallback;
+  return links.map((l, i) => {
+    const ext = /^https?:\/\//i.test(l.url);
+    return (
+      <a key={i} href={l.url} target={ext ? "_blank" : undefined} rel={ext ? "noopener" : undefined}>
+        {l.label}
+      </a>
+    );
+  });
+}
+
 function ShortcutInfo({ item }) {
+  // All hooks unconditionally at the top (the branches below early-return).
+  const physicals = useSC("home.physicals");
+  const sportsIntro = useSC("home.sports.intro");
+  const fall = useSC("home.sports.fall");
+  const winter = useSC("home.sports.winter");
+  const spring = useSC("home.sports.spring");
+  const coach = useSC("home.coach");
+
   if (item.key === "physicals") {
     return (
       <div className="shortcut-info">
-        <div className="shortcut-kicker">Sports Physicals</div>
-        <h2>Clear before tryouts</h2>
-        <p>Sports physicals should be uploaded to Register My Athlete. Please do not turn physicals in to teachers, office admin, or athletic directors.</p>
+        <div className="shortcut-kicker">{physicals.eyebrow || "Sports Physicals"}</div>
+        <h2>{physicals.title || "Clear before tryouts"}</h2>
+        <p>{physicals.body || "Sports physicals should be uploaded to Register My Athlete. Please do not turn physicals in to teachers, office admin, or athletic directors."}</p>
         <div className="shortcut-actions">
-          <a href="https://www.ncsaasports.com/physicals.html" target="_blank" rel="noopener">Physical form</a>
-          <a href="https://www.cvs.com/minuteclinic/services/sports-physicals" target="_blank" rel="noopener">Schedule physical</a>
+          {renderShortcutLinks(physicals, [
+            { label: "Physical form", url: "https://www.ncsaasports.com/physicals.html" },
+            { label: "Schedule physical", url: "https://www.cvs.com/minuteclinic/services/sports-physicals" },
+          ])}
         </div>
       </div>
     );
   }
   if (item.key === "sports") {
     const seasons = [
-      ["Fall", [
+      [fall.title || "Fall", (Array.isArray(fall.bullets) && fall.bullets.length) ? fall.bullets : [
         "Elementary Recreational Flag Football (1-3)",
         "Elementary Flag Football (3-5)",
         "Elementary Girls Competitive Volleyball (3-5)",
@@ -403,7 +446,7 @@ function ShortcutInfo({ item }) {
         "Elementary Coach Pitch Baseball (2-3)",
         "Elementary Cheer",
       ]],
-      ["Winter", [
+      [winter.title || "Winter", (Array.isArray(winter.bullets) && winter.bullets.length) ? winter.bullets : [
         "Elementary Bowling (3-5)",
         "Elementary Comp Boys Basketball (4-5)",
         "Elementary Comp Girls Basketball (4-5)",
@@ -411,7 +454,7 @@ function ShortcutInfo({ item }) {
         "Elementary Recreational Basketball (2-3)",
         "Elementary Kids Pitch Baseball (4-5)",
       ]],
-      ["Spring", [
+      [spring.title || "Spring", (Array.isArray(spring.bullets) && spring.bullets.length) ? spring.bullets : [
         "Elementary Boys Volleyball (4-5)",
         "Elementary Comp Boys Soccer (4-5)",
         "Elementary Comp Girls Soccer (4-5)",
@@ -422,9 +465,9 @@ function ShortcutInfo({ item }) {
     ];
     return (
       <div className="shortcut-info">
-        <div className="shortcut-kicker">Sports Offered</div>
-        <h2>Elementary athletics</h2>
-        <p>SLAM! Athletics offers seasonal sports for elementary students. Final divisions depend on league offerings, coach availability, and student interest.</p>
+        <div className="shortcut-kicker">{sportsIntro.eyebrow || "Sports Offered"}</div>
+        <h2>{sportsIntro.title || "Elementary athletics"}</h2>
+        <p>{sportsIntro.body || "SLAM! Athletics offers seasonal sports for elementary students. Final divisions depend on league offerings, coach availability, and student interest."}</p>
         <div className="season-list">
           {seasons.map(([season, sports]) => (
             <article key={season}>
@@ -440,11 +483,11 @@ function ShortcutInfo({ item }) {
   }
   return (
     <div className="shortcut-info">
-      <div className="shortcut-kicker">Coach for SLAM!</div>
-      <h2>Lead the next team</h2>
-      <p>Interested coaches can help build a positive, organized, student-first athletics experience. Reach out to SLAM! Athletics with the sport, season, and grade level you can support.</p>
+      <div className="shortcut-kicker">{coach.eyebrow || "Coach for SLAM!"}</div>
+      <h2>{coach.title || "Lead the next team"}</h2>
+      <p>{coach.body || "Interested coaches can help build a positive, organized, student-first athletics experience. Reach out to SLAM! Athletics with the sport, season, and grade level you can support."}</p>
       <div className="shortcut-actions">
-        <a href="mailto:kenny.hin@slamnv.org">Email athletics</a>
+        {renderShortcutLinks(coach, [{ label: "Email athletics", url: "mailto:kenny.hin@slamnv.org" }])}
       </div>
     </div>
   );
@@ -452,6 +495,7 @@ function ShortcutInfo({ item }) {
 
 function Hero({ bg }) {
   const [shortcutModal, setShortcutModal] = useState(null);
+  const heroSC = useSC("home.hero");
 
   function openShortcut(event, item) {
     const smallScreen = window.matchMedia("(max-width: 760px)").matches;
@@ -478,8 +522,8 @@ function Hero({ bg }) {
         </div>
 
         <p className="hero-desc">
-          Sign up for our newsletter — schedules, sign-ups, and updates
-          on upcoming events, sent straight to your inbox.
+          {heroSC.body ||
+            "Sign up for our newsletter — schedules, sign-ups, and updates on upcoming events, sent straight to your inbox."}
         </p>
 
         <div className="hero-shortcuts" aria-label="Quick links">
@@ -1773,7 +1817,8 @@ function QA({ faq, loading }) {
 }
 
 function BullsCommitmentCard() {
-  const commitments = [
+  const sc = useSC("home.commitment");
+  const commitments = (Array.isArray(sc.bullets) && sc.bullets.length) ? sc.bullets : [
     "Respect all people at all times.",
     "Work hard and sacrifice personal glory for the team.",
     "Represent SLAM Academy with pride, honor, and integrity.",
@@ -1788,8 +1833,8 @@ function BullsCommitmentCard() {
   return (
     <section className="commitment-card" id="commitment">
       <div className="commitment-title-row">
-        <h2 className="commitment-title">Bulls Commitment</h2>
-        <span className="commitment-promise">I promise to</span>
+        <h2 className="commitment-title">{sc.title || "Bulls Commitment"}</h2>
+        <span className="commitment-promise">{sc.subtitle || "I promise to"}</span>
       </div>
       <ol className="commitment-list">
         {commitments.map((item, i) => (
@@ -1799,7 +1844,7 @@ function BullsCommitmentCard() {
           </li>
         ))}
       </ol>
-      <div className="commitment-signoff">I agree to uphold these promises at all times.</div>
+      <div className="commitment-signoff">{sc.footer || "I agree to uphold these promises at all times."}</div>
     </section>
   );
 }
@@ -1834,8 +1879,10 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
 
 function App() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const siteContent = useSiteContentValue();
 
   return (
+    <SiteContentContext.Provider value={siteContent}>
     <div className="page">
       <HomeLayout heroBg={t.heroBg} />
 
@@ -1866,6 +1913,7 @@ function App() {
         </TweakButton>
       </TweaksPanel>
     </div>
+    </SiteContentContext.Provider>
   );
 }
 

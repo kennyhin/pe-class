@@ -73,53 +73,53 @@
         </div>
       </div>
       <section class="hero">
-        <div class="eyebrow">Athlete clearance board</div>
-        <div class="headline">Stay eligible to play</div>
-        <p class="lead">Athletics are a privilege. Students must be present, academically accountable, and in good standing to participate in practices, tryouts, games, races, and contests.</p>
+        <div class="eyebrow" data-sc-text="eligibility.hero.eyebrow">Athlete clearance board</div>
+        <div class="headline" data-sc-text="eligibility.hero.headline">Stay eligible to play</div>
+        <p class="lead" data-sc-text="eligibility.hero.lead">Athletics are a privilege. Students must be present, academically accountable, and in good standing to participate in practices, tryouts, games, races, and contests.</p>
       </section>
       <section class="field" aria-label="SLAM athletics eligibility policy">
         <div class="grid">
           <article class="card red">
-            <div class="tag">Game day rule</div>
-            <h2>Attend school that day</h2>
-            <p>Students must attend school on the day of an athletic practice or competition. A student who misses school may not participate in practice, tryouts, games, or races that same day.</p>
+            <div class="tag" data-sc-text="eligibility.card1.tag">Game day rule</div>
+            <h2 data-sc-text="eligibility.card1.title">Attend school that day</h2>
+            <p data-sc-text="eligibility.card1.body">Students must attend school on the day of an athletic practice or competition. A student who misses school may not participate in practice, tryouts, games, or races that same day.</p>
           </article>
           <article class="card">
-            <div class="tag">Appointments</div>
-            <h2>Check in or out</h2>
-            <p>For medical appointments or prearranged absences, students must check in or out through the front office. Any partial or full-day absence needs an excused parent note on file.</p>
+            <div class="tag" data-sc-text="eligibility.card2.tag">Appointments</div>
+            <h2 data-sc-text="eligibility.card2.title">Check in or out</h2>
+            <p data-sc-text="eligibility.card2.body">For medical appointments or prearranged absences, students must check in or out through the front office. Any partial or full-day absence needs an excused parent note on file.</p>
           </article>
           <article class="card red">
-            <div class="tag">Red flag</div>
-            <h2>Chronic absence</h2>
-            <p>Students who are chronically absent are ineligible for athletics. Attendance matters before the season and during the season.</p>
+            <div class="tag" data-sc-text="eligibility.card3.tag">Red flag</div>
+            <h2 data-sc-text="eligibility.card3.title">Chronic absence</h2>
+            <p data-sc-text="eligibility.card3.body">Students who are chronically absent are ineligible for athletics. Attendance matters before the season and during the season.</p>
           </article>
           <article class="card green">
-            <div class="tag">Practice plan</div>
-            <h2>Practice attendance</h2>
-            <p>Consistent practice attendance is part of game eligibility. Each head coach sets the team practice attendance policy and will work with students involved in other school activities when possible.</p>
+            <div class="tag" data-sc-text="eligibility.card4.tag">Practice plan</div>
+            <h2 data-sc-text="eligibility.card4.title">Practice attendance</h2>
+            <p data-sc-text="eligibility.card4.body">Consistent practice attendance is part of game eligibility. Each head coach sets the team practice attendance policy and will work with students involved in other school activities when possible.</p>
           </article>
           <article class="card full">
             <div class="decision">
               <div class="whistle">F</div>
               <div>
-                <div class="tag">Academic accountability</div>
-                <h2>Carry-over suspension policy</h2>
-                <p>A scholar-athlete who has an F in a core subject across two consecutive eligibility grade checks may receive a one-game suspension. If there are no games left that season, the suspension carries over to the next sport and must be served in the first eligible game.</p>
+                <div class="tag" data-sc-text="eligibility.card5.tag">Academic accountability</div>
+                <h2 data-sc-text="eligibility.card5.title">Carry-over suspension policy</h2>
+                <p data-sc-text="eligibility.card5.body">A scholar-athlete who has an F in a core subject across two consecutive eligibility grade checks may receive a one-game suspension. If there are no games left that season, the suspension carries over to the next sport and must be served in the first eligible game.</p>
               </div>
             </div>
           </article>
           <article class="card full">
-            <div class="tag">Final call</div>
-            <h2>Athletic director decision</h2>
-            <p>Students are expected to represent SLAM! with positive behavior, academic effort, and teamwork. Final eligibility and discipline decisions rest with the athletic director.</p>
+            <div class="tag" data-sc-text="eligibility.card6.tag">Final call</div>
+            <h2 data-sc-text="eligibility.card6.title">Athletic director decision</h2>
+            <p data-sc-text="eligibility.card6.body">Students are expected to represent SLAM! with positive behavior, academic effort, and teamwork. Final eligibility and discipline decisions rest with the athletic director.</p>
           </article>
         </div>
       </section>
       <div class="cta">
-        <a class="btn red" href="slam-register.html">Register for sports</a>
-        <a class="btn" href="slam-tryouts.html">Tryout form</a>
-        <span class="source">Based on SLAM! Nevada athletics policy</span>
+        <a class="btn red" href="slam-register.html" data-sc-link="eligibility.cta.0">Register for sports</a>
+        <a class="btn" href="slam-tryouts.html" data-sc-link="eligibility.cta.1">Tryout form</a>
+        <span class="source" data-sc-text="eligibility.cta.footer">Based on SLAM! Nevada athletics policy</span>
       </div>
       <div class="bottom-actions">
         <a class="back" href="slam.html">â Back to homepage</a>
@@ -139,6 +139,58 @@
           window.parent.postMessage({ type: "closeShortcutModal" }, "*");
         });
       });
+    })();
+  </script>
+  <!-- Live content from AthleticsOS. The hardcoded text above is the fallback if
+       this fetch fails, so the page never comes up blank. -->
+  <script>
+    (function () {
+      function esc(s) {
+        return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+        });
+      }
+      function fieldOf(content, path) {
+        var i = path.lastIndexOf(".");
+        var section = content[path.slice(0, i)];
+        return section ? section[path.slice(i + 1)] : undefined;
+      }
+      function apply(content) {
+        document.querySelectorAll("[data-sc-text]").forEach(function (el) {
+          var v = fieldOf(content, el.getAttribute("data-sc-text"));
+          if (v != null && v !== "") el.textContent = v;
+        });
+        document.querySelectorAll("[data-sc-bullets]").forEach(function (ul) {
+          var s = content[ul.getAttribute("data-sc-bullets")];
+          if (s && Array.isArray(s.bullets) && s.bullets.length) {
+            ul.innerHTML = s.bullets.map(function (b) { return "<li>" + esc(b) + "</li>"; }).join("");
+          }
+        });
+        document.querySelectorAll("[data-sc-links]").forEach(function (box) {
+          var s = content[box.getAttribute("data-sc-links")];
+          if (!s || !Array.isArray(s.links)) return;
+          var cls = box.getAttribute("data-sc-link-class") || "";
+          box.innerHTML = s.links.map(function (l) {
+            var ext = /^https?:\/\//i.test(l.url);
+            return '<a class="' + cls + '" href="' + esc(l.url) + '"' +
+              (ext ? ' target="_blank" rel="noopener"' : "") + ">" + esc(l.label) + "</a>";
+          }).join("");
+        });
+        document.querySelectorAll("[data-sc-link]").forEach(function (a) {
+          var path = a.getAttribute("data-sc-link");
+          var i = path.lastIndexOf(".");
+          var s = content[path.slice(0, i)];
+          var idx = parseInt(path.slice(i + 1), 10);
+          if (s && Array.isArray(s.links) && s.links[idx]) {
+            a.textContent = s.links[idx].label;
+            a.setAttribute("href", s.links[idx].url);
+          }
+        });
+      }
+      fetch("https://athletic-director-hub.vercel.app/api/site-content")
+        .then(function (r) { return r.json(); })
+        .then(apply)
+        .catch(function () {});
     })();
   </script>
 </body>
