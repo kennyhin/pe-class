@@ -236,7 +236,6 @@
                 <label class="photo-btn">Choose photo<input id="photo" type="file" accept="image/*"></label>
                 <label class="photo-btn">Take photo<input id="camera" type="file" accept="image/*" capture="environment"></label>
               </div>
-              <p style="margin:0; color:#8d8d8d; font-size:12px; line-height:1.4;">Photos preview here but aren't published yet — coming soon.</p>
             </div>
 
             <aside class="preview-card">
@@ -473,7 +472,8 @@
         sport: $('sport').value,
         handle: '@' + $('handle').value.trim().replace(/^@+/, ''),
         body: $('body').value.trim(),
-        link: $('link').value.trim()
+        link: $('link').value.trim(),
+        imageData: imageData
       };
       fetch(ENDPOINT, {
         method: 'POST',

@@ -1301,6 +1301,7 @@ function DesktopPostModal({ onClose }) {
           badgeColor: isStaff ? badgeColor : "",
           submitterRole: role,
           pin: isStaff ? pin : "",
+          imageData,
         }),
       });
       const data = await res.json().catch(() => null);
@@ -1423,7 +1424,6 @@ function DesktopPostModal({ onClose }) {
                     <label>Add photo<input type="file" accept="image/*" onChange={handlePhoto} /></label>
                     <label>Take photo<input type="file" accept="image/*" capture="environment" onChange={handlePhoto} /></label>
                   </div>
-                  <p className="native-review-note">Photos preview here but aren&rsquo;t published yet — coming soon.</p>
                 </div>
 
                 <aside className="native-preview">
