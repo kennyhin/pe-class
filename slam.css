@@ -3009,9 +3009,9 @@ textarea {
   }
   .feed-rail-title {
     margin: 0;
-    max-width: 280px;
+    max-width: 190px;
     font-family: var(--font-display);
-    font-size: clamp(32px, 2.7vw, 50px);
+    font-size: 28px;
     line-height: 0.9;
     letter-spacing: 0;
     text-transform: uppercase;
