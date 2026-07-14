@@ -2981,7 +2981,7 @@ textarea {
   .home-layout {
     height: 100vh;
     display: grid;
-    grid-template-columns: clamp(260px, 15vw, 340px) minmax(0, 1fr);
+    grid-template-columns: clamp(290px, 15vw, 340px) minmax(0, 1fr);
     background: var(--bg);
   }
   .feed-rail {
@@ -3082,10 +3082,18 @@ textarea {
   }
   .feed-rail .post-cta { font-size: 10px; }
   .feed-rail .post-reactions {
-    gap: 15px;
+    gap: 8px;
     margin-top: 6px;
   }
-  .feed-rail .reaction-btn { font-size: 10.5px; }
+  .feed-rail .reaction-btn {
+    min-width: 0;
+    gap: 4px;
+    font-size: 10.5px;
+  }
+  .feed-rail .reaction-btn svg {
+    width: 13px;
+    height: 13px;
+  }
   .main-scroll {
     grid-column: 2;
     grid-row: 1;
