@@ -759,7 +759,7 @@ function sortPostsByDate(a, b) {
     || String(b.name || "").localeCompare(String(a.name || ""));
 }
 
-function formatRelativePostTime(post) {
+function formatAbsolutePostDate(post) {
   const raw = post?.timestamp || post?.time || post?.date;
   if (!raw) return "";
   let date = raw instanceof Date ? raw : new Date(raw);
@@ -767,20 +767,7 @@ function formatRelativePostTime(post) {
     date = new Date(`${postDateKey(post)}T00:00:00`);
   }
   if (Number.isNaN(date.getTime())) return "";
-  const diffMs = Date.now() - date.getTime();
-  if (diffMs < 0) return "now";
-  const minutes = Math.max(1, Math.floor(diffMs / 60000));
-  if (minutes < 60) return `${minutes} ${minutes === 1 ? "minute" : "minutes"} ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours <= 5) return `${hours} ${hours === 1 ? "hour" : "hours"} ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) {
-    const count = Math.max(1, days);
-    return `${count} ${count === 1 ? "day" : "days"} ago`;
-  }
-  const weeks = Math.floor(days / 7);
-  const count = Math.max(1, weeks);
-  return `${count} ${count === 1 ? "week" : "weeks"} ago`;
+  return date.toLocaleDateString("default", { month: "short", day: "numeric" });
 }
 
 function linkifyText(text) {
@@ -1477,15 +1464,15 @@ function DesktopPostModal({ onClose }) {
                 <aside className="native-preview">
                   <div className="native-kicker">Live preview</div>
                   <article className="post native-preview-post">
+                    <span className="post-date">{new Date().toLocaleDateString("default", { month: "short", day: "numeric" })}</span>
                     <div className="post-avatar">{getEventIcon({ sport: previewSport, title: previewSport, type: "event" })}</div>
                     <div className="post-body">
                       <div className="post-meta">
                         <span className="post-name">{visibleTitle || "Post"}</span>
                         <span className={`post-badge ${isStaff ? `staff staff-${badgeColor}` : role === "Parent" ? "parent" : `student ${studentBadgeClass(grade)}`}`}>✓</span>
-                        <span className="post-handle">@{previewHandle}</span>
                         {role === "Student" && grade && <span className="post-grade">{grade}</span>}
-                        <span className="post-date">now</span>
                       </div>
+                      <span className="post-handle">@{previewHandle}</span>
                       <p className="post-text">{body.trim() || "Your update will preview here as you type."}</p>
                       {imageData && <img className="post-image" src={imageData} alt="" />}
                     </div>
@@ -1555,7 +1542,7 @@ function Feed({ posts, loading }) {
           <div className="cal-empty">No updates yet.</div>
         ) : sortedPosts.map((p, i) => {
           const icon = getEventIcon({ sport: p.sport, title: p.sport, type: "event" });
-          const dateLabel = formatRelativePostTime(p);
+          const dateLabel = formatAbsolutePostDate(p);
           const link = String(p.link || "").trim();
           const imageUrl = String(p.image || "").trim();
           const displayUrl = displayImageUrl(imageUrl);
@@ -1569,15 +1556,15 @@ function Feed({ posts, loading }) {
           };
           return (
             <article key={i} className="post">
+              {dateLabel && <span className="post-date">{dateLabel}</span>}
               <div className="post-avatar" aria-label={p.sport || "Update"}>{icon}</div>
               <div className="post-body">
                 <div className="post-meta">
                   <span className="post-name">{p.name}</span>
                   <span className={`post-badge ${badge.className}`} title={badge.title} aria-label={badge.title}>{badge.label}</span>
-                  <span className="post-handle">{p.handle}</span>
                   {p.grade && <span className="post-grade">{p.grade}</span>}
-                  {dateLabel && <span className="post-date">{dateLabel}</span>}
                 </div>
+                <span className="post-handle">{p.handle}</span>
                 <p className="post-text">{linkifyText(p.body)}</p>
                 {isImageUrl(imageUrl) && (
                   <a className="post-image-link" href={imageUrl} target="_blank" rel="noopener noreferrer" aria-label="Open update photo">
