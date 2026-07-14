@@ -24,10 +24,10 @@
     .hero { display:grid; grid-template-columns:minmax(0,1fr) 310px; gap:24px; padding:28px; border-bottom:1px solid rgba(255,255,255,.08); }
     .eyebrow { color:#80FF00; font:900 12px monospace; letter-spacing:.14em; text-transform:uppercase; margin-bottom:10px; }
     .headline { max-width:760px; font:64px/.88 Impact,"Arial Black",sans-serif; text-transform:uppercase; }
-    .lead { max-width:720px; margin:18px 0 0; color:#c9c9c9; font-size:18px; line-height:1.5; }
+    .lead { max-width:720px; margin:18px 0 0; color:#c9c9c9; font-size:18px; line-height:1.5; white-space:pre-line; }
     .coach-note { align-self:stretch; border:1px solid rgba(128,255,0,.2); border-radius:18px; padding:18px; background:rgba(128,255,0,.065); }
     .coach-note b { display:block; margin-bottom:8px; color:#fff; font:24px/.95 Impact,"Arial Black",sans-serif; text-transform:uppercase; }
-    .coach-note p { margin:0; color:#cfcfcf; line-height:1.45; }
+    .coach-note p { margin:0; color:#cfcfcf; line-height:1.45; white-space:pre-line; }
     .board { padding:28px; background:linear-gradient(160deg,rgba(255,255,255,.035),rgba(0,0,0,.2)); position:relative; }
     .board:before { content:""; position:absolute; inset:0; pointer-events:none; opacity:.18; background-image:linear-gradient(90deg,transparent 48%,rgba(255,255,255,.22) 49%,transparent 51%),linear-gradient(rgba(255,255,255,.16) 1px,transparent 1px); background-size:180px 100%,100% 72px; transform:skewX(-8deg); }
     .plays { position:relative; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; }
@@ -35,7 +35,7 @@
     .play-head { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
     .number { width:48px; height:48px; display:grid; place-items:center; border-radius:999px; background:rgba(218,0,22,.08); border:2px solid rgba(218,0,22,.68); color:#fff; font:900 22px Impact,"Arial Black",sans-serif; box-shadow:0 0 0 4px rgba(218,0,22,.08); }
     h2 { margin:0 0 10px; font:26px/.95 Impact,"Arial Black",sans-serif; text-transform:uppercase; }
-    .play p { margin:0; color:#d0d0d0; font-size:14px; line-height:1.45; }
+    .play p { margin:0; color:#d0d0d0; font-size:14px; line-height:1.45; white-space:pre-line; }
     .play ul { margin:12px 0 0; padding-left:18px; color:#d0d0d0; font-size:13px; line-height:1.45; }
     .play:nth-child(even) .number { background:rgba(128,255,0,.08); border-color:rgba(128,255,0,.62); color:#80FF00; box-shadow:0 0 0 4px rgba(128,255,0,.07); }
     .card-links { display:flex; flex-wrap:wrap; gap:8px; margin-top:auto; padding-top:16px; }
@@ -74,11 +74,11 @@
         <div>
           <div class="eyebrow" data-sc-text="register.hero.eyebrow">Parent playbook</div>
           <div class="headline" data-sc-text="register.hero.headline">Register for Sports in 4 Steps</div>
-          <p class="lead" data-sc-text="register.hero.lead">Use this like a pre-game checklist. Complete the paperwork first, then students can be cleared for tryouts, practices, and games.</p>
+          <p class="lead" data-sc-html="register.hero.lead">Use this like a pre-game checklist. Complete the paperwork first, then students can be cleared for tryouts, practices, and games.</p>
         </div>
         <aside class="coach-note">
           <b data-sc-text="register.coachNote.title">Coach's reminder</b>
-          <p data-sc-text="register.coachNote.body">Sports physicals should be uploaded to Register My Athlete. Please do not turn physicals in to teachers, office admin, or athletic directors.</p>
+          <p data-sc-html="register.coachNote.body">Sports physicals should be uploaded to Register My Athlete. Please do not turn physicals in to teachers, office admin, or athletic directors.</p>
         </aside>
       </section>
       <section class="board" aria-label="Register for sports four step playbook">
@@ -86,7 +86,7 @@
           <article class="play">
             <div class="play-head"><span class="number">1</span></div>
             <h2 data-sc-text="register.step1.title">Schedule Physical</h2>
-            <p data-sc-text="register.step1.body">All K-12 athletes must have a sports physical on file and uploaded to Register My Athlete to participate in tryouts, practices, and games.</p>
+            <p data-sc-html="register.step1.body">All K-12 athletes must have a sports physical on file and uploaded to Register My Athlete to participate in tryouts, practices, and games.</p>
             <div class="card-links" data-sc-links="register.step1" data-sc-link-class="card-link">
               <a class="card-link" href="https://www.ncsaasports.com/physicals.html" target="_blank" rel="noopener">Physical form</a>
               <a class="card-link" href="https://www.cvs.com/minuteclinic/services/sports-physicals" target="_blank" rel="noopener">Schedule physical</a>
@@ -95,7 +95,7 @@
           <article class="play">
             <div class="play-head"><span class="number">2</span></div>
             <h2 data-sc-text="register.step2.title">Register My Athlete</h2>
-            <p data-sc-text="register.step2.body">Create or update your Register My Athlete account before tryouts. Families may be prompted to pay a $25 fee for tryouts and participation.</p>
+            <p data-sc-html="register.step2.body">Create or update your Register My Athlete account before tryouts. Families may be prompted to pay a $25 fee for tryouts and participation.</p>
             <ul data-sc-bullets="register.step2">
               <li>K-5: choose Elementary grade bracket.</li>
               <li>6-8: choose Middle School.</li>
@@ -109,7 +109,7 @@
           <article class="play">
             <div class="play-head"><span class="number">3</span></div>
             <h2 data-sc-text="register.step3.title">National Sports ID</h2>
-            <p data-sc-text="register.step3.body">Elementary and middle school students complete National Sports ID. Families may need a birth certificate or passport, Infinite Campus screenshot, and clear student photo.</p>
+            <p data-sc-html="register.step3.body">Elementary and middle school students complete National Sports ID. Families may need a birth certificate or passport, Infinite Campus screenshot, and clear student photo.</p>
             <div class="card-links" data-sc-links="register.step3" data-sc-link-class="card-link">
               <a class="card-link" href="https://www.nationalsportsid.com/" target="_blank" rel="noopener">National Sports ID</a>
             </div>
@@ -117,7 +117,7 @@
           <article class="play">
             <div class="play-head"><span class="number">4</span></div>
             <h2 data-sc-text="register.step4.title">Pay Sports Fee</h2>
-            <p data-sc-text="register.step4.body">Most elementary and middle school athletes have a $150 team fee per athlete per season. Pay through Infinite Campus or at the front office only if the student makes the team.</p>
+            <p data-sc-html="register.step4.body">Most elementary and middle school athletes have a $150 team fee per athlete per season. Pay through Infinite Campus or at the front office only if the student makes the team.</p>
           </article>
           <div class="arrow a1">→</div>
           <div class="arrow a2">→</div>
@@ -162,6 +162,12 @@
         document.querySelectorAll("[data-sc-text]").forEach(function (el) {
           var v = fieldOf(content, el.getAttribute("data-sc-text"));
           if (v != null && v !== "") el.textContent = v;
+        });
+        // Body/lead fields only — already sanitized server-side to a tiny safe
+        // set (<strong>/<em>/<br>) so bold/italic from the editor renders here.
+        document.querySelectorAll("[data-sc-html]").forEach(function (el) {
+          var v = fieldOf(content, el.getAttribute("data-sc-html"));
+          if (v != null && v !== "") el.innerHTML = v;
         });
         document.querySelectorAll("[data-sc-bullets]").forEach(function (ul) {
           var s = content[ul.getAttribute("data-sc-bullets")];

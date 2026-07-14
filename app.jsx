@@ -424,7 +424,7 @@ function ShortcutInfo({ item }) {
       <div className="shortcut-info">
         <div className="shortcut-kicker">{physicals.eyebrow || "Sports Physicals"}</div>
         <h2>{physicals.title || "Clear before tryouts"}</h2>
-        <p>{physicals.body || "Sports physicals should be uploaded to Register My Athlete. Please do not turn physicals in to teachers, office admin, or athletic directors."}</p>
+        <p dangerouslySetInnerHTML={{ __html: physicals.body || "Sports physicals should be uploaded to Register My Athlete. Please do not turn physicals in to teachers, office admin, or athletic directors." }} />
         <div className="shortcut-actions">
           {renderShortcutLinks(physicals, [
             { label: "Physical form", url: "https://www.ncsaasports.com/physicals.html" },
@@ -467,7 +467,7 @@ function ShortcutInfo({ item }) {
       <div className="shortcut-info">
         <div className="shortcut-kicker">{sportsIntro.eyebrow || "Sports Offered"}</div>
         <h2>{sportsIntro.title || "Elementary athletics"}</h2>
-        <p>{sportsIntro.body || "SLAM! Athletics offers seasonal sports for elementary students. Final divisions depend on league offerings, coach availability, and student interest."}</p>
+        <p dangerouslySetInnerHTML={{ __html: sportsIntro.body || "SLAM! Athletics offers seasonal sports for elementary students. Final divisions depend on league offerings, coach availability, and student interest." }} />
         <div className="season-list">
           {seasons.map(([season, sports]) => (
             <article key={season}>
@@ -485,7 +485,7 @@ function ShortcutInfo({ item }) {
     <div className="shortcut-info">
       <div className="shortcut-kicker">{coach.eyebrow || "Coach for SLAM!"}</div>
       <h2>{coach.title || "Lead the next team"}</h2>
-      <p>{coach.body || "Interested coaches can help build a positive, organized, student-first athletics experience. Reach out to SLAM! Athletics with the sport, season, and grade level you can support."}</p>
+      <p dangerouslySetInnerHTML={{ __html: coach.body || "Interested coaches can help build a positive, organized, student-first athletics experience. Reach out to SLAM! Athletics with the sport, season, and grade level you can support." }} />
       <div className="shortcut-actions">
         {renderShortcutLinks(coach, [{ label: "Email athletics", url: "mailto:kenny.hin@slamnv.org" }])}
       </div>
@@ -521,10 +521,14 @@ function Hero({ bg }) {
           <SignupForm accent="red" />
         </div>
 
-        <p className="hero-desc">
-          {heroSC.body ||
-            "Sign up for our newsletter — schedules, sign-ups, and updates on upcoming events, sent straight to your inbox."}
-        </p>
+        <p
+          className="hero-desc"
+          dangerouslySetInnerHTML={{
+            __html:
+              heroSC.body ||
+              "Sign up for our newsletter — schedules, sign-ups, and updates on upcoming events, sent straight to your inbox.",
+          }}
+        />
 
         <div className="hero-shortcuts" aria-label="Quick links">
           {HERO_SHORTCUTS.map((item) => (

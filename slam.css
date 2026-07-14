@@ -291,6 +291,7 @@ textarea {
   color: var(--fg-muted);
   margin: 4px auto 0;
   max-width: 440px;
+  white-space: pre-line;
   opacity: 0;
   animation: fade-up 0.8s var(--ease-out) 1.15s forwards;
 }
@@ -421,6 +422,7 @@ textarea {
   color: var(--fg-muted);
   font-size: 17px;
   line-height: 1.5;
+  white-space: pre-line;
 }
 .shortcut-actions {
   display: flex;
@@ -1628,6 +1630,7 @@ textarea {
   line-height: 1.45;
   color: var(--fg);
   margin: 6px 0 10px;
+  white-space: pre-line;
 }
 .post-image-link {
   display: block;
@@ -2978,7 +2981,7 @@ textarea {
   .home-layout {
     height: 100vh;
     display: grid;
-    grid-template-columns: clamp(390px, 29vw, 500px) minmax(0, 1fr);
+    grid-template-columns: clamp(260px, 15vw, 340px) minmax(0, 1fr);
     background: var(--bg);
   }
   .feed-rail {
