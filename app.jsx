@@ -1490,6 +1490,39 @@ function DesktopPostModal({ onClose }) {
   );
 }
 
+// A highlighted sponsor card (created from AthleticsOS) — same feed, but a
+// glowing tiered treatment instead of the normal post layout.
+function SponsorCard({ sponsor, tier }) {
+  const name = String(sponsor.name || "").trim();
+  const body = String(sponsor.body || "").trim();
+  const link = String(sponsor.link || "").trim();
+  const imageUrl = String(sponsor.image || "").trim();
+  const displayUrl = displayImageUrl(imageUrl);
+  const tierLabel = tier.charAt(0).toUpperCase() + tier.slice(1);
+  return (
+    <article className={"sponsor-card sponsor-card--" + tier}>
+      <div className="sponsor-head">
+        <span className="sponsor-eyebrow">★ Sponsor</span>
+        <span className="sponsor-tier">{tierLabel}</span>
+      </div>
+      <div className="sponsor-main">
+        {isImageUrl(imageUrl)
+          ? <img className="sponsor-logo" src={displayUrl} alt="" loading="lazy" />
+          : <div className="sponsor-logo sponsor-logo--placeholder">★</div>}
+        <div className="sponsor-info">
+          <div className="sponsor-name">{name || "Sponsor"}</div>
+          {body && <p className="sponsor-message">{linkifyText(body)}</p>}
+        </div>
+      </div>
+      {link && (
+        <a className="sponsor-cta" href={link} target="_blank" rel="noopener noreferrer">
+          Visit site <Icon name="arrow-right" size={13} />
+        </a>
+      )}
+    </article>
+  );
+}
+
 // --- Updates feed (Twitter/X style) ---
 function Feed({ posts, loading }) {
   const sortedPosts = [...posts].sort(sortPostsByDate);
@@ -1541,6 +1574,10 @@ function Feed({ posts, loading }) {
         ) : sortedPosts.length === 0 ? (
           <div className="cal-empty">No updates yet.</div>
         ) : sortedPosts.map((p, i) => {
+          const tier = String(p.sponsorTier || "").trim().toLowerCase();
+          if (["platinum", "gold", "silver", "bronze"].indexOf(tier) !== -1) {
+            return <SponsorCard key={i} sponsor={p} tier={tier} />;
+          }
           const icon = getEventIcon({ sport: p.sport, title: p.sport, type: "event" });
           const dateLabel = formatAbsolutePostDate(p);
           const link = String(p.link || "").trim();
