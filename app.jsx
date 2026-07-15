@@ -3,7 +3,7 @@
 
 const { useState, useEffect } = React;
 
-const API_BASE = "https://athletic-director-hub.vercel.app";
+const API_BASE = "https://www.athleticsos.io";
 
 // Editable page copy from AthleticsOS (/api/site-content). Fetched once and shared
 // via context; every consumer falls back to its own hardcoded text until (or if)

@@ -152,7 +152,7 @@
       });
     })();
 
-    var ENDPOINT = 'https://athletic-director-hub.vercel.app/api/tryouts';
+    var ENDPOINT = 'https://www.athleticsos.io/api/tryouts';
     var SIZES = ['YXS','YS','YM','YL','YXL','Adult XS','Adult S','Adult M','Adult L','Adult XL','Adult XXL','Adult XXXL'];
     var SPORTS = {
       fall: {
@@ -191,7 +191,7 @@
     // truth is AthleticsOS's season/sport/division config, edited from the
     // tryout config admin pages there (Sports & Divisions). Fetched in the
     // background on load, same pattern as the teacher list below.
-    fetch('https://athletic-director-hub.vercel.app/api/sports')
+    fetch('https://www.athleticsos.io/api/sports')
       .then(function(res){ return res.ok ? res.json() : null; })
       .then(function(json){
         if (!json || typeof json !== 'object' || !Object.keys(json).length) return;
@@ -216,7 +216,7 @@
     // /admin/tryouts/teachers there. Fetched in the background so it doesn't
     // block the form; by the time someone reaches this question (question 5)
     // it's almost always already resolved.
-    fetch('https://athletic-director-hub.vercel.app/api/teachers')
+    fetch('https://www.athleticsos.io/api/teachers')
       .then(function(res){ return res.ok ? res.json() : null; })
       .then(function(json){
         if (!json || typeof json !== 'object' || !Object.keys(json).length) return;
