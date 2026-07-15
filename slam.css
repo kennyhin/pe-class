@@ -3030,7 +3030,7 @@ textarea {
   .home-layout {
     height: 100vh;
     display: grid;
-    grid-template-columns: clamp(338px, 18vw, 392px) minmax(0, 1fr);
+    grid-template-columns: clamp(410px, 22vw, 464px) minmax(0, 1fr);
     background: var(--bg);
   }
   .feed-rail {
@@ -3058,9 +3058,9 @@ textarea {
   }
   .feed-rail-title {
     margin: 0;
-    max-width: 240px;
+    max-width: 290px;
     font-family: var(--font-display);
-    font-size: 32px;
+    font-size: 38px;
     line-height: 0.9;
     letter-spacing: 0;
     text-transform: uppercase;
@@ -3120,8 +3120,8 @@ textarea {
   .feed-rail .post-grade { font-size: 9px; }
   .feed-rail .post-date { top: 10px; right: 12px; font-size: 9px; }
   .feed-rail .post-text {
-    font-size: 13.4px;
-    line-height: 1.38;
+    font-size: 14px;
+    line-height: 1.42;
     margin: 6px 0 8px;
   }
   .feed-rail .post-image-link {

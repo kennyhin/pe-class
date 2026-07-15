@@ -754,7 +754,19 @@ function postSortKey(post) {
   return String(post?.timestamp || post?.time || post?.date || "");
 }
 
+// A post is pinned while its pinnedUntil date is still in the future; the pin
+// expires on its own with no cleanup needed (the date just falls into the past).
+function isPinned(post) {
+  const until = post && post.pinnedUntil;
+  if (!until) return false;
+  const t = new Date(until).getTime();
+  return !Number.isNaN(t) && t > Date.now();
+}
+
 function sortPostsByDate(a, b) {
+  const pa = isPinned(a) ? 1 : 0;
+  const pb = isPinned(b) ? 1 : 0;
+  if (pa !== pb) return pb - pa; // pinned cards sit at the top of the feed
   return postSortKey(b).localeCompare(postSortKey(a))
     || String(b.name || "").localeCompare(String(a.name || ""));
 }
