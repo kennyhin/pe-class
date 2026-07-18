@@ -29,19 +29,18 @@
     .section { margin:22px 0 0; padding-top:18px; border-top:1px solid rgba(255,255,255,.09); }
     .section h2 { margin:0 0 12px; font:900 13px monospace; letter-spacing:.12em; text-transform:uppercase; color:#80FF00; }
     .hint { color:#8f8f8f; font-size:12px; line-height:1.5; margin:0 0 12px; }
-    /* Tappable bubbles for grades / sports / yes-no */
-    .bubbles { display:flex; flex-wrap:wrap; gap:10px; }
+    /* Minimal tappable chips for grades / sports / yes-no — selection is shown by
+       a single clean colour change, no dots or checkmarks. */
+    .bubbles { display:flex; flex-wrap:wrap; gap:8px; }
     .bubble {
-      position:relative; display:inline-flex; align-items:center; gap:8px;
-      border:1px solid rgba(255,255,255,.18); border-radius:999px; padding:10px 16px; min-height:44px;
-      background:rgba(0,0,0,.28); color:#e9e9e9; font-size:14px; font-weight:700; user-select:none;
-      transition:border-color .12s, background .12s, color .12s;
+      position:relative; display:inline-flex; align-items:center; justify-content:center;
+      border:1px solid rgba(255,255,255,.14); border-radius:10px; padding:11px 16px; min-height:44px;
+      background:transparent; color:#cfcfcf; font-size:14px; font-weight:600; letter-spacing:.01em;
+      user-select:none; transition:border-color .15s ease, background .15s ease, color .15s ease;
     }
-    .bubble:hover { border-color:rgba(128,255,0,.4); }
+    .bubble:hover { border-color:rgba(255,255,255,.32); color:#fff; }
     .bubble input { position:absolute; opacity:0; width:0; height:0; }
-    .bubble .dot { width:16px; height:16px; border-radius:50%; border:2px solid rgba(255,255,255,.35); flex:none; }
-    .bubble.sel { border-color:#80FF00; background:rgba(128,255,0,.12); color:#eaffe0; }
-    .bubble.sel .dot { border-color:#80FF00; background:#80FF00; box-shadow:inset 0 0 0 3px rgba(0,0,0,.35); }
+    .bubble.sel { border-color:rgba(128,255,0,.9); background:rgba(128,255,0,.1); color:#eaffe0; }
     .submit {
       width:100%; min-height:52px; border:0; border-radius:14px; background:#80FF00; color:#04210b;
       font:900 14px monospace; letter-spacing:.1em; text-transform:uppercase; margin-top:22px;
@@ -90,8 +89,8 @@
           <div class="section">
             <h2>Are you a parent of a SLAM student?</h2>
             <div class="bubbles" id="parentBubbles">
-              <label class="bubble" data-val="yes"><input type="radio" name="isParent" value="yes"><span class="dot"></span>Yes</label>
-              <label class="bubble" data-val="no"><input type="radio" name="isParent" value="no"><span class="dot"></span>No</label>
+              <label class="bubble" data-val="yes"><input type="radio" name="isParent" value="yes">Yes</label>
+              <label class="bubble" data-val="no"><input type="radio" name="isParent" value="no">No</label>
             </div>
             <label class="f" id="studentWrap" style="margin-top:14px;display:none">
               <span>Who is your student? (name)</span>
@@ -146,10 +145,7 @@
         var cb = document.createElement("input");
         cb.type = "checkbox";
         cb.value = value;
-        var dot = document.createElement("span");
-        dot.className = "dot";
         wrap.appendChild(cb);
-        wrap.appendChild(dot);
         wrap.appendChild(document.createTextNode(label));
         cb.addEventListener("change", function () {
           wrap.classList.toggle("sel", cb.checked);
