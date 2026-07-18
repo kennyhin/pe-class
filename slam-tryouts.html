@@ -163,7 +163,7 @@
         label: 'Fall',
         dates: 'August - October',
         sports: [
-          { sport:'Flag Football', divisions:[{name:'ES 1-3', grades:['1','2','3']},{name:'ES 4-5', grades:['4','5']}] },
+          { sport:'Flag Football', divisions:[{name:'ES 1-3', grades:['1','2','3']},{name:'ES 4-5', grades:['4','5'], enabled:true}] },
           { sport:'Girls Volleyball', divisions:[{name:'ES 3-5 Girls Rec', grades:['3','4','5']},{name:'ES 3-5 Girls Competitive', grades:['3','4','5']}] },
           { sport:'Cross Country', divisions:[{name:'ES 3-4', grades:['3','4']},{name:'ES 5', grades:['5']}] },
           { sport:'Sideline Cheerleading', divisions:[{name:'ES K-5', grades:['K','1','2','3','4','5']}] },
@@ -269,16 +269,26 @@
       }
       return grades;
     }
-    // TEMPORARY: only Flag Football's Competitive path (grades 3-5) is open for
-    // signups until homeroom teachers are confirmed for the year (~Aug 3).
-    // Locked choices stay visible so families see what's coming, just not
-    // clickable. Delete this block plus the `locked` args below once ready to
-    // open everything back up.
-    function isSeasonLocked(key){ return key !== 'fall'; }
-    function isSportLocked(sport){ return data.season !== 'fall' || !/flag football/i.test(sport || ''); }
-    function isCompetitiveFlagDivision(divisionName){
-      var fd = flagDivisions();
-      return !!(fd && fd.comp && divisionName === fd.comp.name);
+    // What's open is controlled from AthleticsOS (Tryouts -> Edit Tryout Form),
+    // carried on each division as `enabled` via /api/sports (fetched above).
+    // Anything off still shows here, grayed and un-clickable, so families see
+    // what's coming. Fail-closed: a division counts as open only when explicitly
+    // enabled, so the hardcoded fallback below (used if the fetch fails) keeps the
+    // current lock rather than accidentally opening everything.
+    function divEnabled(d){ return !!(d && d.enabled === true); }
+    function isSeasonLocked(key){
+      var s = SPORTS[key];
+      return !(s && (s.sports || []).some(function(sp){ return (sp.divisions || []).some(divEnabled); }));
+    }
+    function isSportLocked(sport){
+      var s = seasonObj();
+      var sp = s && (s.sports || []).find(function(x){ return x.sport === sport; });
+      return !(sp && (sp.divisions || []).some(divEnabled));
+    }
+    function isDivisionLocked(divisionName){
+      var sp = sportObj();
+      var d = sp && (sp.divisions || []).find(function(x){ return x.name === divisionName; });
+      return !divEnabled(d);
     }
     function choice(label, sub, value, active, locked) {
       if (locked) {
@@ -318,12 +328,12 @@
         if (fd) {
           $('question').textContent = 'Recreational or competitive flag?';
           html = '<div class="choices">'
-            + choice('Recreational Flag', 'Grades 1-3', fd.rec.name, data.division===fd.rec.name, !isCompetitiveFlagDivision(fd.rec.name))
-            + choice('Competitive Flag', 'Grades 3-5', fd.comp.name, data.division===fd.comp.name, !isCompetitiveFlagDivision(fd.comp.name))
+            + choice('Recreational Flag', 'Grades 1-3', fd.rec.name, data.division===fd.rec.name, isDivisionLocked(fd.rec.name))
+            + choice('Competitive Flag', 'Grades 3-5', fd.comp.name, data.division===fd.comp.name, isDivisionLocked(fd.comp.name))
             + '</div>';
         } else {
           $('question').textContent = 'Which division?';
-          html = '<div class="choices">' + sportObj().divisions.map(function(d){return choice(d.name, 'Grades: ' + d.grades.join(', '), d.name, data.division===d.name, !isCompetitiveFlagDivision(d.name));}).join('') + '</div>';
+          html = '<div class="choices">' + sportObj().divisions.map(function(d){return choice(d.name, 'Grades: ' + d.grades.join(', '), d.name, data.division===d.name, isDivisionLocked(d.name));}).join('') + '</div>';
         }
       }
       if (kind === 'grade') {
