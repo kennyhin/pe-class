@@ -306,7 +306,7 @@ function Nav() {
     ["Bulls commitment", "#commitment"],
     ["Sports offered", "#sports"],
     ["Tryouts", "slam-tryouts.html"],
-    ["Coach for SLAM!", "#coach"],
+    ["Coach for SLAM!", "slam-coach-apply.html"],
   ];
   return (
     <nav className={`side-nav ${open ? "open" : ""}`} aria-label="Athletics navigation">
@@ -365,7 +365,7 @@ const HERO_SHORTCUTS = [
   { key: "physicals", eyebrow: "Physicals", label: "Sports physicals", href: "#physicals", mode: "info" },
   { key: "sports", eyebrow: "Sports", label: "Sports offered", href: "#sports", mode: "info" },
   { key: "tryouts", eyebrow: "Tryouts", label: "Tryout form", href: "slam-tryouts.html", mode: "page" },
-  { key: "coach", eyebrow: "Coach", label: "Coach for SLAM!", href: "#coach", mode: "info" },
+  { key: "coach", eyebrow: "Coach", label: "Coach for SLAM!", href: "slam-coach-apply.html", mode: "page" },
 ];
 
 function ShortcutModal({ item, onClose }) {
