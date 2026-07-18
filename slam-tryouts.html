@@ -45,6 +45,9 @@
     .choice span { display:block; color:#aaa; margin-top:8px; line-height:1.35; }
     .choice small { display:inline-block; margin-top:14px; color:#80FF00; font:900 11px monospace; letter-spacing:.08em; text-transform:uppercase; }
     .choice.danger small { color:#ffb0b7; }
+    .choice.locked { opacity:.32; pointer-events:none; cursor:default; }
+    .choice.locked:hover { transform:none; border-color:rgba(255,255,255,.12); box-shadow:none; }
+    .choice.locked small { color:#888; }
     .fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; max-width:760px; }
     label { display:flex; flex-direction:column; gap:7px; color:#aaa; font:800 11px monospace; letter-spacing:.1em; text-transform:uppercase; }
     input, select, textarea { width:100%; border:1px solid rgba(255,255,255,.14); border-radius:12px; background:rgba(0,0,0,.28); color:#fff; font:16px Arial,Helvetica,sans-serif; padding:13px 14px; outline:none; }
@@ -95,6 +98,7 @@
       </div>
       <div class="notice">
         <div class="notice-card">
+          <div class="notice-kicker" style="margin-bottom:10px">Now open — Flag Football, grades 3-5</div>
           <div class="notice-grid">
             <div>
               <div class="notice-kicker">Required for tryouts</div>
@@ -265,8 +269,22 @@
       }
       return grades;
     }
-    function choice(label, sub, value, active) {
-      return '<button class="choice" data-value="'+esc(value)+'"><b>'+esc(label)+'</b><span>'+esc(sub||'')+'</span><small>Choose</small></button>';
+    // TEMPORARY: only Flag Football's Competitive path (grades 3-5) is open for
+    // signups until homeroom teachers are confirmed for the year (~Aug 3).
+    // Locked choices stay visible so families see what's coming, just not
+    // clickable. Delete this block plus the `locked` args below once ready to
+    // open everything back up.
+    function isSeasonLocked(key){ return key !== 'fall'; }
+    function isSportLocked(sport){ return data.season !== 'fall' || !/flag football/i.test(sport || ''); }
+    function isCompetitiveFlagDivision(divisionName){
+      var fd = flagDivisions();
+      return !!(fd && fd.comp && divisionName === fd.comp.name);
+    }
+    function choice(label, sub, value, active, locked) {
+      if (locked) {
+        return '<div class="choice locked" aria-disabled="true"><b>'+esc(label)+'</b><span>'+esc(sub||'')+'</span><small>Not open yet</small></div>';
+      }
+      return '<button class="choice'+(active?' active':'')+'" data-value="'+esc(value)+'"><b>'+esc(label)+'</b><span>'+esc(sub||'')+'</span><small>Choose</small></button>';
     }
     function esc(s){ return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
     function field(name,label,type,placeholder){
@@ -289,23 +307,23 @@
       $('status').textContent = '';
       if (kind === 'season') {
         $('question').textContent = 'Which season are you signing up for?';
-        html = '<div class="choices">' + Object.keys(SPORTS).map(function(k){return choice(SPORTS[k].label, SPORTS[k].dates, k, data.season===k);}).join('') + '</div>';
+        html = '<div class="choices">' + Object.keys(SPORTS).map(function(k){return choice(SPORTS[k].label, SPORTS[k].dates, k, data.season===k, isSeasonLocked(k));}).join('') + '</div>';
       }
       if (kind === 'sport') {
         $('question').textContent = 'Which sport?';
-        html = '<div class="choices">' + seasonObj().sports.map(function(s){return choice(s.sport, s.divisions.map(function(d){return d.name;}).join(' / '), s.sport, data.sport===s.sport);}).join('') + '</div>';
+        html = '<div class="choices">' + seasonObj().sports.map(function(s){return choice(s.sport, s.divisions.map(function(d){return d.name;}).join(' / '), s.sport, data.sport===s.sport, isSportLocked(s.sport));}).join('') + '</div>';
       }
       if (kind === 'division') {
         var fd = isFlagFootball() ? flagDivisions() : null;
         if (fd) {
           $('question').textContent = 'Recreational or competitive flag?';
           html = '<div class="choices">'
-            + choice('Recreational Flag', 'Grades 1-3', fd.rec.name, data.division===fd.rec.name)
-            + choice('Competitive Flag', 'Grades 3-5', fd.comp.name, data.division===fd.comp.name)
+            + choice('Recreational Flag', 'Grades 1-3', fd.rec.name, data.division===fd.rec.name, !isCompetitiveFlagDivision(fd.rec.name))
+            + choice('Competitive Flag', 'Grades 3-5', fd.comp.name, data.division===fd.comp.name, !isCompetitiveFlagDivision(fd.comp.name))
             + '</div>';
         } else {
           $('question').textContent = 'Which division?';
-          html = '<div class="choices">' + sportObj().divisions.map(function(d){return choice(d.name, 'Grades: ' + d.grades.join(', '), d.name, data.division===d.name);}).join('') + '</div>';
+          html = '<div class="choices">' + sportObj().divisions.map(function(d){return choice(d.name, 'Grades: ' + d.grades.join(', '), d.name, data.division===d.name, !isCompetitiveFlagDivision(d.name));}).join('') + '</div>';
         }
       }
       if (kind === 'grade') {
@@ -346,7 +364,7 @@
           '<div class="fields" style="margin-top:16px">' + field('signature','Typed parent/guardian signature') + '</div>';
       }
       $('content').innerHTML = html;
-      document.querySelectorAll('.choice').forEach(function(btn){ btn.addEventListener('click', function(){ selectChoice(btn.dataset.value); }); });
+      document.querySelectorAll('.choice:not(.locked)').forEach(function(btn){ btn.addEventListener('click', function(){ selectChoice(btn.dataset.value); }); });
       document.querySelectorAll('.clearance').forEach(function(btn){ btn.addEventListener('click', function(){ saveInputs(); data.clearance = btn.dataset.value; render(); }); });
       $('backBtn').disabled = step === 0;
       $('nextBtn').textContent = step === steps.length - 1 ? 'Submit' : 'Next';
