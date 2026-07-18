@@ -154,8 +154,8 @@
       var $ = function (id) { return document.getElementById(id); };
       var form = $("form"), msg = $("msg"), submitBtn = $("submit");
 
-      // Grades K-12, matching how the tryout form labels them.
-      var grades = ["K","1","2","3","4","5","6","7","8","9","10","11","12"];
+      // Grades K-5 — SLAM Nevada is a K-5 elementary school.
+      var grades = ["K","1","2","3","4","5"];
       grades.forEach(function (g) {
         var o = document.createElement("option");
         o.value = g; o.textContent = g === "K" ? "Kindergarten" : "Grade " + g;
