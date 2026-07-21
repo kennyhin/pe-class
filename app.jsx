@@ -1896,12 +1896,10 @@ function BullsCommitmentCard() {
 const TRYOUT_PROMO = {
   storageKey: "slamPromoFlagFootball2026",
   endsAt: "2026-08-04T23:59:59-07:00",
-  kicker: "Tryouts Open",
-  // Keep this letters-only: the display font (Illini) has no glyphs for
-  // !, (, ), or - — they render as blank gaps. Put punctuation/numbers in
-  // "when" instead, which renders in the regular sans font.
-  title: "SLAM Flag Football Tryouts",
-  when: "Grades 3–5 · Starts Tuesday, August 4 · 5–7 PM",
+  kicker: "Tryouts Open · Grades 3–5",
+  title: "SLAM! Flag Football Tryouts",
+  date: "Tue, Aug 4",
+  time: "5–7 PM",
   cta: "Sign Up Now",
   href: "slam-tryouts.html",
 };
@@ -1931,7 +1929,16 @@ function TryoutPromoPopup() {
         <button className="promo-popup-close" type="button" onClick={() => setOpen(false)}>&times;</button>
         <div className="promo-popup-kicker">{TRYOUT_PROMO.kicker}</div>
         <h3 className="promo-popup-title">{TRYOUT_PROMO.title}</h3>
-        <p className="promo-popup-when">{TRYOUT_PROMO.when}</p>
+        <div className="promo-popup-meta">
+          <div className="promo-popup-meta-item">
+            <span className="promo-popup-meta-label">Date</span>
+            <strong className="promo-popup-meta-value">{TRYOUT_PROMO.date}</strong>
+          </div>
+          <div className="promo-popup-meta-item">
+            <span className="promo-popup-meta-label">Time</span>
+            <strong className="promo-popup-meta-value">{TRYOUT_PROMO.time}</strong>
+          </div>
+        </div>
         <a className="promo-popup-cta" href={TRYOUT_PROMO.href}>
           {TRYOUT_PROMO.cta}
           <Icon name="arrow-right" size={16} />
