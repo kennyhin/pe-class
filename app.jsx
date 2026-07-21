@@ -279,7 +279,7 @@ function SignupForm({ accent }) {
           disabled={status.kind === "sending"}
           style={accent === "lime" ? { background: "var(--slam-lime)", color: "var(--slam-black)" } : null}
         >
-          {status.kind === "sending" ? "Sending…" : "Sign me up"}
+          {status.kind === "sending" ? "Sending…" : "Subscribe"}
           <Icon name="arrow-right" size={16} />
         </button>
       </form>
@@ -518,6 +518,7 @@ function Hero({ bg }) {
         />
 
         <div className="signup-wrap-center">
+          <div className="signup-kicker">Newsletter Sign-Up</div>
           <SignupForm accent="red" />
         </div>
 
@@ -1889,11 +1890,64 @@ function BullsCommitmentCard() {
   );
 }
 
+// Time-boxed tryout promo — pops up once per browser session while a specific
+// tryout window is open, then goes quiet on its own (endsAt) without needing a
+// manual removal later. Update endsAt/when/href here for the next promoted tryout.
+const TRYOUT_PROMO = {
+  storageKey: "slamPromoFlagFootball2026",
+  endsAt: "2026-08-04T23:59:59-07:00",
+  kicker: "Tryouts Open",
+  // Keep this letters-only: the display font (Illini) has no glyphs for
+  // !, (, ), or - — they render as blank gaps. Put punctuation/numbers in
+  // "when" instead, which renders in the regular sans font.
+  title: "SLAM Flag Football Tryouts",
+  when: "Grades 3–5 · Starts Tuesday, August 4 · 5–7 PM",
+  cta: "Sign Up Now",
+  href: "slam-tryouts.html",
+};
+
+function TryoutPromoPopup() {
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (new Date() > new Date(TRYOUT_PROMO.endsAt)) return;
+    let dismissed = false;
+    try { dismissed = !!sessionStorage.getItem(TRYOUT_PROMO.storageKey); } catch (_) {}
+    if (dismissed) return;
+
+    const timer = setTimeout(() => {
+      setOpen(true);
+      try { sessionStorage.setItem(TRYOUT_PROMO.storageKey, "1"); } catch (_) {}
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!open) return null;
+
+  return ReactDOM.createPortal(
+    <div className="promo-popup" role="dialog" aria-modal="true" aria-label={TRYOUT_PROMO.title}>
+      <button className="promo-popup-backdrop" type="button" aria-label="Close" onClick={() => setOpen(false)} />
+      <section className="promo-popup-panel">
+        <button className="promo-popup-close" type="button" onClick={() => setOpen(false)}>&times;</button>
+        <div className="promo-popup-kicker">{TRYOUT_PROMO.kicker}</div>
+        <h3 className="promo-popup-title">{TRYOUT_PROMO.title}</h3>
+        <p className="promo-popup-when">{TRYOUT_PROMO.when}</p>
+        <a className="promo-popup-cta" href={TRYOUT_PROMO.href}>
+          {TRYOUT_PROMO.cta}
+          <Icon name="arrow-right" size={16} />
+        </a>
+      </section>
+    </div>,
+    document.body
+  );
+}
+
 function HomeLayout({ heroBg }) {
   const { posts, events, faq, loaded } = useContent();
   const loading = !loaded;
   return (
     <div className="home-layout">
+      <TryoutPromoPopup />
       <main className="main-scroll">
         <Hero bg={heroBg} />
         <BullsCommitmentCard />

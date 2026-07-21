@@ -284,6 +284,16 @@ textarea {
   animation: fade-up 0.8s var(--ease-out) 0.95s forwards;
 }
 
+.signup-kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--slam-lime);
+  margin-bottom: 10px;
+}
+
 .hero-desc {
   font-family: var(--font-sans);
   font-size: clamp(12px, 1.08vw, 14px);
@@ -344,6 +354,94 @@ textarea {
   border-color: rgba(128,255,0,0.34);
   background: linear-gradient(180deg, rgba(128,255,0,0.09), rgba(255,255,255,0.045));
 }
+.promo-popup {
+  position: fixed;
+  inset: 0;
+  z-index: 340;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  opacity: 0;
+  animation: fade-up 0.35s var(--ease-out) forwards;
+}
+.promo-popup-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.promo-popup-panel {
+  position: relative;
+  width: min(420px, calc(100vw - 32px));
+  padding: 30px 28px 26px;
+  text-align: center;
+  border: 1px solid rgba(128,255,0,0.26);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 88% 0%, rgba(128,255,0,0.14), transparent 32%),
+    linear-gradient(180deg, rgba(28,28,28,0.98), rgba(5,5,5,0.98));
+  box-shadow: 0 30px 90px rgba(0,0,0,0.58);
+}
+.promo-popup-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 999px;
+  background: rgba(0,0,0,0.5);
+  color: var(--slam-white);
+  font-size: 20px;
+  line-height: 1;
+}
+.promo-popup-kicker {
+  color: var(--slam-lime);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 1000;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.promo-popup-title {
+  margin: 10px 0 8px;
+  color: var(--slam-white);
+  font-family: var(--font-display);
+  font-size: clamp(22px, 3.4vw, 30px);
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+.promo-popup-when {
+  margin: 0;
+  color: var(--fg-muted);
+  font-size: 14px;
+  line-height: 1.4;
+}
+.promo-popup-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  margin-top: 20px;
+  padding: 0 24px;
+  border-radius: 999px;
+  background: var(--slam-red);
+  color: var(--slam-white);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 1000;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: transform var(--dur-fast) var(--ease-snap);
+}
+.promo-popup-cta:hover { transform: scale(1.03); }
+.promo-popup-cta svg { transition: transform var(--dur-base) var(--ease-snap); }
+.promo-popup-cta:hover svg { transform: translateX(3px); }
+
 .shortcut-modal {
   position: fixed;
   inset: 0;
