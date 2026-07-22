@@ -32,8 +32,6 @@
     + ".slam-msg.bot{align-self:flex-start;background:#fff;color:" + BLACK + ";border:1px solid #e5e7eb;border-bottom-left-radius:4px;}"
     + ".slam-msg.user{align-self:flex-end;background:" + GREEN + ";color:#fff;border-bottom-right-radius:4px;}"
     + ".slam-msg.error{align-self:flex-start;background:#fef2f2;color:" + RED + ";border:1px solid #fecaca;border-bottom-left-radius:4px;}"
-    + ".slam-sources{margin-top:6px;font-size:11px;color:#6b7280;}"
-    + ".slam-sources strong{color:" + GREEN + ";font-weight:600;}"
     + ".slam-typing{align-self:flex-start;display:flex;gap:4px;padding:12px 14px;background:#fff;border:1px solid #e5e7eb;border-radius:16px;border-bottom-left-radius:4px;}"
     + ".slam-typing span{width:8px;height:8px;border-radius:50%;background:" + GREEN + ";opacity:0.5;animation:slamTypingBounce 1.2s ease-in-out infinite;}"
     + ".slam-typing span:nth-child(2){animation-delay:0.15s;}"
@@ -83,7 +81,7 @@
   function greet() {
     if (greeted) return;
     greeted = true;
-    addBot("Hi! I'm the SLAM Bull Bot. Ask me about tryouts, teams, practices, payments — anything about SLAM Athletics. I'll show you where I found the answer.");
+    addBot("Hi! I'm the SLAM Bull Bot. Ask me anything about tryouts, teams, practices, or payments.");
   }
 
   function togglePanel() {
@@ -111,22 +109,10 @@
     msgsEl.scrollTop = msgsEl.scrollHeight;
   }
 
-  function addBot(text, sources) {
+  function addBot(text) {
     var d = document.createElement("div");
     d.className = "slam-msg bot";
     d.innerHTML = esc(text).replace(/\n/g, "<br>");
-    if (sources && sources.length) {
-      var src = document.createElement("div");
-      src.className = "slam-sources";
-      var parts = sources.map(function (s) {
-        var label = esc(s.label);
-        return s.url
-          ? '<a href="' + esc(s.url) + '" target="_blank" rel="noopener" style="color:' + GREEN + ';text-decoration:underline;">' + label + '</a>'
-          : label;
-      });
-      src.innerHTML = "<strong>Source:</strong> " + parts.join(" · ");
-      d.appendChild(src);
-    }
     msgsEl.appendChild(d);
     msgsEl.scrollTop = msgsEl.scrollHeight;
   }
@@ -172,7 +158,7 @@
         return;
       }
       var data = await res.json();
-      addBot(data.answer || "I'm not sure — try emailing Kenny at kenny.hin@slamnv.org.", data.sources);
+      addBot(data.answer || "I'm not sure — try emailing Kenny at kenny.hin@slamnv.org.");
     } catch (e) {
       hideTyping();
       addError("Network issue — check your connection and try again.");
