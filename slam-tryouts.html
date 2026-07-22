@@ -33,7 +33,7 @@
     .stage { padding:34px; min-height:620px; }
     .rail { border-left:1px solid rgba(255,255,255,.1); background:rgba(0,0,0,.2); padding:24px; }
     .rail-toggle { display:none; }
-    .progress { display:grid; grid-template-columns:repeat(10,1fr); gap:6px; margin:0 0 18px; max-width:640px; }
+    .progress { display:grid; grid-template-columns:repeat(9,1fr); gap:6px; margin:0 0 18px; max-width:640px; }
     .progress i { height:7px; border-radius:999px; background:rgba(255,255,255,.1); }
     .progress i.on { background:#80FF00; box-shadow:0 0 18px rgba(128,255,0,.38); }
     .step { color:#80FF00; font:800 12px monospace; letter-spacing:.14em; text-transform:uppercase; margin-bottom:16px; }
@@ -45,9 +45,6 @@
     .choice span { display:block; color:#aaa; margin-top:8px; line-height:1.35; }
     .choice small { display:inline-block; margin-top:14px; color:#80FF00; font:900 11px monospace; letter-spacing:.08em; text-transform:uppercase; }
     .choice.danger small { color:#ffb0b7; }
-    .choice.locked { opacity:.32; pointer-events:none; cursor:default; }
-    .choice.locked:hover { transform:none; border-color:rgba(255,255,255,.12); box-shadow:none; }
-    .choice.locked small { color:#888; }
     .fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; max-width:760px; }
     label { display:flex; flex-direction:column; gap:7px; color:#aaa; font:800 11px monospace; letter-spacing:.1em; text-transform:uppercase; }
     input, select, textarea { width:100%; border:1px solid rgba(255,255,255,.14); border-radius:12px; background:rgba(0,0,0,.28); color:#fff; font:16px Arial,Helvetica,sans-serif; padding:13px 14px; outline:none; }
@@ -71,13 +68,7 @@
     .summary b { display:block; color:#fff; font-size:12px; text-transform:uppercase; margin-bottom:3px; }
     .status { margin-top:14px; color:#80FF00; font:800 12px monospace; text-transform:uppercase; }
     .hidden { display:none; }
-    html.modal-embed body { background:transparent; }
-    html.modal-embed .page { padding:0; background:transparent; }
-    html.modal-embed .shell { max-width:none; min-height:100vh; border:0; border-radius:0; box-shadow:none; }
-    html.modal-embed .bottom-actions { position:sticky; bottom:0; z-index:5; background:linear-gradient(180deg,rgba(5,5,5,0),rgba(5,5,5,.95) 38%); }
-    html.modal-embed .back { border-color:rgba(128,255,0,.38); color:#80FF00; }
-    @media (max-width:1100px){ .top{align-items:flex-start;flex-direction:column}.top-actions{width:100%;justify-content:flex-start}.page-links{justify-content:flex-start}.brand{width:100%} }
-    @media (max-width:850px){ .page{padding:10px}.main{grid-template-columns:1fr}.notice{padding:8px 10px}.notice-grid{grid-template-columns:1fr;gap:5px}.notice-card{padding:9px 11px}.notice-kicker{font-size:10px;margin-bottom:3px}.notice-card ul{margin:4px 0 0;padding-left:16px}.notice-card li{font-size:11px;line-height:1.22}.rail{border-left:0;border-top:1px solid rgba(255,255,255,.1);padding:0;background:rgba(0,0,0,.18)}.rail-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;border:0;background:rgba(255,255,255,.04);color:#fff;padding:13px 18px;font:900 12px monospace;letter-spacing:.12em;text-transform:uppercase}.rail-toggle:after{content:">";color:#80FF00;transition:transform .18s ease}.rail.open .rail-toggle:after{transform:rotate(90deg)}.rail .step,.rail .summary{display:none}.rail.open .step,.rail.open .summary{display:grid}.rail .step{padding:14px 18px 0;margin:0}.rail .summary{padding:12px 18px 18px;gap:7px}.summary div{font-size:12px;padding-bottom:7px}.choices,.fields,.clearance-grid{grid-template-columns:1fr}.stage{padding:18px;min-height:auto}.question{font-size:34px}.top{padding:14px 16px}.brand img{width:48px}h1{font-size:34px}.bottom-actions{padding:16px;justify-content:stretch}.back{width:100%} }
+    @media (max-width:850px){ .page{padding:10px}.main{grid-template-columns:1fr}.notice{padding:8px 10px}.notice-grid{grid-template-columns:1fr;gap:5px}.notice-card{padding:9px 11px}.notice-kicker{font-size:10px;margin-bottom:3px}.notice-card ul{margin:4px 0 0;padding-left:16px}.notice-card li{font-size:11px;line-height:1.22}.rail{border-left:0;border-top:1px solid rgba(255,255,255,.1);padding:0;background:rgba(0,0,0,.18)}.rail-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;border:0;background:rgba(255,255,255,.04);color:#fff;padding:13px 18px;font:900 12px monospace;letter-spacing:.12em;text-transform:uppercase}.rail-toggle:after{content:">";color:#80FF00;transition:transform .18s ease}.rail.open .rail-toggle:after{transform:rotate(90deg)}.rail .step,.rail .summary{display:none}.rail.open .step,.rail.open .summary{display:grid}.rail .step{padding:14px 18px 0;margin:0}.rail .summary{padding:12px 18px 18px;gap:7px}.summary div{font-size:12px;padding-bottom:7px}.choices,.fields,.clearance-grid{grid-template-columns:1fr}.stage{padding:18px;min-height:auto}.question{font-size:34px}.top{align-items:flex-start;padding:14px 16px}.top-actions{width:100%;justify-content:flex-start}.page-links{justify-content:flex-start}.brand img{width:48px}h1{font-size:34px}.bottom-actions{padding:16px;justify-content:stretch}.back{width:100%} }
   </style>
 </head>
 <body>
@@ -98,14 +89,13 @@
       </div>
       <div class="notice">
         <div class="notice-card">
-          <div class="notice-kicker" style="margin-bottom:10px">Now open — Flag Football, grades 3-5</div>
           <div class="notice-grid">
             <div>
               <div class="notice-kicker">Required for tryouts</div>
               <ul>
                 <li>One form per sport.</li>
                 <li>Sports physical OR waiver option at the end.</li>
-                <li><a href="https://www.ncsaasports.com/physicals.html" target="_blank" rel="noopener">Physical form</a> Â· <a href="https://www.cvs.com/minuteclinic/services/sports-physicals" target="_blank" rel="noopener">Schedule physical</a></li>
+                <li><a href="https://www.ncsaasports.com/physicals.html" target="_blank" rel="noopener">Physical form</a> · <a href="https://www.cvs.com/minuteclinic/services/sports-physicals" target="_blank" rel="noopener">Schedule physical</a></li>
               </ul>
             </div>
             <div>
@@ -137,33 +127,19 @@
         </aside>
       </div>
       <div class="bottom-actions">
-        <a class="back" href="slam.html">&larr; Back to homepage</a>
+        <a class="back" href="slam.html">← Back to homepage</a>
       </div>
     </section>
   </main>
   <script>
-    (function () {
-      var params = new URLSearchParams(window.location.search);
-      if (params.get("modal") !== "1") return;
-
-      document.documentElement.classList.add("modal-embed");
-      document.querySelectorAll('a[href$="slam.html"]').forEach(function (link) {
-        link.textContent = "← Back to homepage";
-        link.addEventListener("click", function (event) {
-          event.preventDefault();
-          window.parent.postMessage({ type: "closeShortcutModal" }, "*");
-        });
-      });
-    })();
-
-    var ENDPOINT = 'https://www.athleticsos.io/api/tryouts';
+    var ENDPOINT = 'https://script.google.com/macros/s/AKfycbx-a6Rgey0CuqAOTXnQp_puTWihRsclvndOBPrSwdjgbJszTfcwFC2-zXnESPguGwyu7Q/exec';
     var SIZES = ['YXS','YS','YM','YL','YXL','Adult XS','Adult S','Adult M','Adult L','Adult XL','Adult XXL','Adult XXXL'];
     var SPORTS = {
       fall: {
         label: 'Fall',
         dates: 'August - October',
         sports: [
-          { sport:'Flag Football', divisions:[{name:'ES 1-3', grades:['1','2','3']},{name:'ES 4-5', grades:['4','5'], enabled:true}] },
+          { sport:'Flag Football', divisions:[{name:'ES 1-3', grades:['1','2','3']},{name:'ES 4-5', grades:['4','5']}] },
           { sport:'Girls Volleyball', divisions:[{name:'ES 3-5 Girls Rec', grades:['3','4','5']},{name:'ES 3-5 Girls Competitive', grades:['3','4','5']}] },
           { sport:'Cross Country', divisions:[{name:'ES 3-4', grades:['3','4']},{name:'ES 5', grades:['5']}] },
           { sport:'Sideline Cheerleading', divisions:[{name:'ES K-5', grades:['K','1','2','3','4','5']}] },
@@ -191,43 +167,6 @@
         ]
       }
     };
-    // SPORTS above is only the offline/error fallback now — the live source of
-    // truth is AthleticsOS's season/sport/division config, edited from the
-    // tryout config admin pages there (Sports & Divisions). Fetched in the
-    // background on load, same pattern as the teacher list below.
-    fetch('https://www.athleticsos.io/api/sports')
-      .then(function(res){ return res.ok ? res.json() : null; })
-      .then(function(json){
-        if (!json || typeof json !== 'object' || !Object.keys(json).length) return;
-        SPORTS = json;
-        if (['season','sport','division','grade'].indexOf(steps[step]) !== -1) render();
-      })
-      .catch(function(){ /* keep the hardcoded fallback above */ });
-    var TEACHERS_BY_GRADE = {
-      'K': ['Molanari','Gray','Rollans','Vela'],
-      '1': ['Luangrath','Weber','Buckhanan','Harris'],
-      '2': ['Casipong','Guzman','Garritano','Gomez'],
-      '3': ['DeLaria','Benton','Lewis','J. Ramirez','A. Ramirez'],
-      '4': ['Swanson/Johnson','La Spina','Tumanavao','Henandez','Sanchez'],
-      '5': ['Bobadilla','Law','Galvan','Christensen','Young']
-    };
-    // Must match UNKNOWN_TEACHER in AthleticsOS (src/app/admin/tryouts/page.tsx and
-    // TryoutWizard.tsx) exactly — the admin tryout list matches on this string to
-    // show a "pick their teacher" dropdown once the family finds out.
-    var UNKNOWN_TEACHER = "Don't know yet";
-    // TEACHERS_BY_GRADE above is only the offline/error fallback now — the live
-    // source of truth is AthleticsOS's Teacher table, edited from
-    // /admin/tryouts/teachers there. Fetched in the background so it doesn't
-    // block the form; by the time someone reaches this question (question 5)
-    // it's almost always already resolved.
-    fetch('https://www.athleticsos.io/api/teachers')
-      .then(function(res){ return res.ok ? res.json() : null; })
-      .then(function(json){
-        if (!json || typeof json !== 'object' || !Object.keys(json).length) return;
-        TEACHERS_BY_GRADE = json;
-        if (steps[step] === 'homeroomTeacher') render();
-      })
-      .catch(function(){ /* keep the hardcoded fallback above */ });
     var WAIVER = [
       ['Liability waiver and release','Participation in SLAM! Athletics tryouts and programs is voluntary and involves physical activity and inherent risks, including injury. I release and hold harmless SLAM Nevada Elementary School, SLAM! Athletics, staff, coaches, volunteers, and affiliated organizations from claims or damages arising out of participation.'],
       ['Assumption of risk','I understand athletic activities carry inherent risks including sprains, fractures, concussions, illness, and other harm. SLAM! Athletics makes no guarantee regarding placement on any team or roster.'],
@@ -236,65 +175,16 @@
       ['Photo/video release','I grant SLAM! Athletics and SLAM Nevada Elementary School permission to photograph or record my child during tryouts and activities for educational, promotional, and social media purposes.'],
       ['Electronic signature','By signing below, I confirm I have read and understand this waiver and consent form. I am the parent/legal guardian or authorized signer and this electronic signature is legally binding.']
     ];
-    var steps = ['season','sport','division','grade','homeroomTeacher','sizes','numbers','student','email','waiver'];
-    var data = { season:'', sport:'', division:'', grade:'', homeroomTeacher:'', shirtSize:'', shortSize:'', jersey1:'', jersey2:'', jersey3:'', lastName:'', firstName:'', email:'', clearance:'', signature:'' };
+    var steps = ['season','sport','division','grade','sizes','numbers','student','email','waiver'];
+    var data = { season:'', sport:'', division:'', grade:'', shirtSize:'', shortSize:'', jersey1:'', jersey2:'', jersey3:'', lastName:'', firstName:'', email:'', clearance:'', signature:'' };
     var step = 0;
     var $ = function(id){ return document.getElementById(id); };
 
     function seasonObj(){ return SPORTS[data.season]; }
     function sportObj(){ return (seasonObj()?.sports || []).find(function(s){ return s.sport === data.sport; }); }
     function divisionObj(){ return (sportObj()?.divisions || []).find(function(d){ return d.name === data.division; }); }
-    // Flag Football special case: 3rd graders can go recreational OR competitive.
-    // Config gives two divisions (e.g. "ES 1-3" grades 1-3, "ES 4-5" grades 4-5);
-    // we present them as Recreational / Competitive and let a 3rd grader into the
-    // competitive one. The submitted division stays the real config name so
-    // AthleticsOS routing is unaffected.
-    function isFlagFootball(){ return /flag football/i.test(data.sport || ''); }
-    function gradeNum(g){ return g === 'K' ? 0 : parseInt(g, 10) || 0; }
-    function minGrade(d){ return Math.min.apply(null, (d.grades || []).map(gradeNum)); }
-    function flagDivisions(){
-      var divs = (sportObj()?.divisions || []).slice();
-      if (divs.length !== 2) return null; // only split when there are exactly two
-      divs.sort(function(a, b){ return minGrade(a) - minGrade(b); });
-      return { rec: divs[0], comp: divs[1] };
-    }
-    function gradeOptions(){
-      var div = divisionObj();
-      if (!div) return [];
-      var grades = (div.grades || []).slice();
-      var fd = flagDivisions();
-      // Competitive flag: also let 3rd graders in.
-      if (isFlagFootball() && fd && fd.comp && div.name === fd.comp.name && grades.indexOf('3') === -1) {
-        grades = ['3'].concat(grades);
-      }
-      return grades;
-    }
-    // What's open is controlled from AthleticsOS (Tryouts -> Edit Tryout Form),
-    // carried on each division as `enabled` via /api/sports (fetched above).
-    // Anything off still shows here, grayed and un-clickable, so families see
-    // what's coming. Fail-closed: a division counts as open only when explicitly
-    // enabled, so the hardcoded fallback below (used if the fetch fails) keeps the
-    // current lock rather than accidentally opening everything.
-    function divEnabled(d){ return !!(d && d.enabled === true); }
-    function isSeasonLocked(key){
-      var s = SPORTS[key];
-      return !(s && (s.sports || []).some(function(sp){ return (sp.divisions || []).some(divEnabled); }));
-    }
-    function isSportLocked(sport){
-      var s = seasonObj();
-      var sp = s && (s.sports || []).find(function(x){ return x.sport === sport; });
-      return !(sp && (sp.divisions || []).some(divEnabled));
-    }
-    function isDivisionLocked(divisionName){
-      var sp = sportObj();
-      var d = sp && (sp.divisions || []).find(function(x){ return x.name === divisionName; });
-      return !divEnabled(d);
-    }
-    function choice(label, sub, value, active, locked) {
-      if (locked) {
-        return '<div class="choice locked" aria-disabled="true"><b>'+esc(label)+'</b><span>'+esc(sub||'')+'</span><small>Not open yet</small></div>';
-      }
-      return '<button class="choice'+(active?' active':'')+'" data-value="'+esc(value)+'"><b>'+esc(label)+'</b><span>'+esc(sub||'')+'</span><small>Choose</small></button>';
+    function choice(label, sub, value, active) {
+      return '<button class="choice" data-value="'+esc(value)+'"><b>'+esc(label)+'</b><span>'+esc(sub||'')+'</span><small>Choose</small></button>';
     }
     function esc(s){ return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
     function field(name,label,type,placeholder){
@@ -317,34 +207,19 @@
       $('status').textContent = '';
       if (kind === 'season') {
         $('question').textContent = 'Which season are you signing up for?';
-        html = '<div class="choices">' + Object.keys(SPORTS).map(function(k){return choice(SPORTS[k].label, SPORTS[k].dates, k, data.season===k, isSeasonLocked(k));}).join('') + '</div>';
+        html = '<div class="choices">' + Object.keys(SPORTS).map(function(k){return choice(SPORTS[k].label, SPORTS[k].dates, k, data.season===k);}).join('') + '</div>';
       }
       if (kind === 'sport') {
         $('question').textContent = 'Which sport?';
-        html = '<div class="choices">' + seasonObj().sports.map(function(s){return choice(s.sport, s.divisions.map(function(d){return d.name;}).join(' / '), s.sport, data.sport===s.sport, isSportLocked(s.sport));}).join('') + '</div>';
+        html = '<div class="choices">' + seasonObj().sports.map(function(s){return choice(s.sport, s.divisions.map(function(d){return d.name;}).join(' / '), s.sport, data.sport===s.sport);}).join('') + '</div>';
       }
       if (kind === 'division') {
-        var fd = isFlagFootball() ? flagDivisions() : null;
-        if (fd) {
-          $('question').textContent = 'Recreational or competitive flag?';
-          html = '<div class="choices">'
-            + choice('Recreational Flag', 'Grades 1-3', fd.rec.name, data.division===fd.rec.name, isDivisionLocked(fd.rec.name))
-            + choice('Competitive Flag', 'Grades 3-5', fd.comp.name, data.division===fd.comp.name, isDivisionLocked(fd.comp.name))
-            + '</div>';
-        } else {
-          $('question').textContent = 'Which division?';
-          html = '<div class="choices">' + sportObj().divisions.map(function(d){return choice(d.name, 'Grades: ' + d.grades.join(', '), d.name, data.division===d.name, isDivisionLocked(d.name));}).join('') + '</div>';
-        }
+        $('question').textContent = 'Which division?';
+        html = '<div class="choices">' + sportObj().divisions.map(function(d){return choice(d.name, 'Grades: ' + d.grades.join(', '), d.name, data.division===d.name);}).join('') + '</div>';
       }
       if (kind === 'grade') {
         $('question').textContent = 'What grade?';
-        html = '<div class="choices">' + gradeOptions().map(function(g){return choice(g, 'Grade ' + g, g, data.grade===g);}).join('') + '</div>';
-      }
-      if (kind === 'homeroomTeacher') {
-        $('question').textContent = "Who is your student's homeroom teacher?";
-        var teachers = TEACHERS_BY_GRADE[data.grade] || [];
-        html = '<div class="choices">' + teachers.map(function(t){return choice(t, '', t, data.homeroomTeacher===t);}).join('')
-          + choice(UNKNOWN_TEACHER, "I'll find out later", UNKNOWN_TEACHER, data.homeroomTeacher===UNKNOWN_TEACHER) + '</div>';
+        html = '<div class="choices">' + divisionObj().grades.map(function(g){return choice(g, 'Grade ' + g, g, data.grade===g);}).join('') + '</div>';
       }
       if (kind === 'sizes') {
         $('question').textContent = 'Jersey sizes';
@@ -374,7 +249,7 @@
           '<div class="fields" style="margin-top:16px">' + field('signature','Typed parent/guardian signature') + '</div>';
       }
       $('content').innerHTML = html;
-      document.querySelectorAll('.choice:not(.locked)').forEach(function(btn){ btn.addEventListener('click', function(){ selectChoice(btn.dataset.value); }); });
+      document.querySelectorAll('.choice').forEach(function(btn){ btn.addEventListener('click', function(){ selectChoice(btn.dataset.value); }); });
       document.querySelectorAll('.clearance').forEach(function(btn){ btn.addEventListener('click', function(){ saveInputs(); data.clearance = btn.dataset.value; render(); }); });
       $('backBtn').disabled = step === 0;
       $('nextBtn').textContent = step === steps.length - 1 ? 'Submit' : 'Next';
@@ -389,9 +264,8 @@
       if (kind === 'season') { data.sport=''; data.division=''; data.grade=''; }
       if (kind === 'sport') { data.division=''; data.grade=''; }
       if (kind === 'division') data.grade='';
-      if (kind === 'grade') data.homeroomTeacher='';
       render();
-      if (['season','sport','division','grade','homeroomTeacher'].indexOf(kind) !== -1) {
+      if (['season','sport','division','grade'].indexOf(kind) !== -1) {
         window.setTimeout(function(){ if (valid() && step < steps.length - 1) { step++; render(); } }, 120);
       }
     }
@@ -402,7 +276,6 @@
       if (kind === 'sport') return !!data.sport;
       if (kind === 'division') return !!data.division;
       if (kind === 'grade') return !!data.grade;
-      if (kind === 'homeroomTeacher') return !!data.homeroomTeacher;
       if (kind === 'numbers') return data.jersey1 && data.jersey2 && data.jersey3 && new Set([data.jersey1,data.jersey2,data.jersey3]).size === 3;
       if (kind === 'student') return data.lastName && data.firstName;
       if (kind === 'email') return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email);
@@ -417,28 +290,22 @@
     function back(){ saveInputs(); if (step > 0) { step--; render(); } }
     function submit(){
       $('nextBtn').disabled = true; $('status').textContent = 'Submitting...';
-      var payload = {};
-      Object.keys(data).forEach(function(k){ payload[k] = data[k]; });
-      payload.ua = navigator.userAgent;
-      fetch(ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      }).then(function(res){
-        return res.json().then(function(body){ return { ok: res.ok, body: body }; });
-      }).then(function(result){
-        if (!result.ok || !result.body.ok) throw new Error((result.body && result.body.error) || 'Submission failed');
+      var fd = new FormData();
+      fd.append('action','tryout');
+      Object.keys(data).forEach(function(k){ fd.append(k, data[k] === true ? 'yes' : data[k]); });
+      fd.append('ua', navigator.userAgent);
+      fetch(ENDPOINT, { method:'POST', body:fd, mode:'no-cors' }).then(function(){
         $('question').textContent = 'You are signed up';
         $('content').innerHTML = '<div class="choice active"><b>Tryout form sent</b><span>We will follow up using the email you provided.</span></div>';
         $('nextBtn').classList.add('hidden'); $('backBtn').classList.add('hidden'); $('status').textContent = '';
-      }).catch(function(err){
-        $('status').textContent = err && err.message ? err.message : 'Could not submit. Please try again.';
+      }).catch(function(){
+        $('status').textContent = 'Could not submit. Please try again.';
         $('nextBtn').disabled = false;
       });
     }
     function renderSummary(){
       var clearance = data.clearance === 'rmaPhysical' ? 'Physical uploaded to RMA' : data.clearance === 'waiver' ? 'Waiver signed' : '';
-      var rows = [['Season', seasonObj()?.label], ['Sport', data.sport], ['Division', data.division], ['Grade', data.grade], ['Teacher', data.homeroomTeacher], ['Sizes', data.shirtSize && data.shortSize ? data.shirtSize + ' / ' + data.shortSize : ''], ['Numbers', [data.jersey1,data.jersey2,data.jersey3].filter(Boolean).join(', ')], ['Student', [data.firstName,data.lastName].filter(Boolean).join(' ')], ['Email', data.email], ['Physical / waiver', clearance]];
+      var rows = [['Season', seasonObj()?.label], ['Sport', data.sport], ['Division', data.division], ['Grade', data.grade], ['Sizes', data.shirtSize && data.shortSize ? data.shirtSize + ' / ' + data.shortSize : ''], ['Numbers', [data.jersey1,data.jersey2,data.jersey3].filter(Boolean).join(', ')], ['Student', [data.firstName,data.lastName].filter(Boolean).join(' ')], ['Email', data.email], ['Physical / waiver', clearance]];
       $('summary').innerHTML = rows.map(function(r){ return '<div><b>'+r[0]+'</b>'+esc(r[1] || 'Not selected')+'</div>'; }).join('');
     }
     $('nextBtn').addEventListener('click', next);
@@ -450,5 +317,6 @@
     });
     render();
   </script>
+  <script src="slam-chat-widget.js" defer></script>
 </body>
 </html>
