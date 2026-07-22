@@ -109,10 +109,33 @@
     msgsEl.scrollTop = msgsEl.scrollHeight;
   }
 
+  // Auto-link known resources (case-insensitive, longest match first).
+  // Applied to already-escaped HTML so no injection risk.
+  var LINKS = [
+    { re: /\bRegister My Athlete\b/gi, url: "https://www.registermyathlete.com/login/" },
+    { re: /\bRMA\b/g, url: "https://www.registermyathlete.com/login/" },
+    { re: /\bNational Sports ID\b/gi, url: "https://www.nationalsportsid.com/" },
+    { re: /\bNSID\b/g, url: "https://www.nationalsportsid.com/" },
+    { re: /\b(?:www\.)?ncsaasports\.com\b/gi, url: "https://www.ncsaasports.com/" },
+    { re: /\bNCSAA\b/g, url: "https://www.ncsaasports.com/" },
+    { re: /\bslamnvathletics\.org\b/gi, url: "https://slamnvathletics.org" },
+    { re: /\b(?:www\.)?slamnv\.org\b/gi, url: "https://www.slamnv.org" },
+    { re: /\bkenny\.hin@slamnv\.org\b/gi, url: "mailto:kenny.hin@slamnv.org" },
+  ];
+
+  function linkify(html) {
+    // Skip regions already inside a link, and only match on plain text.
+    return LINKS.reduce(function (h, l) {
+      return h.replace(l.re, function (match) {
+        return '<a href="' + l.url + '" target="_blank" rel="noopener" style="color:' + GREEN + ';text-decoration:underline;font-weight:600;">' + match + "</a>";
+      });
+    }, html);
+  }
+
   function addBot(text) {
     var d = document.createElement("div");
     d.className = "slam-msg bot";
-    d.innerHTML = esc(text).replace(/\n/g, "<br>");
+    d.innerHTML = linkify(esc(text).replace(/\n/g, "<br>"));
     msgsEl.appendChild(d);
     msgsEl.scrollTop = msgsEl.scrollHeight;
   }
