@@ -7,7 +7,7 @@
   if (window.__slamChatMounted) return;
   window.__slamChatMounted = true;
 
-  var API_URL = "https://athleticsos.io/api/chat";
+  var API_URL = "https://www.athleticsos.io/api/chat";
   var LOGO = "assets/bull-only-transparent.png";
 
   var GREEN = "#1b4d20";
