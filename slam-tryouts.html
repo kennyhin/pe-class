@@ -45,6 +45,9 @@
     .choice span { display:block; color:#aaa; margin-top:8px; line-height:1.35; }
     .choice small { display:inline-block; margin-top:14px; color:#80FF00; font:900 11px monospace; letter-spacing:.08em; text-transform:uppercase; }
     .choice.danger small { color:#ffb0b7; }
+    .choice.closed { opacity:.42; cursor:not-allowed; transform:none !important; border-color:rgba(255,255,255,.08); box-shadow:none !important; }
+    .choice.closed:hover { transform:none; border-color:rgba(255,255,255,.08); box-shadow:none; }
+    .choice.closed small { color:#666; }
     .fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; max-width:760px; }
     label { display:flex; flex-direction:column; gap:7px; color:#aaa; font:800 11px monospace; letter-spacing:.1em; text-transform:uppercase; }
     input, select, textarea { width:100%; border:1px solid rgba(255,255,255,.14); border-radius:12px; background:rgba(0,0,0,.28); color:#fff; font:16px Arial,Helvetica,sans-serif; padding:13px 14px; outline:none; }
@@ -132,41 +135,11 @@
     </section>
   </main>
   <script>
+    var API_BASE = 'https://www.athleticsos.io';
     var ENDPOINT = 'https://script.google.com/macros/s/AKfycbx-a6Rgey0CuqAOTXnQp_puTWihRsclvndOBPrSwdjgbJszTfcwFC2-zXnESPguGwyu7Q/exec';
+    var SEASON_ORDER = ['fall', 'winter', 'spring'];
     var SIZES = ['YXS','YS','YM','YL','YXL','Adult XS','Adult S','Adult M','Adult L','Adult XL','Adult XXL','Adult XXXL'];
-    var SPORTS = {
-      fall: {
-        label: 'Fall',
-        dates: 'August - October',
-        sports: [
-          { sport:'Flag Football', divisions:[{name:'ES 1-3', grades:['1','2','3']},{name:'ES 4-5', grades:['4','5']}] },
-          { sport:'Girls Volleyball', divisions:[{name:'ES 3-5 Girls Rec', grades:['3','4','5']},{name:'ES 3-5 Girls Competitive', grades:['3','4','5']}] },
-          { sport:'Cross Country', divisions:[{name:'ES 3-4', grades:['3','4']},{name:'ES 5', grades:['5']}] },
-          { sport:'Sideline Cheerleading', divisions:[{name:'ES K-5', grades:['K','1','2','3','4','5']}] },
-          { sport:'Baseball', divisions:[{name:'ES K-1 T-Ball', grades:['K','1']},{name:'ES 2-3 Coach Pitch Baseball', grades:['2','3']}] }
-        ]
-      },
-      winter: {
-        label: 'Winter',
-        dates: 'November - February',
-        sports: [
-          { sport:'Basketball', divisions:[{name:'ES K-5', grades:['K','1','2','3','4','5']}] },
-          { sport:'Bowling', divisions:[{name:'ES 3-5', grades:['3','4','5']}] },
-          { sport:'Sideline Cheerleading', divisions:[{name:'ES K-5', grades:['K','1','2','3','4','5']}] },
-          { sport:'Baseball', divisions:[{name:'ES 4-5 Kid Pitch Baseball', grades:['4','5']}] }
-        ]
-      },
-      spring: {
-        label: 'Spring',
-        dates: 'March - May',
-        sports: [
-          { sport:'Soccer', divisions:[{name:'ES K-5', grades:['K','1','2','3','4','5']}] },
-          { sport:'Boys Volleyball', divisions:[{name:'ES 3-5', grades:['3','4','5']}] },
-          { sport:'Cheerleading Competitions', divisions:[{name:'ES 3-5', grades:['3','4','5']}] },
-          { sport:'Track & Field', divisions:[{name:'ES 4-5', grades:['4','5']}] }
-        ]
-      }
-    };
+    var SPORTS = {};
     var WAIVER = [
       ['Liability waiver and release','Participation in SLAM! Athletics tryouts and programs is voluntary and involves physical activity and inherent risks, including injury. I release and hold harmless SLAM Nevada Elementary School, SLAM! Athletics, staff, coaches, volunteers, and affiliated organizations from claims or damages arising out of participation.'],
       ['Assumption of risk','I understand athletic activities carry inherent risks including sprains, fractures, concussions, illness, and other harm. SLAM! Athletics makes no guarantee regarding placement on any team or roster.'],
@@ -183,8 +156,14 @@
     function seasonObj(){ return SPORTS[data.season]; }
     function sportObj(){ return (seasonObj()?.sports || []).find(function(s){ return s.sport === data.sport; }); }
     function divisionObj(){ return (sportObj()?.divisions || []).find(function(d){ return d.name === data.division; }); }
-    function choice(label, sub, value, active) {
-      return '<button class="choice" data-value="'+esc(value)+'"><b>'+esc(label)+'</b><span>'+esc(sub||'')+'</span><small>Choose</small></button>';
+    function divisionOpen(d){ return d.enabled !== false; }
+    function sportOpen(s){ return (s.divisions || []).some(divisionOpen); }
+    function seasonOpen(key){ var s = SPORTS[key]; return !!s && (s.sports || []).some(sportOpen); }
+    function choice(label, sub, value, active, open) {
+      if (!open) {
+        return '<div class="choice closed"><b>'+esc(label)+'</b><span>'+esc(sub||'')+'</span><small>Coming soon</small></div>';
+      }
+      return '<button type="button" class="choice'+(active?' active':'')+'" data-value="'+esc(value)+'"><b>'+esc(label)+'</b><span>'+esc(sub||'')+'</span><small>Choose</small></button>';
     }
     function esc(s){ return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
     function field(name,label,type,placeholder){
@@ -207,19 +186,25 @@
       $('status').textContent = '';
       if (kind === 'season') {
         $('question').textContent = 'Which season are you signing up for?';
-        html = '<div class="choices">' + Object.keys(SPORTS).map(function(k){return choice(SPORTS[k].label, SPORTS[k].dates, k, data.season===k);}).join('') + '</div>';
+        html = '<div class="choices">' + SEASON_ORDER.filter(function(k){ return SPORTS[k]; }).map(function(k){
+          return choice(SPORTS[k].label, SPORTS[k].dates, k, data.season===k, seasonOpen(k));
+        }).join('') + '</div>';
       }
       if (kind === 'sport') {
         $('question').textContent = 'Which sport?';
-        html = '<div class="choices">' + seasonObj().sports.map(function(s){return choice(s.sport, s.divisions.map(function(d){return d.name;}).join(' / '), s.sport, data.sport===s.sport);}).join('') + '</div>';
+        html = '<div class="choices">' + (seasonObj()?.sports || []).map(function(s){
+          return choice(s.sport, s.divisions.map(function(d){return d.name;}).join(' / '), s.sport, data.sport===s.sport, sportOpen(s));
+        }).join('') + '</div>';
       }
       if (kind === 'division') {
         $('question').textContent = 'Which division?';
-        html = '<div class="choices">' + sportObj().divisions.map(function(d){return choice(d.name, 'Grades: ' + d.grades.join(', '), d.name, data.division===d.name);}).join('') + '</div>';
+        html = '<div class="choices">' + (sportObj()?.divisions || []).map(function(d){
+          return choice(d.name, 'Grades: ' + d.grades.join(', '), d.name, data.division===d.name, divisionOpen(d));
+        }).join('') + '</div>';
       }
       if (kind === 'grade') {
         $('question').textContent = 'What grade?';
-        html = '<div class="choices">' + divisionObj().grades.map(function(g){return choice(g, 'Grade ' + g, g, data.grade===g);}).join('') + '</div>';
+        html = '<div class="choices">' + divisionObj().grades.map(function(g){return choice(g, 'Grade ' + g, g, data.grade===g, true);}).join('') + '</div>';
       }
       if (kind === 'sizes') {
         $('question').textContent = 'Jersey sizes';
@@ -249,7 +234,7 @@
           '<div class="fields" style="margin-top:16px">' + field('signature','Typed parent/guardian signature') + '</div>';
       }
       $('content').innerHTML = html;
-      document.querySelectorAll('.choice').forEach(function(btn){ btn.addEventListener('click', function(){ selectChoice(btn.dataset.value); }); });
+      document.querySelectorAll('.choice[data-value]').forEach(function(btn){ btn.addEventListener('click', function(){ selectChoice(btn.dataset.value); }); });
       document.querySelectorAll('.clearance').forEach(function(btn){ btn.addEventListener('click', function(){ saveInputs(); data.clearance = btn.dataset.value; render(); }); });
       $('backBtn').disabled = step === 0;
       $('nextBtn').textContent = step === steps.length - 1 ? 'Submit' : 'Next';
@@ -260,6 +245,15 @@
     }
     function selectChoice(value){
       var kind = steps[step];
+      if (kind === 'season' && !seasonOpen(value)) return;
+      if (kind === 'sport') {
+        var sport = (seasonObj()?.sports || []).find(function(s){ return s.sport === value; });
+        if (!sport || !sportOpen(sport)) return;
+      }
+      if (kind === 'division') {
+        var division = (sportObj()?.divisions || []).find(function(d){ return d.name === value; });
+        if (!division || !divisionOpen(division)) return;
+      }
       data[kind] = value;
       if (kind === 'season') { data.sport=''; data.division=''; data.grade=''; }
       if (kind === 'sport') { data.division=''; data.grade=''; }
@@ -272,9 +266,15 @@
     function valid(){
       saveInputs();
       var kind = steps[step];
-      if (kind === 'season') return !!data.season;
-      if (kind === 'sport') return !!data.sport;
-      if (kind === 'division') return !!data.division;
+      if (kind === 'season') return !!data.season && seasonOpen(data.season);
+      if (kind === 'sport') {
+        var sport = (seasonObj()?.sports || []).find(function(s){ return s.sport === data.sport; });
+        return !!data.sport && !!sport && sportOpen(sport);
+      }
+      if (kind === 'division') {
+        var division = (sportObj()?.divisions || []).find(function(d){ return d.name === data.division; });
+        return !!data.division && !!division && divisionOpen(division);
+      }
       if (kind === 'grade') return !!data.grade;
       if (kind === 'numbers') return data.jersey1 && data.jersey2 && data.jersey3 && new Set([data.jersey1,data.jersey2,data.jersey3]).size === 3;
       if (kind === 'student') return data.lastName && data.firstName;
@@ -315,7 +315,13 @@
       var open = rail.classList.toggle('open');
       this.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
-    render();
+    fetch(API_BASE + '/api/sports')
+      .then(function(r){ return r.json(); })
+      .then(function(j){ SPORTS = j || {}; render(); })
+      .catch(function(){
+        $('question').textContent = 'Could not load form';
+        $('content').innerHTML = '<div class="choice closed"><b>Try again in a moment</b><span>We could not load the latest sports list from AthleticsOS.</span><small>Refresh the page</small></div>';
+      });
   </script>
 </body>
 </html>
