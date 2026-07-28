@@ -136,7 +136,6 @@
   </main>
   <script>
     var API_BASE = 'https://www.athleticsos.io';
-    var ENDPOINT = 'https://script.google.com/macros/s/AKfycbx-a6Rgey0CuqAOTXnQp_puTWihRsclvndOBPrSwdjgbJszTfcwFC2-zXnESPguGwyu7Q/exec';
     var SEASON_ORDER = ['fall', 'winter', 'spring'];
     var SIZES = ['YXS','YS','YM','YL','YXL','Adult XS','Adult S','Adult M','Adult L','Adult XL','Adult XXL','Adult XXXL'];
     var SPORTS = {};
@@ -289,17 +288,41 @@
     }
     function back(){ saveInputs(); if (step > 0) { step--; render(); } }
     function submit(){
+      // AthleticsOS is the source of truth for the Tryout List. The old Google
+      // Apps Script endpoint only wrote to a Sheet (and used no-cors, so failures
+      // still looked like success) — that is why signups stopped showing in AD Hub.
       $('nextBtn').disabled = true; $('status').textContent = 'Submitting...';
-      var fd = new FormData();
-      fd.append('action','tryout');
-      Object.keys(data).forEach(function(k){ fd.append(k, data[k] === true ? 'yes' : data[k]); });
-      fd.append('ua', navigator.userAgent);
-      fetch(ENDPOINT, { method:'POST', body:fd, mode:'no-cors' }).then(function(){
+      saveInputs();
+      var payload = {
+        season: data.season,
+        sport: data.sport,
+        division: data.division,
+        grade: data.grade,
+        shirtSize: data.shirtSize,
+        shortSize: data.shortSize,
+        jersey1: data.jersey1,
+        jersey2: data.jersey2,
+        jersey3: data.jersey3,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        clearance: data.clearance,
+        signature: data.signature,
+        ua: navigator.userAgent
+      };
+      fetch(API_BASE + '/api/tryouts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(function(r){
+        return r.json().then(function(j){ return { ok: r.ok && j && j.ok, error: (j && j.error) || 'Submission failed' }; });
+      }).then(function(res){
+        if (!res.ok) throw new Error(res.error);
         $('question').textContent = 'You are signed up';
         $('content').innerHTML = '<div class="choice active"><b>Tryout form sent</b><span>We will follow up using the email you provided.</span></div>';
         $('nextBtn').classList.add('hidden'); $('backBtn').classList.add('hidden'); $('status').textContent = '';
-      }).catch(function(){
-        $('status').textContent = 'Could not submit. Please try again.';
+      }).catch(function(err){
+        $('status').textContent = (err && err.message) ? err.message : 'Could not submit. Please try again.';
         $('nextBtn').disabled = false;
       });
     }
