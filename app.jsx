@@ -1890,18 +1890,16 @@ function BullsCommitmentCard() {
   );
 }
 
-// Time-boxed tryout promo — pops up once per browser session while a specific
-// tryout window is open, then goes quiet on its own (endsAt) without needing a
-// manual removal later. Update endsAt/when/href here for the next promoted tryout.
+// Time-boxed homepage promo — pops up once per browser session until endsAt.
+// Swap image/copy/storageKey when the next tryout (or update) should be promoted.
 const TRYOUT_PROMO = {
-  storageKey: "slamPromoFlagFootball2026",
-  endsAt: "2026-08-04T23:59:59-07:00",
-  kicker: "Tryouts Open · Grades 3–5",
-  title: "SLAM! Flag Football Tryouts",
-  date: "Tue, Aug 4",
-  time: "5–7 PM",
-  cta: "Sign Up Now",
+  storageKey: "slamPromoFlagFootballPostponed2026",
+  endsAt: "2026-08-31T23:59:59-07:00",
+  title: "Flag Football Comp Tryouts — Postponed",
+  image: "assets/flag-football-tryouts-postponed.png",
+  note: "Aug 8 tryouts are postponed. Drop your email below and we’ll share the new date — tryout signup is still open.",
   href: "slam-tryouts.html",
+  cta: "Open tryout form",
 };
 
 function TryoutPromoPopup() {
@@ -1925,19 +1923,17 @@ function TryoutPromoPopup() {
   return ReactDOM.createPortal(
     <div className="promo-popup" role="dialog" aria-modal="true" aria-label={TRYOUT_PROMO.title}>
       <button className="promo-popup-backdrop" type="button" aria-label="Close" onClick={() => setOpen(false)} />
-      <section className="promo-popup-panel">
+      <section className="promo-popup-panel promo-popup-panel--flyer">
         <button className="promo-popup-close" type="button" onClick={() => setOpen(false)}>&times;</button>
-        <div className="promo-popup-kicker">{TRYOUT_PROMO.kicker}</div>
-        <h3 className="promo-popup-title">{TRYOUT_PROMO.title}</h3>
-        <div className="promo-popup-meta">
-          <div className="promo-popup-meta-item">
-            <span className="promo-popup-meta-label">Date</span>
-            <strong className="promo-popup-meta-value">{TRYOUT_PROMO.date}</strong>
-          </div>
-          <div className="promo-popup-meta-item">
-            <span className="promo-popup-meta-label">Time</span>
-            <strong className="promo-popup-meta-value">{TRYOUT_PROMO.time}</strong>
-          </div>
+        <img
+          className="promo-popup-flyer"
+          src={TRYOUT_PROMO.image}
+          alt={TRYOUT_PROMO.title}
+        />
+        <p className="promo-popup-note">{TRYOUT_PROMO.note}</p>
+        <div className="promo-popup-signup">
+          <div className="promo-popup-signup-kicker">Get the new date</div>
+          <SignupForm accent="red" />
         </div>
         <a className="promo-popup-cta" href={TRYOUT_PROMO.href}>
           {TRYOUT_PROMO.cta}
