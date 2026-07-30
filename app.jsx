@@ -1897,7 +1897,7 @@ const TRYOUT_PROMO = {
   endsAt: "2026-08-31T23:59:59-07:00",
   title: "Flag Football Comp Tryouts — Postponed",
   image: "assets/flag-football-tryouts-postponed.png",
-  note: "Aug 8 tryouts are postponed. Drop your email below and we’ll share the new date — tryout signup is still open.",
+  note: "Aug 8 tryouts are postponed. A new date is coming soon — tryout signup is still open.",
   href: "slam-tryouts.html",
   cta: "Open tryout form",
 };
@@ -1931,10 +1931,6 @@ function TryoutPromoPopup() {
           alt={TRYOUT_PROMO.title}
         />
         <p className="promo-popup-note">{TRYOUT_PROMO.note}</p>
-        <div className="promo-popup-signup">
-          <div className="promo-popup-signup-kicker">Get the new date</div>
-          <SignupForm accent="red" />
-        </div>
         <a className="promo-popup-cta" href={TRYOUT_PROMO.href}>
           {TRYOUT_PROMO.cta}
           <Icon name="arrow-right" size={16} />
