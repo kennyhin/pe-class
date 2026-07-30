@@ -108,6 +108,9 @@ textarea {
 .side-nav-toggle {
   display: none;
 }
+.side-nav-backdrop {
+  display: none;
+}
 .display-apostrophe {
   font-family: var(--font-mono);
   font-size: 0.82em;
@@ -2978,7 +2981,7 @@ textarea {
 }
 @media (max-width: 520px) {
   .side-nav {
-    position: absolute;
+    position: fixed;
     top: 12px;
     right: auto;
     left: 12px;
@@ -2991,11 +2994,24 @@ textarea {
     background: linear-gradient(180deg, rgba(18,18,18,0.54), rgba(10,10,10,0.3));
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
+    z-index: 280;
+    overflow: visible;
   }
   .side-nav.open {
     width: min(250px, calc(100% - 24px));
     padding: 8px 10px 10px;
-    background: linear-gradient(180deg, rgba(18,18,18,0.82), rgba(10,10,10,0.68));
+    background: linear-gradient(180deg, rgba(18,18,18,0.92), rgba(10,10,10,0.88));
+    box-shadow: 0 24px 60px rgba(0,0,0,0.55);
+  }
+  .side-nav.open .side-nav-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    border: 0;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
   }
   .side-nav-toggle {
     appearance: none;

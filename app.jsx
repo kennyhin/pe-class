@@ -297,19 +297,47 @@ function SignupForm({ accent }) {
 // ---------------------------------------------------------------------------
 // Sections
 // ---------------------------------------------------------------------------
-function Nav() {
+function Nav({ onOpenInfo }) {
   const [open, setOpen] = useState(false);
   const items = [
-    ["Register for sports", "slam-register.html"],
-    ["Athletic eligibility", "slam-eligibility.html"],
-    ["Sports physicals/insurance", "#physicals"],
-    ["Bulls commitment", "#commitment"],
-    ["Sports offered", "#sports"],
-    ["Tryouts", "slam-tryouts.html"],
-    ["Coach for SLAM!", "slam-coach-apply.html"],
+    { label: "Register for sports", href: "slam-register.html" },
+    { label: "Athletic eligibility", href: "slam-eligibility.html" },
+    { label: "Sports physicals/insurance", href: "#physicals", infoKey: "physicals" },
+    { label: "Bulls commitment", href: "#commitment" },
+    { label: "Sports offered", href: "#sports", infoKey: "sports" },
+    { label: "Tryouts", href: "slam-tryouts.html" },
+    { label: "Coach for SLAM!", href: "slam-coach-apply.html" },
   ];
+
+  function handleNavClick(event, item) {
+    // Close the drawer first so it doesn't sit over the destination.
+    setOpen(false);
+
+    if (item.infoKey) {
+      event.preventDefault();
+      onOpenInfo?.(item.infoKey);
+      return;
+    }
+
+    if (item.href.startsWith("#")) {
+      event.preventDefault();
+      const id = item.href.slice(1);
+      window.requestAnimationFrame(() => {
+        document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  }
+
   return (
     <nav className={`side-nav ${open ? "open" : ""}`} aria-label="Athletics navigation">
+      {open && (
+        <button
+          className="side-nav-backdrop"
+          type="button"
+          aria-label="Close menu"
+          onClick={() => setOpen(false)}
+        />
+      )}
       <button
         className="side-nav-toggle"
         type="button"
@@ -328,9 +356,13 @@ function Nav() {
       >
         <img src="assets/bull-only-transparent.png" alt="SLAM! Athletics bull" />
       </button>
-      {items.map(([label, href]) => (
-        <a key={label} href={href}>
-          <span>{label}</span>
+      {items.map((item) => (
+        <a
+          key={item.label}
+          href={item.href}
+          onClick={(event) => handleNavClick(event, item)}
+        >
+          <span>{item.label}</span>
           <i aria-hidden="true" />
         </a>
       ))}
@@ -507,7 +539,12 @@ function Hero({ bg }) {
   return (
     <section className="hero" id="top" data-screen-label="01 Hero">
       <HeroBackground variant={bg} />
-      <Nav />
+      <Nav
+        onOpenInfo={(key) => {
+          const item = HERO_SHORTCUTS.find((entry) => entry.key === key);
+          if (item) setShortcutModal(item);
+        }}
+      />
       <div className="hero-inner hero-center">
         <div className="welcome-eyebrow">Welcome to</div>
 
