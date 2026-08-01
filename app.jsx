@@ -1928,14 +1928,17 @@ function BullsCommitmentCard() {
 }
 
 // Time-boxed homepage promo — pops up once per browser session until endsAt.
-// Swap image/copy/storageKey when the next tryout (or update) should be promoted.
+// Swap copy/storageKey when the next tryout (or update) should be promoted.
 const TRYOUT_PROMO = {
-  storageKey: "slamPromoFlagFootballPostponed2026",
-  endsAt: "2026-08-31T23:59:59-07:00",
-  title: "Flag Football Comp Tryouts — Postponed",
-  image: "assets/flag-football-tryouts-postponed.png",
+  storageKey: "slamPromoFlagFootballRescheduled2026",
+  endsAt: "2026-08-08T23:59:59-07:00",
+  kicker: "Rescheduled · Grades 3–5",
+  title: "Flag Football Tryouts (3–5)",
+  note: "Has been rescheduled to:",
+  date: "Aug 8",
+  time: "8AM – 9:30AM",
   href: "slam-tryouts.html",
-  cta: "Open tryout form",
+  cta: "Sign Up Now",
 };
 
 function TryoutPromoPopup() {
@@ -1959,13 +1962,21 @@ function TryoutPromoPopup() {
   return ReactDOM.createPortal(
     <div className="promo-popup" role="dialog" aria-modal="true" aria-label={TRYOUT_PROMO.title}>
       <button className="promo-popup-backdrop" type="button" aria-label="Close" onClick={() => setOpen(false)} />
-      <section className="promo-popup-panel promo-popup-panel--flyer">
+      <section className="promo-popup-panel">
         <button className="promo-popup-close" type="button" onClick={() => setOpen(false)}>&times;</button>
-        <img
-          className="promo-popup-flyer"
-          src={TRYOUT_PROMO.image}
-          alt={TRYOUT_PROMO.title}
-        />
+        <div className="promo-popup-kicker">{TRYOUT_PROMO.kicker}</div>
+        <h3 className="promo-popup-title">{TRYOUT_PROMO.title}</h3>
+        <p className="promo-popup-note">{TRYOUT_PROMO.note}</p>
+        <div className="promo-popup-meta">
+          <div className="promo-popup-meta-item">
+            <span className="promo-popup-meta-label">Date</span>
+            <strong className="promo-popup-meta-value">{TRYOUT_PROMO.date}</strong>
+          </div>
+          <div className="promo-popup-meta-item">
+            <span className="promo-popup-meta-label">Time</span>
+            <strong className="promo-popup-meta-value">{TRYOUT_PROMO.time}</strong>
+          </div>
+        </div>
         <a className="promo-popup-cta" href={TRYOUT_PROMO.href}>
           {TRYOUT_PROMO.cta}
           <Icon name="arrow-right" size={16} />
