@@ -41,11 +41,20 @@
     .card-links { display:flex; flex-wrap:wrap; gap:8px; margin-top:auto; padding-top:16px; }
     .card-link { display:inline-flex; align-items:center; justify-content:center; min-height:34px; border:1px solid rgba(255,255,255,.14); border-radius:999px; padding:0 12px; background:rgba(255,255,255,.055); color:#e8e8e8; font:900 10px monospace; letter-spacing:.08em; text-decoration:none; text-transform:uppercase; }
     .card-link:hover { border-color:rgba(128,255,0,.42); color:#80FF00; }
+    .approval-disclosure { margin-top:16px; }
+    .approval-toggle { width:100%; min-height:40px; border:1px solid rgba(128,255,0,.32); border-radius:10px; padding:8px 12px; background:rgba(128,255,0,.075); color:#e8e8e8; font:900 10px/1.35 monospace; letter-spacing:.08em; text-transform:uppercase; }
+    .approval-toggle:hover, .approval-toggle[aria-expanded="true"] { border-color:rgba(128,255,0,.62); background:rgba(128,255,0,.12); color:#80FF00; }
+    .approval-toggle:focus-visible { outline:3px solid #80FF00; outline-offset:3px; }
+    .approval-panel { margin-top:10px; border:1px solid rgba(128,255,0,.2); border-radius:12px; padding:14px; background:rgba(128,255,0,.065); }
+    .approval-panel h3 { margin:0 0 10px; color:#fff; font:20px/1 Impact,"Arial Black",sans-serif; text-transform:uppercase; }
+    .approval-panel ol { margin:0; padding-left:20px; color:#d0d0d0; font-size:13px; line-height:1.5; }
+    .approval-panel li + li { margin-top:8px; }
+    .approval-panel strong { color:#fff; }
     .bottom-actions { display:flex; justify-content:flex-end; padding:18px 28px 28px; border-top:1px solid rgba(255,255,255,.08); }
     .arrow { position:absolute; top:188px; width:44px; height:18px; color:#80FF00; font:900 28px monospace; opacity:.86; pointer-events:none; }
     .a1 { left:23.5%; } .a2 { left:49%; transform:rotate(-4deg); } .a3 { left:74.5%; }
     @media (max-width:980px){ .hero{grid-template-columns:1fr}.plays{grid-template-columns:1fr 1fr}.arrow{display:none}.play{min-height:260px}.headline{font-size:52px} }
-    @media (max-width:560px){ .page{padding:10px}.top{padding:14px 16px;align-items:flex-start}.top-actions{width:100%;justify-content:flex-start}.page-links{justify-content:flex-start}.brand img{width:48px}h1{font-size:32px}.hero{padding:20px}.headline{font-size:40px}.lead{font-size:15px}.board{padding:18px}.plays{grid-template-columns:1fr}.play{min-height:0}.bottom-actions{padding:16px;justify-content:stretch}.back{width:100%} }
+    @media (max-width:560px){ .page{padding:10px}.top{padding:14px 16px;align-items:flex-start;flex-wrap:wrap}.top-actions{width:100%;justify-content:flex-start}.page-links{justify-content:flex-start}.brand img{width:48px}h1{font-size:32px}.hero{padding:20px}.headline{font-size:40px}.lead{font-size:15px}.board{padding:18px}.plays{grid-template-columns:1fr}.play{min-height:0}.approval-panel ol{font-size:14px}.bottom-actions{padding:16px;justify-content:stretch}.back{width:100%} }
   </style>
 </head>
 <body>
@@ -95,6 +104,19 @@
               <li>6-8: choose Middle School.</li>
               <li>9-12: no label, just the sport.</li>
             </ul>
+            <div class="approval-disclosure">
+              <button class="approval-toggle" id="approval-toggle" type="button" aria-expanded="false" aria-controls="approval-details">How admin approval works</button>
+              <div class="approval-panel" id="approval-details" role="region" aria-labelledby="approval-toggle" hidden>
+                <h3>What happens after you register</h3>
+                <ol>
+                  <li><strong>Admin review, not automatic.</strong> Once you create or update your Register My Athlete account and finish registration, it is sent to the SLAM! athletic office for approval. Approval is not instant.</li>
+                  <li><strong>Have these ready:</strong> correct student information, the sports physical uploaded in Step 1, and the right grade bracket (K-5 Elementary, 6-8 Middle School, or 9-12 just the sport).</li>
+                  <li><strong>Watch for the approval email.</strong> You will get a confirmation once your account is approved. Check spam or junk if it does not show up quickly.</li>
+                  <li><strong>Approved means cleared for tryouts.</strong> After approval, your athlete is cleared to participate. The team fee in Step 4 is only due if the student makes the team.</li>
+                  <li><strong>Need help?</strong> Contact the SLAM! athletic office.</li>
+                </ol>
+              </div>
+            </div>
             <div class="card-links">
               <a class="card-link" href="https://www.registermyathlete.com/login/" target="_blank" rel="noopener">RMA website</a>
               <a class="card-link" href="https://www.slamnv.org/ourpages/auto/2024/11/9/34062080/SLAM%20Athletics%20-%20Parent%20RMA%20Instructions.pdf?rnd=1731195637965" target="_blank" rel="noopener">RMA instructions</a>
@@ -123,5 +145,16 @@
       </div>
     </section>
   </main>
+  <script>
+    const approvalToggle = document.getElementById("approval-toggle");
+    const approvalDetails = document.getElementById("approval-details");
+
+    approvalToggle.addEventListener("click", () => {
+      const isExpanded = approvalToggle.getAttribute("aria-expanded") === "true";
+      approvalToggle.setAttribute("aria-expanded", String(!isExpanded));
+      approvalToggle.textContent = isExpanded ? "How admin approval works" : "Hide details";
+      approvalDetails.hidden = isExpanded;
+    });
+  </script>
 </body>
 </html>
