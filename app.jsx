@@ -396,6 +396,7 @@ const HERO_SHORTCUTS = [
   { key: "eligibility", eyebrow: "Eligibility", label: "Athletic eligibility", href: "slam-eligibility.html", mode: "page" },
   { key: "physicals", eyebrow: "Physicals", label: "Sports physicals", href: "#physicals", mode: "info" },
   { key: "sports", eyebrow: "Sports", label: "Sports offered", href: "#sports", mode: "info" },
+  { key: "tryout-schedule", eyebrow: "Tryouts", label: "Tryout schedule & dates", href: "#tryout-schedule", mode: "info" },
   { key: "tryouts", eyebrow: "Tryouts", label: "Tryout form", href: "slam-tryouts.html", mode: "page" },
   { key: "coach", eyebrow: "Coach", label: "Coach for SLAM!", href: "slam-coach-apply.html", mode: "page" },
 ];
@@ -421,6 +422,8 @@ function ShortcutModal({ item, onClose }) {
         <button className="shortcut-modal-close" type="button" onClick={onClose}>×</button>
         {isPage ? (
           <iframe title={item.label} src={`${item.href}?modal=1`} />
+        ) : item.key === "tryout-schedule" ? (
+          <TryoutScheduleInfo />
         ) : (
           <ShortcutInfo item={item} />
         )}
@@ -521,6 +524,35 @@ function ShortcutInfo({ item }) {
       <div className="shortcut-actions">
         {renderShortcutLinks(coach, [{ label: "Email athletics", url: "mailto:kenny.hin@slamnv.org" }])}
       </div>
+    </div>
+  );
+}
+
+// Standalone shortcut panel — live schedule + notes, independent of the
+// tryout form page. Dates auto-drop off the API the day after they pass.
+function TryoutScheduleInfo() {
+  const [state, setState] = useState({ loading: true, data: null, error: false });
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(API_BASE + "/api/tryout-schedule")
+      .then((r) => r.json())
+      .then((data) => { if (!cancelled) setState({ loading: false, data, error: false }); })
+      .catch(() => { if (!cancelled) setState({ loading: false, data: null, error: true }); });
+    return () => { cancelled = true; };
+  }, []);
+
+  return (
+    <div className="shortcut-info">
+      <div className="shortcut-kicker">Tryouts</div>
+      <h2>Tryout Schedule &amp; Info</h2>
+      {state.loading ? (
+        <p>Loading schedule…</p>
+      ) : state.error ? (
+        <p>Could not load the schedule right now — try again in a moment.</p>
+      ) : (
+        <TryoutScheduleTable schedule={state.data.schedule} notes={state.data.notes} />
+      )}
     </div>
   );
 }
@@ -1960,6 +1992,49 @@ function PopupFaqItem({ item }) {
   );
 }
 
+// Shared by the popup's "tryoutSchedule" block and the standalone "Tryout
+// schedule & dates" hero shortcut — same markup, two different homes.
+function TryoutScheduleTable({ schedule, notes }) {
+  const days = schedule || [];
+  const noteList = notes || [];
+  return (
+    <>
+      {days.length === 0 ? (
+        <p className="promo-popup-note">Dates are being finalized — check back soon.</p>
+      ) : (
+        <div className="tryout-popup-schedule">
+          {days.map((day) => (
+            <div key={day.date} className="tryout-popup-day">
+              <div className="tryout-popup-date">{formatScheduleDate(day.date)}</div>
+              <div className="tryout-popup-col-head">
+                <span>Sport</span>
+                <span>Time</span>
+              </div>
+              {day.rows.map((row, i) => (
+                <div key={i} className="tryout-popup-row">
+                  <span className="tryout-popup-sport">
+                    {row.teamName.toUpperCase()}
+                    {row.roundLabel && <span className="tryout-popup-badge">{row.roundLabel}</span>}
+                  </span>
+                  <span className="tryout-popup-time">
+                    {formatScheduleTime(row.start)} – {formatScheduleTime(row.end)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+      {noteList.length > 0 && (
+        <div className="tryout-popup-notes">
+          <div className="tryout-popup-notes-title">Important</div>
+          <ul>{noteList.map((note, i) => <li key={i}>{note}</li>)}</ul>
+        </div>
+      )}
+    </>
+  );
+}
+
 function PopupBlock({ block }) {
   switch (block.type) {
     case "header":
@@ -1986,46 +2061,8 @@ function PopupBlock({ block }) {
       );
     }
 
-    case "tryoutSchedule": {
-      const schedule = block.data.schedule || [];
-      const notes = block.data.notes || [];
-      return (
-        <>
-          {schedule.length === 0 ? (
-            <p className="promo-popup-note">Dates are being finalized — check back soon.</p>
-          ) : (
-            <div className="tryout-popup-schedule">
-              {schedule.map((day) => (
-                <div key={day.date} className="tryout-popup-day">
-                  <div className="tryout-popup-date">{formatScheduleDate(day.date)}</div>
-                  <div className="tryout-popup-col-head">
-                    <span>Sport</span>
-                    <span>Time</span>
-                  </div>
-                  {day.rows.map((row, i) => (
-                    <div key={i} className="tryout-popup-row">
-                      <span className="tryout-popup-sport">
-                        {row.teamName.toUpperCase()}
-                        {row.roundLabel && <span className="tryout-popup-badge">{row.roundLabel}</span>}
-                      </span>
-                      <span className="tryout-popup-time">
-                        {formatScheduleTime(row.start)} – {formatScheduleTime(row.end)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          )}
-          {notes.length > 0 && (
-            <div className="tryout-popup-notes">
-              <div className="tryout-popup-notes-title">Important</div>
-              <ul>{notes.map((note, i) => <li key={i}>{note}</li>)}</ul>
-            </div>
-          )}
-        </>
-      );
-    }
+    case "tryoutSchedule":
+      return <TryoutScheduleTable schedule={block.data.schedule} notes={block.data.notes} />;
 
     case "faq": {
       const items = block.data.items || [];
