@@ -1939,32 +1939,6 @@ const TRYOUT_POPUP_CONFIG = {
   cta: "View Full Details & Sign Up",
 };
 
-// Answers to the questions parents actually asked in the comments — kept as a
-// short static list here since they're specific to this popup, not the
-// site-wide FAQ (slam-faq.html).
-const TRYOUT_FAQ = [
-  {
-    q: "Do Tee-ball / Coach Pitch athletes still need to register with RMA?",
-    a: "Yes — Register My Athlete (RMA) is required for every athlete before they're cleared to participate, in addition to the sport sign-up form.",
-  },
-  {
-    q: "Is there a middle school flag football tryout?",
-    a: "Not currently — Flag Football is offered for elementary grades only (1st–3rd and 3rd–5th).",
-  },
-  {
-    q: "Are Flag Football (3rd–5th) tryouts really two days?",
-    a: "Yes — there's a first session and a make-up session for anyone who can't make the first one. Both are listed below.",
-  },
-  {
-    q: "When are cheerleading tryouts for Kindergarten?",
-    a: "Kindergarten is included in Sideline Cheerleading (K–5th) — a date hasn't been set yet. Check back here once it's posted.",
-  },
-  {
-    q: "Is Cross Country open to all ages?",
-    a: "Cross Country is for elementary grades 3rd–5th only.",
-  },
-];
-
 function formatScheduleDate(dateStr) {
   const noon = new Date(dateStr + "T12:00:00");
   return noon.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" }).toUpperCase();
@@ -1982,11 +1956,11 @@ function TryoutFaqItem({ item }) {
   return (
     <div className={`qa-item ${open ? "open" : ""}`}>
       <button className="qa-q" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
-        <span>{item.q}</span>
+        <span>{item.question}</span>
         <span className="qa-icon" aria-hidden="true">{open ? "−" : "+"}</span>
       </button>
       <div className="qa-a-wrap" style={{ maxHeight: open ? 300 : 0 }}>
-        <p className="qa-a">{item.a}</p>
+        <p className="qa-a">{item.answer}</p>
       </div>
     </div>
   );
@@ -2069,10 +2043,12 @@ function TryoutPromoPopup() {
           </div>
         )}
 
-        <div className="tryout-popup-faq">
-          <div className="tryout-popup-section-title">Common Questions</div>
-          {TRYOUT_FAQ.map((item, i) => <TryoutFaqItem key={i} item={item} />)}
-        </div>
+        {schedule.faq && schedule.faq.length > 0 && (
+          <div className="tryout-popup-faq">
+            <div className="tryout-popup-section-title">Common Questions</div>
+            {schedule.faq.map((item, i) => <TryoutFaqItem key={i} item={item} />)}
+          </div>
+        )}
 
         <a className="promo-popup-cta" href={TRYOUT_POPUP_CONFIG.href}>
           {TRYOUT_POPUP_CONFIG.cta}
