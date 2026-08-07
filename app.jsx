@@ -1928,57 +1928,154 @@ function BullsCommitmentCard() {
 }
 
 // Time-boxed homepage promo — pops up once per browser session until endsAt.
-// Swap copy/storageKey when the next tryout (or update) should be promoted.
-const TRYOUT_PROMO = {
-  storageKey: "slamPromoFlagFootballRescheduled2026",
-  endsAt: "2026-08-08T23:59:59-07:00",
-  kicker: "Rescheduled · Grades 3–5",
-  title: "Flag Football Tryouts (3–5)",
-  note: "Has been rescheduled to:",
-  date: "Aug 8",
-  time: "8AM – 9:30AM",
+// Schedule/notes are fetched live from AthleticsOS (Tryout Builder → Save),
+// so this never goes stale the way a hand-copied single event used to.
+const TRYOUT_POPUP_CONFIG = {
+  storageKey: "slamPromoTryoutScheduleFull2026",
+  endsAt: "2026-08-21T23:59:59-07:00",
+  kicker: "26–27 Fall Tryouts",
+  title: "Tryout Schedule",
   href: "slam-tryouts.html",
-  cta: "Sign Up Now",
+  cta: "View Full Details & Sign Up",
 };
+
+// Answers to the questions parents actually asked in the comments — kept as a
+// short static list here since they're specific to this popup, not the
+// site-wide FAQ (slam-faq.html).
+const TRYOUT_FAQ = [
+  {
+    q: "Do Tee-ball / Coach Pitch athletes still need to register with RMA?",
+    a: "Yes — Register My Athlete (RMA) is required for every athlete before they're cleared to participate, in addition to the sport sign-up form.",
+  },
+  {
+    q: "Is there a middle school flag football tryout?",
+    a: "Not currently — Flag Football is offered for elementary grades only (1st–3rd and 3rd–5th).",
+  },
+  {
+    q: "Are Flag Football (3rd–5th) tryouts really two days?",
+    a: "Yes — there's a first session and a make-up session for anyone who can't make the first one. Both are listed below.",
+  },
+  {
+    q: "When are cheerleading tryouts for Kindergarten?",
+    a: "Kindergarten is included in Sideline Cheerleading (K–5th) — a date hasn't been set yet. Check back here once it's posted.",
+  },
+  {
+    q: "Is Cross Country open to all ages?",
+    a: "Cross Country is for elementary grades 3rd–5th only.",
+  },
+];
+
+function formatScheduleDate(dateStr) {
+  const noon = new Date(dateStr + "T12:00:00");
+  return noon.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" }).toUpperCase();
+}
+
+function formatScheduleTime(hhmm) {
+  const [h, m] = hhmm.split(":").map(Number);
+  const period = h >= 12 ? "PM" : "AM";
+  const hour12 = h % 12 || 12;
+  return `${hour12}:${String(m).padStart(2, "0")} ${period}`;
+}
+
+function TryoutFaqItem({ item }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className={`qa-item ${open ? "open" : ""}`}>
+      <button className="qa-q" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+        <span>{item.q}</span>
+        <span className="qa-icon" aria-hidden="true">{open ? "−" : "+"}</span>
+      </button>
+      <div className="qa-a-wrap" style={{ maxHeight: open ? 300 : 0 }}>
+        <p className="qa-a">{item.a}</p>
+      </div>
+    </div>
+  );
+}
 
 function TryoutPromoPopup() {
   const [open, setOpen] = useState(false);
+  const [schedule, setSchedule] = useState(null);
 
   useEffect(() => {
-    if (new Date() > new Date(TRYOUT_PROMO.endsAt)) return;
+    if (new Date() > new Date(TRYOUT_POPUP_CONFIG.endsAt)) return;
     let dismissed = false;
-    try { dismissed = !!sessionStorage.getItem(TRYOUT_PROMO.storageKey); } catch (_) {}
+    try { dismissed = !!sessionStorage.getItem(TRYOUT_POPUP_CONFIG.storageKey); } catch (_) {}
     if (dismissed) return;
 
-    const timer = setTimeout(() => {
-      setOpen(true);
-      try { sessionStorage.setItem(TRYOUT_PROMO.storageKey, "1"); } catch (_) {}
-    }, 800);
-    return () => clearTimeout(timer);
+    let cancelled = false;
+    let timer = null;
+    fetch(API_BASE + "/api/tryout-schedule")
+      .then((r) => r.json())
+      .then((data) => {
+        if (cancelled || !data || !Array.isArray(data.schedule)) return;
+        setSchedule(data);
+        timer = setTimeout(() => {
+          if (cancelled) return;
+          setOpen(true);
+          try { sessionStorage.setItem(TRYOUT_POPUP_CONFIG.storageKey, "1"); } catch (_) {}
+        }, 800);
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
   }, []);
 
-  if (!open) return null;
+  if (!open || !schedule) return null;
 
   return ReactDOM.createPortal(
-    <div className="promo-popup" role="dialog" aria-modal="true" aria-label={TRYOUT_PROMO.title}>
+    <div className="promo-popup" role="dialog" aria-modal="true" aria-label={TRYOUT_POPUP_CONFIG.title}>
       <button className="promo-popup-backdrop" type="button" aria-label="Close" onClick={() => setOpen(false)} />
-      <section className="promo-popup-panel">
+      <section className="promo-popup-panel promo-popup-panel--flyer">
         <button className="promo-popup-close" type="button" onClick={() => setOpen(false)}>&times;</button>
-        <div className="promo-popup-kicker">{TRYOUT_PROMO.kicker}</div>
-        <h3 className="promo-popup-title">{TRYOUT_PROMO.title}</h3>
-        <p className="promo-popup-note">{TRYOUT_PROMO.note}</p>
-        <div className="promo-popup-meta">
-          <div className="promo-popup-meta-item">
-            <span className="promo-popup-meta-label">Date</span>
-            <strong className="promo-popup-meta-value">{TRYOUT_PROMO.date}</strong>
+        <div className="promo-popup-kicker">{TRYOUT_POPUP_CONFIG.kicker}</div>
+        <h3 className="promo-popup-title">{TRYOUT_POPUP_CONFIG.title}</h3>
+
+        {schedule.schedule.length === 0 ? (
+          <p className="promo-popup-note">Dates are being finalized — check back soon.</p>
+        ) : (
+          <div className="tryout-popup-schedule">
+            {schedule.schedule.map((day) => (
+              <div key={day.date} className="tryout-popup-day">
+                <div className="tryout-popup-date">{formatScheduleDate(day.date)}</div>
+                <div className="tryout-popup-col-head">
+                  <span>Sport</span>
+                  <span>Time</span>
+                </div>
+                {day.rows.map((row, i) => (
+                  <div key={i} className="tryout-popup-row">
+                    <span className="tryout-popup-sport">
+                      {row.teamName.toUpperCase()}
+                      {row.roundLabel && <span className="tryout-popup-badge">{row.roundLabel}</span>}
+                    </span>
+                    <span className="tryout-popup-time">
+                      {formatScheduleTime(row.start)} – {formatScheduleTime(row.end)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ))}
           </div>
-          <div className="promo-popup-meta-item">
-            <span className="promo-popup-meta-label">Time</span>
-            <strong className="promo-popup-meta-value">{TRYOUT_PROMO.time}</strong>
+        )}
+
+        {schedule.notes && schedule.notes.length > 0 && (
+          <div className="tryout-popup-notes">
+            <div className="tryout-popup-notes-title">Important</div>
+            <ul>
+              {schedule.notes.map((note, i) => <li key={i}>{note}</li>)}
+            </ul>
           </div>
+        )}
+
+        <div className="tryout-popup-faq">
+          <div className="tryout-popup-section-title">Common Questions</div>
+          {TRYOUT_FAQ.map((item, i) => <TryoutFaqItem key={i} item={item} />)}
         </div>
-        <a className="promo-popup-cta" href={TRYOUT_PROMO.href}>
-          {TRYOUT_PROMO.cta}
+
+        <a className="promo-popup-cta" href={TRYOUT_POPUP_CONFIG.href}>
+          {TRYOUT_POPUP_CONFIG.cta}
           <Icon name="arrow-right" size={16} />
         </a>
       </section>

@@ -511,6 +511,116 @@ textarea {
 }
 .promo-popup-panel--flyer .signup-status { min-height: 18px; }
 
+.tryout-popup-section-title {
+  margin: 22px 0 8px;
+  color: var(--slam-lime);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 1000;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.tryout-popup-schedule {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+.tryout-popup-day {
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.tryout-popup-date {
+  padding: 9px 14px;
+  background: rgba(255,255,255,0.06);
+  color: var(--slam-white);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.tryout-popup-col-head {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 14px;
+  background: rgba(128,255,0,0.16);
+  color: var(--slam-lime);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.tryout-popup-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 12px;
+  padding: 10px 14px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.tryout-popup-sport {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  color: var(--slam-white);
+  font-family: "Archivo Black", "Impact", sans-serif;
+  font-size: 12.5px;
+  text-transform: uppercase;
+}
+.tryout-popup-time {
+  flex-shrink: 0;
+  color: var(--slam-red);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.tryout-popup-badge {
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--slam-red);
+  color: var(--slam-white);
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.tryout-popup-notes {
+  margin-top: 20px;
+  padding: 14px 16px;
+  border: 1px solid rgba(218,0,22,0.4);
+  border-radius: 14px;
+  background: rgba(218,0,22,0.08);
+}
+.tryout-popup-notes-title {
+  margin: 0 0 8px;
+  color: var(--slam-red);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 1000;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.tryout-popup-notes ul {
+  margin: 0;
+  padding-left: 18px;
+  color: #cfcfcf;
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+.tryout-popup-notes li + li { margin-top: 6px; }
+.tryout-popup-faq { margin-top: 6px; }
+.tryout-popup-faq .qa-item { border-bottom-color: rgba(255,255,255,0.1); }
+.tryout-popup-faq .qa-q { padding: 12px 0; font-size: 13px; }
+.tryout-popup-faq .qa-a { font-size: 12.5px; padding-right: 0; }
+
 .shortcut-modal {
   position: fixed;
   inset: 0;
