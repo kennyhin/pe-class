@@ -1927,17 +1927,11 @@ function BullsCommitmentCard() {
   );
 }
 
-// Time-boxed homepage promo — pops up once per browser session until endsAt.
-// Schedule/notes are fetched live from AthleticsOS (Tryout Builder → Save),
-// so this never goes stale the way a hand-copied single event used to.
-const TRYOUT_POPUP_CONFIG = {
-  storageKey: "slamPromoTryoutScheduleFull2026",
-  endsAt: "2026-08-21T23:59:59-07:00",
-  kicker: "26–27 Fall Tryouts",
-  title: "Tryout Schedule",
-  href: "slam-tryouts.html",
-  cta: "View Full Details & Sign Up",
-};
+// Homepage popup — built from reorderable blocks in AthleticsOS
+// (/admin/website/popups) instead of hand-coded here. Pops up once per
+// browser session, per popup id, until its optional endsAt. Renders whatever
+// the currently-active popup's blocks are — could be none.
+const POPUP_OPEN_DELAY_MS = 800;
 
 function formatScheduleDate(dateStr) {
   const noon = new Date(dateStr + "T12:00:00");
@@ -1951,7 +1945,7 @@ function formatScheduleTime(hhmm) {
   return `${hour12}:${String(m).padStart(2, "0")} ${period}`;
 }
 
-function TryoutFaqItem({ item }) {
+function PopupFaqItem({ item }) {
   const [open, setOpen] = useState(false);
   return (
     <div className={`qa-item ${open ? "open" : ""}`}>
@@ -1966,28 +1960,121 @@ function TryoutFaqItem({ item }) {
   );
 }
 
-function TryoutPromoPopup() {
+function PopupBlock({ block }) {
+  switch (block.type) {
+    case "header":
+      return <h3 className="promo-popup-title">{block.data.text}</h3>;
+
+    case "subheader":
+      return <div className="promo-popup-kicker">{block.data.text}</div>;
+
+    case "text": {
+      const lines = String(block.data.body || "").split("\n").filter((l) => l.trim());
+      if (block.data.style === "callout") {
+        return (
+          <div className="tryout-popup-notes">
+            <div className="tryout-popup-notes-title">{block.data.title || "Important"}</div>
+            <ul>{lines.map((l, i) => <li key={i}>{l}</li>)}</ul>
+          </div>
+        );
+      }
+      return (
+        <div>
+          {block.data.title && <p className="promo-popup-note" style={{ fontWeight: 700 }}>{block.data.title}</p>}
+          {lines.map((l, i) => <p key={i} className="promo-popup-note">{l}</p>)}
+        </div>
+      );
+    }
+
+    case "tryoutSchedule": {
+      const schedule = block.data.schedule || [];
+      const notes = block.data.notes || [];
+      return (
+        <>
+          {schedule.length === 0 ? (
+            <p className="promo-popup-note">Dates are being finalized — check back soon.</p>
+          ) : (
+            <div className="tryout-popup-schedule">
+              {schedule.map((day) => (
+                <div key={day.date} className="tryout-popup-day">
+                  <div className="tryout-popup-date">{formatScheduleDate(day.date)}</div>
+                  <div className="tryout-popup-col-head">
+                    <span>Sport</span>
+                    <span>Time</span>
+                  </div>
+                  {day.rows.map((row, i) => (
+                    <div key={i} className="tryout-popup-row">
+                      <span className="tryout-popup-sport">
+                        {row.teamName.toUpperCase()}
+                        {row.roundLabel && <span className="tryout-popup-badge">{row.roundLabel}</span>}
+                      </span>
+                      <span className="tryout-popup-time">
+                        {formatScheduleTime(row.start)} – {formatScheduleTime(row.end)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
+          {notes.length > 0 && (
+            <div className="tryout-popup-notes">
+              <div className="tryout-popup-notes-title">Important</div>
+              <ul>{notes.map((note, i) => <li key={i}>{note}</li>)}</ul>
+            </div>
+          )}
+        </>
+      );
+    }
+
+    case "faq": {
+      const items = block.data.items || [];
+      if (items.length === 0) return null;
+      return (
+        <div className="tryout-popup-faq">
+          <div className="tryout-popup-section-title">Common Questions</div>
+          {items.map((item, i) => <PopupFaqItem key={i} item={item} />)}
+        </div>
+      );
+    }
+
+    case "button":
+      return (
+        <a className="promo-popup-cta" href={block.data.href}>
+          {block.data.label}
+          <Icon name="arrow-right" size={16} />
+        </a>
+      );
+
+    default:
+      return null;
+  }
+}
+
+function SitePopup() {
   const [open, setOpen] = useState(false);
-  const [schedule, setSchedule] = useState(null);
+  const [popup, setPopup] = useState(null);
 
   useEffect(() => {
-    if (new Date() > new Date(TRYOUT_POPUP_CONFIG.endsAt)) return;
-    let dismissed = false;
-    try { dismissed = !!sessionStorage.getItem(TRYOUT_POPUP_CONFIG.storageKey); } catch (_) {}
-    if (dismissed) return;
-
     let cancelled = false;
     let timer = null;
-    fetch(API_BASE + "/api/tryout-schedule")
+    fetch(API_BASE + "/api/popup")
       .then((r) => r.json())
       .then((data) => {
-        if (cancelled || !data || !Array.isArray(data.schedule)) return;
-        setSchedule(data);
+        if (cancelled || !data || !data.popup) return;
+        const p = data.popup;
+        if (p.endsAt && new Date() > new Date(p.endsAt)) return;
+        const storageKey = `slamPopupDismissed:${p.id}`;
+        let dismissed = false;
+        try { dismissed = !!sessionStorage.getItem(storageKey); } catch (_) {}
+        if (dismissed) return;
+
+        setPopup(p);
         timer = setTimeout(() => {
           if (cancelled) return;
           setOpen(true);
-          try { sessionStorage.setItem(TRYOUT_POPUP_CONFIG.storageKey, "1"); } catch (_) {}
-        }, 800);
+          try { sessionStorage.setItem(storageKey, "1"); } catch (_) {}
+        }, POPUP_OPEN_DELAY_MS);
       })
       .catch(() => {});
 
@@ -1997,63 +2084,14 @@ function TryoutPromoPopup() {
     };
   }, []);
 
-  if (!open || !schedule) return null;
+  if (!open || !popup) return null;
 
   return ReactDOM.createPortal(
-    <div className="promo-popup" role="dialog" aria-modal="true" aria-label={TRYOUT_POPUP_CONFIG.title}>
+    <div className="promo-popup" role="dialog" aria-modal="true" aria-label={popup.name}>
       <button className="promo-popup-backdrop" type="button" aria-label="Close" onClick={() => setOpen(false)} />
       <section className="promo-popup-panel promo-popup-panel--flyer">
         <button className="promo-popup-close" type="button" onClick={() => setOpen(false)}>&times;</button>
-        <div className="promo-popup-kicker">{TRYOUT_POPUP_CONFIG.kicker}</div>
-        <h3 className="promo-popup-title">{TRYOUT_POPUP_CONFIG.title}</h3>
-
-        {schedule.schedule.length === 0 ? (
-          <p className="promo-popup-note">Dates are being finalized — check back soon.</p>
-        ) : (
-          <div className="tryout-popup-schedule">
-            {schedule.schedule.map((day) => (
-              <div key={day.date} className="tryout-popup-day">
-                <div className="tryout-popup-date">{formatScheduleDate(day.date)}</div>
-                <div className="tryout-popup-col-head">
-                  <span>Sport</span>
-                  <span>Time</span>
-                </div>
-                {day.rows.map((row, i) => (
-                  <div key={i} className="tryout-popup-row">
-                    <span className="tryout-popup-sport">
-                      {row.teamName.toUpperCase()}
-                      {row.roundLabel && <span className="tryout-popup-badge">{row.roundLabel}</span>}
-                    </span>
-                    <span className="tryout-popup-time">
-                      {formatScheduleTime(row.start)} – {formatScheduleTime(row.end)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {schedule.notes && schedule.notes.length > 0 && (
-          <div className="tryout-popup-notes">
-            <div className="tryout-popup-notes-title">Important</div>
-            <ul>
-              {schedule.notes.map((note, i) => <li key={i}>{note}</li>)}
-            </ul>
-          </div>
-        )}
-
-        {schedule.faq && schedule.faq.length > 0 && (
-          <div className="tryout-popup-faq">
-            <div className="tryout-popup-section-title">Common Questions</div>
-            {schedule.faq.map((item, i) => <TryoutFaqItem key={i} item={item} />)}
-          </div>
-        )}
-
-        <a className="promo-popup-cta" href={TRYOUT_POPUP_CONFIG.href}>
-          {TRYOUT_POPUP_CONFIG.cta}
-          <Icon name="arrow-right" size={16} />
-        </a>
+        {popup.blocks.map((block, i) => <PopupBlock key={i} block={block} />)}
       </section>
     </div>,
     document.body
@@ -2065,7 +2103,7 @@ function HomeLayout({ heroBg }) {
   const loading = !loaded;
   return (
     <div className="home-layout">
-      <TryoutPromoPopup />
+      <SitePopup />
       <main className="main-scroll">
         <Hero bg={heroBg} />
         <BullsCommitmentCard />
