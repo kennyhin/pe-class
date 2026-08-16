@@ -47,7 +47,20 @@
     .choice.danger small { color:#ffb0b7; }
     .choice.closed { opacity:.42; cursor:not-allowed; transform:none !important; border-color:rgba(255,255,255,.08); box-shadow:none !important; }
     .choice.closed:hover { transform:none; border-color:rgba(255,255,255,.08); box-shadow:none; }
-    .choice.closed small { color:#666; }
+    .choice.closed { opacity:1; }
+    .choice.closed small { color:#ffb0b7; }
+    .choice.closed.soon { opacity:.42; }
+    .choice.closed.soon small { color:#666; }
+    a.season-link { color:#80FF00; font:800 11px monospace; letter-spacing:.08em; text-transform:uppercase; text-decoration:underline; text-underline-offset:3px; }
+    .choice.closed a.season-link { display:inline-block; margin-top:10px; pointer-events:auto; cursor:pointer; }
+    .other-seasons { margin:18px 0 0; }
+    .other-panel { margin-top:18px; border:1px solid rgba(255,255,255,.11); border-radius:16px; padding:14px 16px; background:rgba(0,0,0,.24); }
+    .other-panel p { color:#d5d5d5; font-size:13px; line-height:1.35; margin:0 0 10px; }
+    .other-panel ul { margin:6px 0 14px; padding-left:18px; color:#d5d5d5; }
+    .other-panel li { margin:6px 0; font-size:13px; }
+    .other-panel li b { color:#fff; }
+    .rail-filled { margin:0 0 16px; padding:0 0 14px; border-bottom:1px solid rgba(255,255,255,.1); }
+    .rail-filled p { color:#bbb; font-size:13px; line-height:1.35; margin:8px 0; }
     .fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; max-width:760px; }
     label { display:flex; flex-direction:column; gap:7px; color:#aaa; font:800 11px monospace; letter-spacing:.1em; text-transform:uppercase; }
     input, select, textarea { width:100%; border:1px solid rgba(255,255,255,.14); border-radius:12px; background:rgba(0,0,0,.28); color:#fff; font:16px Arial,Helvetica,sans-serif; padding:13px 14px; outline:none; }
@@ -156,14 +169,45 @@
     function seasonObj(){ return SPORTS[data.season]; }
     function sportObj(){ return (seasonObj()?.sports || []).find(function(s){ return s.sport === data.sport; }); }
     function divisionObj(){ return (sportObj()?.divisions || []).find(function(d){ return d.name === data.division; }); }
-    function divisionOpen(d){ return d.enabled !== false; }
-    function sportOpen(s){ return (s.divisions || []).some(divisionOpen); }
+    var FILLED_SPORTS = ['Girls Volleyball', 'Cross Country'];
+    var FILLED_DIVISIONS = ['ES K-1 T-Ball', 'ES 2-3 Coach Pitch Baseball'];
+    var FILLED_NOTE = 'Filled — teams decided, waitlist full';
+    var showingOtherSeasons = false;
+    function isFilledSport(s){ return !!s && FILLED_SPORTS.indexOf(s.sport) !== -1; }
+    function isFilledDivision(d){ return !!d && FILLED_DIVISIONS.indexOf(d.name) !== -1; }
+    function sportIsFilled(s){ return isFilledSport(s) || ((s.divisions || []).length > 0 && (s.divisions || []).every(isFilledDivision)); }
+    function divisionOpen(d){ return d.enabled !== false && !isFilledDivision(d); }
+    function sportOpen(s){ if (isFilledSport(s)) return false; return (s.divisions || []).some(divisionOpen); }
     function seasonOpen(key){ var s = SPORTS[key]; return !!s && (s.sports || []).some(sportOpen); }
-    function choice(label, sub, value, active, open) {
+    function choice(label, sub, value, active, open, filled) {
       if (!open) {
-        return '<div class="choice closed"><b>'+esc(label)+'</b><span>'+esc(sub||'')+'</span><small>Coming soon</small></div>';
+        if (filled) {
+          return '<div class="choice closed"><b>'+esc(label)+'</b><span>'+esc(sub||'')+'</span><small>'+FILLED_NOTE+'</small><a class="season-link" href="#winter-spring">See winter &amp; spring sports</a></div>';
+        }
+        return '<div class="choice closed soon"><b>'+esc(label)+'</b><span>'+esc(sub||'')+'</span><small>Coming soon</small></div>';
       }
       return '<button type="button" class="choice'+(active?' active':'')+'" data-value="'+esc(value)+'"><b>'+esc(label)+'</b><span>'+esc(sub||'')+'</span><small>Choose</small></button>';
+    }
+    function otherSeasonsPanel(){
+      var blocks = ['winter','spring'].map(function(key){
+        var s = SPORTS[key];
+        if (!s) return '';
+        var items = (s.sports || []).map(function(sp){
+          return '<li><b>'+esc(sp.sport)+'</b> — '+esc((sp.divisions||[]).map(function(d){ return d.name; }).join(', '))+'</li>';
+        }).join('');
+        return '<div class="notice-kicker">'+esc(s.label)+' · '+esc(s.dates)+'</div><ul>'+items+'</ul>';
+      }).join('');
+      return '<div class="other-panel" id="winter-spring"><div class="notice-kicker">Also offered</div><p>Winter and spring sports. Signup for these opens later.</p>'+blocks+'</div>';
+    }
+    function showWinterSpring(e){
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      showingOtherSeasons = true;
+      render();
+    }
+    function bindSeasonLinks(){
+      document.querySelectorAll('a.season-link').forEach(function(a){
+        a.addEventListener('click', showWinterSpring);
+      });
     }
     function esc(s){ return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
     function field(name,label,type,placeholder){
@@ -190,16 +234,30 @@
           return choice(SPORTS[k].label, SPORTS[k].dates, k, data.season===k, seasonOpen(k));
         }).join('') + '</div>';
       }
+      if (showingOtherSeasons) {
+        $('question').textContent = 'Winter and spring sports';
+        html = otherSeasonsPanel();
+        $('content').innerHTML = html;
+        bindSeasonLinks();
+        $('backBtn').disabled = false;
+        $('nextBtn').classList.add('hidden');
+        renderSummary();
+        return;
+      }
+      $('nextBtn').classList.remove('hidden');
       if (kind === 'sport') {
         $('question').textContent = 'Which sport?';
         html = '<div class="choices">' + (seasonObj()?.sports || []).map(function(s){
-          return choice(s.sport, s.divisions.map(function(d){return d.name;}).join(' / '), s.sport, data.sport===s.sport, sportOpen(s));
+          return choice(s.sport, s.divisions.map(function(d){return d.name;}).join(' / '), s.sport, data.sport===s.sport, sportOpen(s), sportIsFilled(s));
         }).join('') + '</div>';
+        if (data.season === 'fall') {
+          html += '<p class="other-seasons"><a class="season-link" href="#winter-spring">See other sports offered in winter and spring</a></p>';
+        }
       }
       if (kind === 'division') {
         $('question').textContent = 'Which division?';
         html = '<div class="choices">' + (sportObj()?.divisions || []).map(function(d){
-          return choice(d.name, 'Grades: ' + d.grades.join(', '), d.name, data.division===d.name, divisionOpen(d));
+          return choice(d.name, 'Grades: ' + d.grades.join(', '), d.name, data.division===d.name, divisionOpen(d), isFilledDivision(d));
         }).join('') + '</div>';
       }
       if (kind === 'grade') {
@@ -240,6 +298,7 @@
       $('content').innerHTML = html;
       document.querySelectorAll('.choice[data-value]').forEach(function(btn){ btn.addEventListener('click', function(){ selectChoice(btn.dataset.value); }); });
       document.querySelectorAll('.clearance').forEach(function(btn){ btn.addEventListener('click', function(){ saveInputs(); data.clearance = btn.dataset.value; render(); }); });
+      bindSeasonLinks();
       $('backBtn').disabled = step === 0;
       $('nextBtn').textContent = step === steps.length - 1 ? 'Submit' : 'Next';
       renderSummary();
@@ -293,7 +352,7 @@
       if (step < steps.length - 1) { step++; render(); return; }
       submit();
     }
-    function back(){ saveInputs(); if (step > 0) { step--; render(); } }
+    function back(){ saveInputs(); if (showingOtherSeasons) { showingOtherSeasons = false; render(); return; } if (step > 0) { step--; render(); } }
     function submit(){
       // AthleticsOS is the source of truth for the Tryout List. The old Google
       // Apps Script endpoint only wrote to a Sheet (and used no-cors, so failures
@@ -337,7 +396,9 @@
     function renderSummary(){
       var clearance = data.clearance === 'rmaPhysical' ? 'Physical uploaded to RMA' : data.clearance === 'waiver' ? 'Waiver signed' : '';
       var rows = [['Season', seasonObj()?.label], ['Sport', data.sport], ['Division', data.division], ['Grade', data.grade], ['Homeroom teacher', data.homeroomTeacher], ['Sizes', data.shirtSize && data.shortSize ? data.shirtSize + ' / ' + data.shortSize : ''], ['Numbers', [data.jersey1,data.jersey2,data.jersey3].filter(Boolean).join(', ')], ['Student', [data.firstName,data.lastName].filter(Boolean).join(' ')], ['Email', data.email], ['Physical / waiver', clearance]];
-      $('summary').innerHTML = rows.map(function(r){ return '<div><b>'+r[0]+'</b>'+esc(r[1] || 'Not selected')+'</div>'; }).join('');
+      var filled = '<div class="rail-filled"><div class="notice-kicker" style="color:#ff6b76">Filled</div><p>Girls Volleyball, Cross Country, T-Ball, and Coach Pitch are filled. Teams have been decided and waitlists are full.</p><p><a class="season-link" href="#winter-spring">See winter and spring sports</a></p></div>';
+      $('summary').innerHTML = filled + rows.map(function(r){ return '<div><b>'+r[0]+'</b>'+esc(r[1] || 'Not selected')+'</div>'; }).join('');
+      bindSeasonLinks();
     }
     $('nextBtn').addEventListener('click', next);
     $('backBtn').addEventListener('click', back);
