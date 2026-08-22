@@ -169,7 +169,7 @@
     function seasonObj(){ return SPORTS[data.season]; }
     function sportObj(){ return (seasonObj()?.sports || []).find(function(s){ return s.sport === data.sport; }); }
     function divisionObj(){ return (sportObj()?.divisions || []).find(function(d){ return d.name === data.division; }); }
-    var FILLED_SPORTS = ['Girls Volleyball', 'Cross Country'];
+    var FILLED_SPORTS = ['Girls Volleyball', 'Flag Football'];
     var FILLED_DIVISIONS = ['ES K-1 T-Ball', 'ES 2-3 Coach Pitch Baseball'];
     var FILLED_NOTE = 'Filled — teams decided, waitlist full';
     var showingOtherSeasons = false;
@@ -396,7 +396,7 @@
     function renderSummary(){
       var clearance = data.clearance === 'rmaPhysical' ? 'Physical uploaded to RMA' : data.clearance === 'waiver' ? 'Waiver signed' : '';
       var rows = [['Season', seasonObj()?.label], ['Sport', data.sport], ['Division', data.division], ['Grade', data.grade], ['Homeroom teacher', data.homeroomTeacher], ['Sizes', data.shirtSize && data.shortSize ? data.shirtSize + ' / ' + data.shortSize : ''], ['Numbers', [data.jersey1,data.jersey2,data.jersey3].filter(Boolean).join(', ')], ['Student', [data.firstName,data.lastName].filter(Boolean).join(' ')], ['Email', data.email], ['Physical / waiver', clearance]];
-      var filled = '<div class="rail-filled"><div class="notice-kicker" style="color:#ff6b76">Filled</div><p>Girls Volleyball, Cross Country, T-Ball, and Coach Pitch are filled. Teams have been decided and waitlists are full.</p><p><a class="season-link" href="#winter-spring">See winter and spring sports</a></p></div>';
+      var filled = '<div class="rail-filled"><div class="notice-kicker" style="color:#ff6b76">Filled</div><p>Flag Football, Girls Volleyball, T-Ball, and Coach Pitch are filled. Teams have been decided and waitlists are full. Cross Country is still open.</p><p><a class="season-link" href="#winter-spring">See winter and spring sports</a></p></div>';
       $('summary').innerHTML = filled + rows.map(function(r){ return '<div><b>'+r[0]+'</b>'+esc(r[1] || 'Not selected')+'</div>'; }).join('');
       bindSeasonLinks();
     }
