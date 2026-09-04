@@ -302,6 +302,7 @@ function Nav({ onOpenInfo }) {
   const items = [
     { label: "Register for sports", href: "slam-register.html" },
     { label: "Athletic eligibility", href: "slam-eligibility.html" },
+    { label: "Games & schedules", href: "games.html" },
     { label: "Sports physicals/insurance", href: "#physicals", infoKey: "physicals" },
     { label: "Bulls commitment", href: "#commitment" },
     { label: "Sports offered", href: "#sports", infoKey: "sports" },
@@ -394,6 +395,7 @@ function AnimatedHeadline({ text, className }) {
 const HERO_SHORTCUTS = [
   { key: "register", eyebrow: "Register", label: "Register for sports", href: "slam-register.html", mode: "page" },
   { key: "eligibility", eyebrow: "Eligibility", label: "Athletic eligibility", href: "slam-eligibility.html", mode: "page" },
+  { key: "schedules", eyebrow: "Schedules", label: "Games & schedules", href: "games.html", mode: "page" },
   { key: "physicals", eyebrow: "Physicals", label: "Sports physicals", href: "#physicals", mode: "info" },
   { key: "sports", eyebrow: "Sports", label: "Sports offered", href: "#sports", mode: "info" },
   { key: "tryouts", eyebrow: "Tryouts", label: "Tryout form", href: "slam-tryouts.html", mode: "page" },
