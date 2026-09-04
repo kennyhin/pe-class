@@ -5,12 +5,14 @@
   "use strict";
 
   var COMBINED_URL = "data/ncsaa-fall2026-games.json";
-  var PART_URLS = {
-    meta: "data/ncsaa-fall2026-meta.json",
-    flag: "data/ncsaa-fall2026-flag-football.json",
-    volleyball: "data/ncsaa-fall2026-girls-volleyball.json",
-    tball: "data/ncsaa-fall2026-t-ball-coach-pitch.json"
-  };
+  var INDEX_URL = "data/ncsaa-fall2026-index.json";
+  var META_URL = "data/ncsaa-fall2026-meta.json";
+  var FALLBACK_PARTS = [
+    [META_URL, ""],
+    ["data/ncsaa-fall2026-flag-football.json", "Flag Football"],
+    ["data/ncsaa-fall2026-girls-volleyball.json", "Girls Volleyball"],
+    ["data/ncsaa-fall2026-t-ball-coach-pitch.json", "T-Ball / Coach Pitch"]
+  ];
 
   var SPORTS = [
     { id: "all", label: "All" },
@@ -73,7 +75,7 @@
     var s = text(value).toLowerCase();
     if (!s) return "";
     if (s === "all") return "all";
-    if (s.indexOf("cross") !== -1 || s === "xc" || s.indexOf("xc ") !== -1) return "xc";
+    if (s.indexOf("cross") !== -1 || s === "xc" || s.indexOf("xc ") !== -1 || s.indexOf("xc_") !== -1) return "xc";
     if (s.indexOf("volley") !== -1) return "volleyball";
     if (s.indexOf("t-ball") !== -1 || s.indexOf("tball") !== -1 || s.indexOf("coach pitch") !== -1) return "tball";
     if (s.indexOf("flag") !== -1) return "flag";
@@ -205,7 +207,7 @@
           if (fallbackSport && !copy.sport) copy.sport = fallbackSport;
           if (key === "xc_meets" || key === "cross_country" || key === "meets") {
             if (!copy.sport) copy.sport = "Cross Country";
-            if (!copy.event_type) copy.event_type = "meet";
+            if (!copy.event_type) copy.event_type = copy.event_type || "xc_meet";
           }
           out.push(copy);
         });
@@ -257,10 +259,15 @@
     else if (typeof week === "number") week = "Week " + week;
     else week = text(week);
 
-    var title = text(raw.title || raw.name || raw.event || raw.meet);
+    var isMeet = eventType === "meet" || eventType === "xc_meet" || sportId(sport) === "xc";
+    if (isMeet) {
+      if (/^meet\b/i.test(home) && !away) home = "";
+      if (/^meet\b/i.test(away) && !home) away = "";
+    }
+    var title = text(raw.title || raw.name || raw.event || raw.meet || raw.date_display);
     if (!title) {
       if (eventType === "jamboree") title = "Flag Football Jamboree";
-      else if (eventType === "meet" || sportId(sport) === "xc") title = text(raw.meet) || "Cross Country meet";
+      else if (isMeet) title = text(raw.week || raw.home || raw.meet) || "Cross Country meet";
       else if (away && home) title = displayTeam(away, notes) + " vs " + displayTeam(home, notes);
       else title = sport;
     }
@@ -273,6 +280,7 @@
       date: date,
       start_time: start,
       venue: venue,
+      venue_map_url: text(raw.venue_map_url || raw.map_url || raw.map),
       away: away,
       home: home,
       awayLabel: displayTeam(away, notes),
@@ -340,7 +348,35 @@
       err.status = res.status;
       throw err;
     }
-    return res.json();
+    var raw = await res.text();
+    var trimmed = raw.trim();
+    if (!trimmed) throw new Error("Empty file " + url);
+    if (trimmed.indexOf("file://") === 0) {
+      throw new Error("Placeholder pointer in " + url + " — waiting for real JSON");
+    }
+    try {
+      return JSON.parse(trimmed);
+    } catch (err) {
+      throw new Error("Invalid JSON in " + url);
+    }
+  }
+
+  async function loadIndexParts() {
+    try {
+      var index = await fetchJson(INDEX_URL);
+      var parts = [[META_URL, ""]];
+      if (index && Array.isArray(index.files)) {
+        index.files.forEach(function (file) {
+          var path = text(file && (file.path || file.url || file.file));
+          var sport = text(file && file.sport);
+          if (path) parts.push([path, sport]);
+        });
+      }
+      if (index && index.meta) parts.unshift([text(index.meta), ""]);
+      return parts;
+    } catch (_) {
+      return FALLBACK_PARTS.slice();
+    }
   }
 
   async function loadData() {
@@ -355,17 +391,16 @@
       }
     }
 
-    var parts = [
-      [PART_URLS.meta, ""],
-      [PART_URLS.flag, "Flag Football"],
-      [PART_URLS.volleyball, "Girls Volleyball"],
-      [PART_URLS.tball, "T-Ball / Coach Pitch"]
-    ];
+    var parts = await loadIndexParts();
+    var seen = {};
     var found = 0;
     var lastError = "";
     for (var i = 0; i < parts.length; i++) {
+      var url = parts[i][0];
+      if (!url || seen[url]) continue;
+      seen[url] = true;
       try {
-        var payload = await fetchJson(parts[i][0]);
+        var payload = await fetchJson(url);
         applyPayload(payload, parts[i][1], bag);
         found += 1;
       } catch (err) {
@@ -374,6 +409,8 @@
     }
     if (!found) {
       bag.error = lastError || "Schedule JSON not found yet.";
+    } else if (!bag.rows.length) {
+      bag.error = lastError || "Schedule files loaded but no game rows yet.";
     }
     return bag;
   }
@@ -400,6 +437,7 @@
   function uniqueTeams(games) {
     var map = {};
     games.forEach(function (game) {
+      if (isMeetLike(game)) return;
       [game.away, game.home].forEach(function (raw, idx) {
         var label = idx === 0 ? game.awayLabel : game.homeLabel;
         if (!label) return;
@@ -433,8 +471,12 @@
     return groups;
   }
 
+  function isMeetLike(game) {
+    return game.event_type === "meet" || game.event_type === "xc_meet" || game.sportId === "xc";
+  }
+
   function matchupHtml(game) {
-    if (game.event_type === "jamboree" || game.event_type === "meet" || (!game.away && !game.home)) {
+    if (isMeetLike(game) || (!game.away && !game.home)) {
       return escapeHtml(game.title);
     }
     return escapeHtml(game.awayLabel || "TBD") +
@@ -623,6 +665,7 @@
       ["When", formatDate(game.date) + " · " + formatTime(game.start_time)],
       ["Opponent", game.awayLabel && game.homeLabel ? game.awayLabel + " at " + game.homeLabel : (game.title || "—")],
       ["Venue", game.venue || "TBD"],
+      ["Map", game.venue_map_url || ""],
       ["Sport", game.sport],
       ["Division", game.division || "—"],
       ["Week", game.week || "—"],
@@ -631,6 +674,7 @@
       ["Source", game.source || state.source]
     ];
     if (game.notes) rows.push(["Notes", game.notes]);
+    rows = rows.filter(function (row) { return text(row[1]); });
     els.detailBody.innerHTML =
       '<div class="detail-kicker">' + (game.slam ? "SLAM game" : "Elementary game") + "</div>" +
       "<h2 id=\"detail-title\">" + matchupHtml(game) + "</h2>" +
