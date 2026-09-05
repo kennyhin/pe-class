@@ -1,18 +1,32 @@
 {
   "season": "Fall 2026",
-  "generated_at": "2026-09-04T16:10:00-07:00",
   "timezone": "America/Los_Angeles",
-  "files": {
-    "meta": "data/ncsaa-fall2026-meta.json",
-    "flag-football": "data/ncsaa-fall2026-flag-football.json",
-    "girls-volleyball": "data/ncsaa-fall2026-girls-volleyball.json",
-    "t-ball-coach-pitch": "data/ncsaa-fall2026-t-ball-coach-pitch.json",
-    "combined": "data/ncsaa-fall2026-games.json"
-  },
-  "counts": {
-    "flag-football": 344,
-    "girls-volleyball": 184,
-    "t-ball-coach-pitch": 165,
-    "total_games": 693
-  }
+  "generated_at": "2026-09-04T16:10:00-07:00",
+  "meta": "data/ncsaa-fall2026-meta.json",
+  "files": [
+    {
+      "sport": "Girls Volleyball",
+      "path": "data/ncsaa-fall2026-girls-volleyball.json"
+    },
+    {
+      "sport": "Flag Football",
+      "path": "data/ncsaa-fall2026-flag-football-part1.json",
+      "part": 1
+    },
+    {
+      "sport": "Flag Football",
+      "path": "data/ncsaa-fall2026-flag-football-part2.json",
+      "part": 2
+    },
+    {
+      "sport": "T-Ball / Coach Pitch",
+      "path": "data/ncsaa-fall2026-t-ball-coach-pitch.json"
+    }
+  ],
+  "meta_includes": [
+    "jamboree",
+    "xc_meets",
+    "display_notes"
+  ],
+  "load_notes": "Concatenate flag part1.games + part2.games. Merge meta.jamboree and meta.xc_meets into the schedule list."
 }
