@@ -1,8 +1,8 @@
 /* Fall 2026 elementary games page.
-   Load order: data/ncsaa-fall2026-index.json → each listed path
-   (Flag part1.games + part2.games) → meta.jamboree + meta.xc_meets.
-   display_notes maps SLAM (Vevers-Royball) → Adrianna / Vevers-Royball.
-   Optional fallback: data/ncsaa-fall2026-games.json if a combined file appears. */
+   Load order: data/ncsaa-fall2026-index.json → each listed sport path
+   (flag-football, girls-volleyball, t-ball-coach-pitch) → meta.jamboree
+   + meta.xc_meets. display_notes maps SLAM (Vevers-Royball) →
+   Adrianna / Vevers-Royball. Fallback: data/ncsaa-fall2026-games.json. */
 (function () {
   "use strict";
 
@@ -11,6 +11,7 @@
   var META_URL = "data/ncsaa-fall2026-meta.json";
   var FALLBACK_PARTS = [
     [META_URL, ""],
+    ["data/ncsaa-fall2026-flag-football.json", "Flag Football"],
     ["data/ncsaa-fall2026-flag-football-part1.json", "Flag Football"],
     ["data/ncsaa-fall2026-flag-football-part2.json", "Flag Football"],
     ["data/ncsaa-fall2026-girls-volleyball.json", "Girls Volleyball"],
