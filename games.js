@@ -1,22 +1,23 @@
 /* Fall 2026 elementary games page.
-   Load order: data/ncsaa-fall2026-index.json → each listed sport path
-   (flag-football, girls-volleyball, t-ball-coach-pitch) → meta.jamboree
-   + meta.xc_meets. display_notes maps SLAM (Vevers-Royball) →
-   Adrianna / Vevers-Royball. Fallback: data/ncsaa-fall2026-games.json. */
+   Load: index.json → each listed file → concat Flag part1.games +
+   part2.games → append meta.jamboree + meta.xc_meets.
+   display_notes: SLAM (Vevers-Royball) → Adrianna / Vevers-Royball. */
 (function () {
   "use strict";
 
   var COMBINED_URL = "data/ncsaa-fall2026-games.json";
   var INDEX_URL = "data/ncsaa-fall2026-index.json";
   var META_URL = "data/ncsaa-fall2026-meta.json";
+  var FLAG_PARTS = [
+    ["data/ncsaa-fall2026-flag-football-part1.json", "Flag Football"],
+    ["data/ncsaa-fall2026-flag-football-part2.json", "Flag Football"]
+  ];
+  var FLAG_SINGLE = ["data/ncsaa-fall2026-flag-football.json", "Flag Football"];
   var FALLBACK_PARTS = [
     [META_URL, ""],
-    ["data/ncsaa-fall2026-flag-football.json", "Flag Football"],
-    ["data/ncsaa-fall2026-flag-football-part1.json", "Flag Football"],
-    ["data/ncsaa-fall2026-flag-football-part2.json", "Flag Football"],
     ["data/ncsaa-fall2026-girls-volleyball.json", "Girls Volleyball"],
     ["data/ncsaa-fall2026-t-ball-coach-pitch.json", "T-Ball / Coach Pitch"]
-  ];
+  ].concat(FLAG_PARTS);
 
   var SPORTS = [
     { id: "all", label: "All" },
@@ -365,10 +366,20 @@
     }
   }
 
+  function isFlagSinglePath(path) {
+    return /ncsaa-fall2026-flag-football\.json$/.test(text(path));
+  }
+
+  function expandListedFile(path, sport) {
+    if (isFlagSinglePath(path)) return FLAG_PARTS.slice();
+    return [[path, sport || ( /flag-football/i.test(path) ? "Flag Football" : "")]];
+  }
+
   async function loadIndexParts() {
+    var parts = [[META_URL, ""]];
     try {
       var index = await fetchJson(INDEX_URL);
-      var parts = [[META_URL, ""]];
+      if (index && index.meta) parts.unshift([text(index.meta), ""]);
       if (index && Array.isArray(index.files)) {
         index.files.forEach(function (file) {
           var path = "";
@@ -379,19 +390,20 @@
             path = text(file.path || file.url || file.file);
             sport = text(file.sport);
           }
-          if (path) parts.push([path, sport]);
+          if (!path) return;
+          expandListedFile(path, sport).forEach(function (entry) { parts.push(entry); });
         });
       } else if (index && index.files && typeof index.files === "object") {
         Object.keys(index.files).forEach(function (key) {
           var path = text(index.files[key]);
-          if (path) parts.push([path, ""]);
+          if (!path) return;
+          expandListedFile(path, "").forEach(function (entry) { parts.push(entry); });
         });
       }
-      if (index && index.meta) parts.unshift([text(index.meta), ""]);
-      return parts;
-    } catch (_) {
-      return FALLBACK_PARTS.slice();
-    }
+      FLAG_PARTS.forEach(function (entry) { parts.push(entry); });
+      if (parts.length > 1) return parts;
+    } catch (_) {}
+    return FALLBACK_PARTS.slice();
   }
 
   async function loadData() {
@@ -399,6 +411,7 @@
     var parts = await loadIndexParts();
     var seen = {};
     var found = 0;
+    var loadedFlagPart = false;
     var lastError = "";
     for (var i = 0; i < parts.length; i++) {
       var url = parts[i][0];
@@ -408,11 +421,24 @@
         var payload = await fetchJson(url);
         applyPayload(payload, parts[i][1], bag);
         found += 1;
+        if (/flag-football-part/i.test(url) && collectFromPayload(payload, "Flag Football").length) {
+          loadedFlagPart = true;
+        }
       } catch (err) {
         lastError = (err && err.message) || String(err);
       }
     }
+    if (!loadedFlagPart) {
+      try {
+        applyPayload(await fetchJson(FLAG_SINGLE[0]), FLAG_SINGLE[1], bag);
+      } catch (_) {}
+    }
     if (bag.rows.length) return bag;
+
+    try {
+      applyPayload(await fetchJson(FLAG_SINGLE[0]), FLAG_SINGLE[1], bag);
+      if (bag.rows.length) return bag;
+    } catch (_) {}
 
     try {
       var combined = await fetchJson(COMBINED_URL);
