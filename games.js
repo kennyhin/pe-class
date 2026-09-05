@@ -1,6 +1,8 @@
 /* Fall 2026 elementary games page.
-   TODO: Prefer data/ncsaa-fall2026-games.json once the parallel executor
-   pushes it. Until then, merge the per-sport + meta files listed below. */
+   Load order: data/ncsaa-fall2026-index.json → each listed path
+   (Flag part1.games + part2.games) → meta.jamboree + meta.xc_meets.
+   display_notes maps SLAM (Vevers-Royball) → Adrianna / Vevers-Royball.
+   Optional fallback: data/ncsaa-fall2026-games.json if a combined file appears. */
 (function () {
   "use strict";
 
@@ -9,6 +11,8 @@
   var META_URL = "data/ncsaa-fall2026-meta.json";
   var FALLBACK_PARTS = [
     [META_URL, ""],
+    ["data/ncsaa-fall2026-flag-football-part1.json", "Flag Football"],
+    ["data/ncsaa-fall2026-flag-football-part2.json", "Flag Football"],
     ["data/ncsaa-fall2026-flag-football.json", "Flag Football"],
     ["data/ncsaa-fall2026-girls-volleyball.json", "Girls Volleyball"],
     ["data/ncsaa-fall2026-t-ball-coach-pitch.json", "T-Ball / Coach Pitch"]
@@ -381,16 +385,6 @@
 
   async function loadData() {
     var bag = { rows: [], notes: mergeNotes(), source: DEFAULT_SOURCE };
-    try {
-      var combined = await fetchJson(COMBINED_URL);
-      applyPayload(combined, "", bag);
-      if (bag.rows.length) return bag;
-    } catch (err) {
-      if (err && err.status && err.status !== 404) {
-        console.warn("Combined schedule failed", err);
-      }
-    }
-
     var parts = await loadIndexParts();
     var seen = {};
     var found = 0;
@@ -407,6 +401,16 @@
         lastError = (err && err.message) || String(err);
       }
     }
+    if (bag.rows.length) return bag;
+
+    try {
+      var combined = await fetchJson(COMBINED_URL);
+      applyPayload(combined, "", bag);
+      if (bag.rows.length) return bag;
+    } catch (err) {
+      if (!lastError) lastError = (err && err.message) || String(err);
+    }
+
     if (!found) {
       bag.error = lastError || "Schedule JSON not found yet.";
     } else if (!bag.rows.length) {
@@ -652,10 +656,9 @@
     }
     els.status.hidden = false;
     els.status.innerHTML =
-      "<strong>TODO — schedule data is not on this deploy yet.</strong><br>" +
-      "This draft page is ready and will load <code>data/ncsaa-fall2026-games.json</code> " +
-      "or the merged per-sport files (<code>meta</code>, <code>flag-football</code>, " +
-      "<code>girls-volleyball</code>, <code>t-ball-coach-pitch</code>) as soon as they land on this branch.<br>" +
+      "<strong>Schedule data did not load.</strong><br>" +
+      "Expected <code>data/ncsaa-fall2026-index.json</code> plus the sport JSON paths it lists, " +
+      "and <code>data/ncsaa-fall2026-meta.json</code> for jamboree, XC, and display notes.<br>" +
       (state.error ? "Last load note: " + escapeHtml(state.error) : "");
   }
 
