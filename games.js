@@ -75,9 +75,9 @@
     var s = text(value).toLowerCase();
     if (!s) return "";
     if (s === "all") return "all";
-    if (s.indexOf("cross") !== -1 || s === "xc" || s.indexOf("xc ") !== -1 || s.indexOf("xc_") !== -1) return "xc";
+    if (s.indexOf("cross") !== -1 || s === "xc" || /\bxc\b/.test(s) || s.indexOf("xc_meet") !== -1) return "xc";
     if (s.indexOf("volley") !== -1) return "volleyball";
-    if (s.indexOf("t-ball") !== -1 || s.indexOf("tball") !== -1 || s.indexOf("coach pitch") !== -1) return "tball";
+    if (/\bt-?ball\b/.test(s) || s.indexOf("coach pitch") !== -1 || s.indexOf("tee-ball") !== -1 || s.indexOf("tee ball") !== -1) return "tball";
     if (s.indexOf("flag") !== -1) return "flag";
     return s.replace(/[^a-z0-9]+/g, "-");
   }
