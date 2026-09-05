@@ -1,1 +1,26 @@
-{"season":"Fall 2026","files":["data/ncsaa-fall2026-meta.json","data/ncsaa-fall2026-girls-volleyball.json","data/ncsaa-fall2026-t-ball-coach-pitch.json","data/ncsaa-fall2026-flag-football-part1.json","data/ncsaa-fall2026-flag-football-part2.json"],"notes":"Merge part1+part2 games arrays for Flag Football; meta has jamboree + xc_meets + display_notes"}
+{
+  "season": "Fall 2026",
+  "timezone": "America/Los_Angeles",
+  "generated_at": "2026-09-04T16:10:00-07:00",
+  "meta": "data/ncsaa-fall2026-meta.json",
+  "combined": "data/ncsaa-fall2026-games.json",
+  "files": [
+    {
+      "sport": "Girls Volleyball",
+      "path": "data/ncsaa-fall2026-girls-volleyball.json"
+    },
+    {
+      "sport": "Flag Football",
+      "path": "data/ncsaa-fall2026-flag-football.json"
+    },
+    {
+      "sport": "T-Ball / Coach Pitch",
+      "path": "data/ncsaa-fall2026-t-ball-coach-pitch.json"
+    }
+  ],
+  "meta_includes": [
+    "jamboree",
+    "xc_meets",
+    "display_notes"
+  ]
+}
