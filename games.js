@@ -13,7 +13,6 @@
     [META_URL, ""],
     ["data/ncsaa-fall2026-flag-football-part1.json", "Flag Football"],
     ["data/ncsaa-fall2026-flag-football-part2.json", "Flag Football"],
-    ["data/ncsaa-fall2026-flag-football.json", "Flag Football"],
     ["data/ncsaa-fall2026-girls-volleyball.json", "Girls Volleyball"],
     ["data/ncsaa-fall2026-t-ball-coach-pitch.json", "T-Ball / Coach Pitch"]
   ];
@@ -371,9 +370,20 @@
       var parts = [[META_URL, ""]];
       if (index && Array.isArray(index.files)) {
         index.files.forEach(function (file) {
-          var path = text(file && (file.path || file.url || file.file));
-          var sport = text(file && file.sport);
+          var path = "";
+          var sport = "";
+          if (typeof file === "string") {
+            path = text(file);
+          } else if (file) {
+            path = text(file.path || file.url || file.file);
+            sport = text(file.sport);
+          }
           if (path) parts.push([path, sport]);
+        });
+      } else if (index && index.files && typeof index.files === "object") {
+        Object.keys(index.files).forEach(function (key) {
+          var path = text(index.files[key]);
+          if (path) parts.push([path, ""]);
         });
       }
       if (index && index.meta) parts.unshift([text(index.meta), ""]);
